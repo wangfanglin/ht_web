@@ -1,0 +1,144 @@
+<% layout('/layouts/default.html', {title: '换新工单历史管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa icon-notebook"></i> ${text('换新工单历史管理')}
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+				<% if(hasPermi('renew:htRenewHistory:edit')){ %>
+					<a href="${ctx}/renew/htRenewHistory/form" class="btn btn-default btnTool" title="${text('新增换新工单历史')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
+				<% } %>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${htRenewHistory}" action="${ctx}/renew/htRenewHistory/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="form-group">
+					<label class="control-label">${text('环节说明')}：</label>
+					<div class="control-inline">
+						<#form:input path="taskRemarks" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('环节处理人')}：</label>
+					<div class="control-inline">
+						<#form:input path="taskBy" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('活动id')}：</label>
+					<div class="control-inline">
+						<#form:input path="activityId" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('工单id')}：</label>
+					<div class="control-inline">
+						<#form:input path="formId" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('联系情况')}：</label>
+					<div class="control-inline">
+						<#form:input path="contactStatus" maxlength="10" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('再次沟通时间')}：</label>
+					<div class="control-inline">
+						<#form:input path="againDate" readonly="true" maxlength="20" class="form-control Wdate-datetime"
+							dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:false});"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('理赔资料状态')}：</label>
+					<div class="control-inline">
+						<#form:input path="claimStatus" maxlength="10" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('核实理赔资料')}：</label>
+					<div class="control-inline">
+						<#form:input path="claimData" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('手机品牌')}：</label>
+					<div class="control-inline">
+						<#form:input path="phoneBrand" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('理赔是否齐全齐全1是，2否')}：</label>
+					<div class="control-inline">
+						<#form:input path="isQualified" maxlength="10" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('手机型号')}：</label>
+					<div class="control-inline">
+						<#form:input path="phoneType" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('手机颜色')}：</label>
+					<div class="control-inline">
+						<#form:input path="phoneColor" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('相关图片')}：</label>
+					<div class="control-inline">
+						<#form:input path="image" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="reset" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'${text("环节说明")}', name:'taskRemarks', index:'a.task_remarks', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			return '<a href="${ctx}/renew/htRenewHistory/form?id='+row.id+'" class="btnList" data-title="${text("编辑换新工单历史")}">'+(val||row.id)+'</a>';
+		}},
+		{header:'${text("环节处理人")}', name:'taskBy', index:'a.task_by', width:150, align:"left"},
+		{header:'${text("活动id")}', name:'activityId', index:'a.activity_id', width:150, align:"left"},
+		{header:'${text("工单id")}', name:'formId', index:'a.form_id', width:150, align:"left"},
+		{header:'${text("联系情况")}', name:'contactStatus', index:'a.contact_status', width:150, align:"left"},
+		{header:'${text("再次沟通时间")}', name:'againDate', index:'a.again_date', width:150, align:"center"},
+		{header:'${text("理赔资料状态")}', name:'claimStatus', index:'a.claim_status', width:150, align:"left"},
+		{header:'${text("核实理赔资料")}', name:'claimData', index:'a.claim_data', width:150, align:"left"},
+		{header:'${text("手机品牌")}', name:'phoneBrand', index:'a.phone_brand', width:150, align:"left"},
+		{header:'${text("理赔是否齐全齐全1是，2否")}', name:'isQualified', index:'a.is_qualified', width:150, align:"left"},
+		{header:'${text("手机型号")}', name:'phoneType', index:'a.phone_type', width:150, align:"left"},
+		{header:'${text("手机颜色")}', name:'phoneColor', index:'a.phone_color', width:150, align:"left"},
+		{header:'${text("相关图片")}', name:'image', index:'a.image', width:150, align:"left"},
+		{header:'${text("更新时间")}', name:'updateDate', index:'a.update_date', width:150, align:"center"},
+		{header:'${text("备注信息")}', name:'remarks', index:'a.remarks', width:150, align:"left"},
+		{header:'${text("操作")}', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('renew:htRenewHistory:edit')){ %>
+				actions.push('<a href="${ctx}/renew/htRenewHistory/form?id='+row.id+'" class="btnList" title="${text("编辑换新工单历史")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+				actions.push('<a href="${ctx}/renew/htRenewHistory/delete?id='+row.id+'" class="btnList" title="${text("删除换新工单历史")}" data-confirm="${text("确认要删除该换新工单历史吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			<% } %>
+			return actions.join('');
+		}}
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>

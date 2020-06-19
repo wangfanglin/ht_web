@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.htuserapplyinfo.dao.HtUserApplyInfoDao">
+    <insert id="insertApplyLog">
+        insert into ht_apply_log (id,apply_id,create_date)values(null,#{applyId},NOW())
+    </insert>
+
+    <!-- 查询数据
+    <select id="findList" resultType="HtUserApplyInfo">
+        SELECT ${sqlMap.column.toSql()}
+        FROM ${sqlMap.table.toSql()}
+        <where>
+            ${sqlMap.where.toSql()}
+        </where>
+        ORDER BY ${sqlMap.order.toSql()}
+    </select> -->
+
+    <select id="findByFormId" resultType="com.jeesite.modules.htuserapplyinfo.entity.HtUserApplyInfo">
+        select * from ht_user_apply_info where form_id=#{formId}
+    </select>
+    <select id="finfArea" resultType="java.util.Map">
+         select * from ht_user_apply_area where id=#{areaId}
+    </select>
+    <select id="findPartImgs" resultType="java.util.Map">
+              select bad_side_wimg,bad_side_oimg,bad_reverse_img,bad_front_img,
+card_reverse_img ,  card_front_img  , card_hand_img ,
+voucher_img
+from ht_user_apply_info where id=#{id}
+    </select>
+    <select id="check" resultType="java.lang.Integer">
+        select count(1) from ht_apply_log where apply_id = #{applyId}
+    </select>
+    <select id="findUserByPolicy" resultType="java.lang.String">
+        select user_id  from ht_user_apply_info where policy_id = #{policyId} order by create_date  desc limit 1
+    </select>
+
+
+
+    <select id="getByClmNo" resultType="HtUserApplyInfo">
+    SELECT ${sqlMap.column.toSql()}
+    FROM ${sqlMap.table.toSql()}
+    <where>
+        clm_no = #{clmNo}
+    </where>
+    ORDER BY ${sqlMap.order.toSql()}
+    limit 1
+    </select>
+
+</mapper>

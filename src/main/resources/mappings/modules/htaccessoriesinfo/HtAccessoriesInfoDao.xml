@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.htaccessoriesinfo.dao.HtAccessoriesInfoDao">
+	
+	<!-- 查询数据
+	<select id="findList" resultType="HtAccessoriesInfo">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+	</select> -->
+	<select id="getAccessoriesInfoList" resultType="HtAccessoriesInfo">
+	  SELECT
+		a.`id` AS "id",
+		a.`name` AS "name",
+		a.`type` AS "type",
+		a.`is_original` AS "isOriginal",
+		a.`category` AS "category",
+		a.`assembly_id` AS "assemblyId",
+		a.`price` AS "price",
+		a.`is_start` AS "isStart",
+		a.`create_date` AS "createDate",
+		a.`create_by` AS "createBy",
+		a.`update_date` AS "updateDate",
+		a.`update_by` AS "updateBy",
+		a.`remark` AS "remark",
+		a.`status` AS "status",
+		b.`id` AS "htAssemblyUnit.id",
+		b.`name` AS "htAssemblyUnit.name",
+		b.`main_flag` AS "htAssemblyUnit.mainFlag",
+		b.`category` AS "htAssemblyUnit.category",
+		b.`is_start` AS "htAssemblyUnit.isStart",
+		b.`create_date` AS "htAssemblyUnit.createDate",
+		b.`update_date` AS "htAssemblyUnit.updateDate",
+		b.`update_by` AS "htAssemblyUnit.updateBy",
+		b.`remark` AS "htAssemblyUnit.remark",
+		b.`status` AS "htAssemblyUnit.status",
+		b.`create_by` AS "htAssemblyUnit.createBy",
+			(
+					SELECT
+						group_concat(h.`name` SEPARATOR ',')
+					FROM
+						ht_brand_info h
+					WHERE
+						id IN (SELECT d.brand_id
+							FROM 	ht_accessories_phone_brand d
+							WHERE d.accessories_info_id = a.id )) AS "phoneBrand",
+				(
+					SELECT
+						group_concat(`model` SEPARATOR ',')
+					FROM
+						ht_phone_model_info
+					WHERE
+						id IN (SELECT e.phone_model_id
+							FROM 	ht_accessories_phone_model e
+							WHERE e.accessories_info_id = a.id )) AS "phoneModel"
+			FROM
+				`ht_accessories_info` a
+			LEFT JOIN `ht_assembly_unit` b ON b.id = a.assembly_id
+			<where>
+				a.`status` != '1'
+				<if test="name !=null and name!='' ">
+					and a.`name` like CONCAT('%',#{name},'%')
+				</if>
+				<if test="status !=null and status!='' ">
+					and a.`status` = #{status}
+				</if>
+			</where>
+			<if test="page != null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</if>
+	</select>
+</mapper>

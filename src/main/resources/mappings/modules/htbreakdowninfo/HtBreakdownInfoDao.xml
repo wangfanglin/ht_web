@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.htbreakdowninfo.dao.HtBreakdownInfoDao">
+	
+	<!-- 查询数据
+	<select id="findList" resultType="HtBreakdownInfo">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+	</select> -->
+	<insert id="saveBreakDownMiddle" parameterType="java.util.List">
+		INSERT INTO ht_breakdown_assembly (
+		breakdown_id,
+		is_zf,
+		assembly_id
+		)VALUES
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.breakdown_id,jdbcType=VARCHAR},
+			#{item.is_zf,jdbcType=CHAR},
+			#{item.assembly_id,jdbcType=VARCHAR}
+			)
+		</foreach>
+	</insert>
+	<select id="findAssemblyConcat" resultType="HtBreakdownInfo">
+			SELECT
+				a.id,
+				a.break_type,
+				a.create_date,
+				a.create_by,
+				a.update_date,
+				a.update_by,
+				a.remark,
+				a. STATUS,
+				(SELECT group_concat(`name` SEPARATOR '+') FROM ht_assembly_unit WHERE id in(SELECT e.assembly_id FROM ht_breakdown_assembly e WHERE breakdown_id = a.id ORDER BY is_zf DESC)) AS "assemblyConcat"
+			FROM
+				ht_breakdown_info a
+			WHERE
+				a.`status` = '0' and a.break_type like CONCAT('%',#{breakType},'%')
+		<if test="page != null and page.orderBy != null and page.orderBy != ''">
+			ORDER BY ${page.orderBy}
+		</if>
+	</select>
+	<select id="getBreakDownAssemblyList" resultType="java.util.Map">
+		SELECT is_zf,assembly_id FROM ht_breakdown_assembly WHERE breakdown_id = #{breakdownId}
+	</select>
+	<delete id="delBreakDownMiddle">
+		DELETE FROM ht_breakdown_assembly WHERE breakdown_id = #{breakDownInfoId}
+	</delete>
+	<select id="getAreaByLevel" resultType="java.util.Map">
+		SELECT area_code,area_name FROM js_sys_area WHERE area_type = #{level}  AND `status` = '0'
+	</select>
+	<select id="getAreaLinkage" resultType="Area" parameterType="java.util.List">
+		SELECT area_code,area_name FROM js_sys_area WHERE area_type = '2'  AND `status` = '0'
+		AND
+		<foreach item="item" collection="list" separator="OR" open="(" close=")" index="">
+			parent_code =  #{item}
+		</foreach>
+	</select>
+	<select id="getOfficeList" resultType="java.util.Map">
+		SELECT office_code,office_name FROM js_sys_office WHERE parent_codes LIKE "%XS001%" AND office_type = '2' AND `status` = '0'
+	</select>
+	<select id="getBreakDownInfo" resultType="java.util.Map">
+		SELECT
+			c.breakdown_id,COUNT(1) AS "count",group_concat(c.assembly_id SEPARATOR ',') AS "str"
+		FROM
+			ht_breakdown_assembly c INNER JOIN ht_breakdown_info o ON c.breakdown_id = o.id AND o.`status` = '0'
+		GROUP BY
+	breakdown_id  HAVING COUNT(1) = #{counts}
+	</select>
+
+</mapper>

@@ -1,0 +1,112 @@
+<% layout('/layouts/default.html', {title: '方案选择', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-body">
+			<#form:form id="searchForm" action="${ctx}/repair/htRepairClientForm/selectListData" method="post" class="form-inline "
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<#form:hidden name="assemblyId" value="${assemblyId}"/>
+				<#form:hidden name="phoneModelId" value="${phoneModelId}"/>
+
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">查询</button>
+					<button type="reset" class="btn btn-default btn-sm">重置</button>
+				</div>
+			</#form:form>	
+			<div class="row">
+				<div class="col-xs-10 pr10">
+					<table id="dataGrid"></table>
+					<div id="dataGridPage"></div>
+				</div>
+				<div class="col-xs-2 pl0">
+					<div id="selectData" class="tags-input"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+var selectData = ${isNotBlank(selectData!) ? selectData! : "{\}"},
+selectNum = 0, dataGrid = $('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'${text("主键")}', name:'id',hidden:true, index:'a.id', width:200, align:"center"},
+		{header:'${text("损坏部位")}', name:'sunhuaibuwei', index:'a.name', width:200, align:"center"},
+		{header:'${text("配件名称")}', name:'peijian', index:'u.name', width:200, align:"center"},
+		{header:'${text("配件品质")}', name:'is_original', index:'a.is_original', width:200, align:"center"},
+		{header:'${text("配件报价")}', name:'price', index:'a.price', width:200, align:"center"},
+		{header:'${text("属性名称")}', width:200, align:"center"},
+		{header:'${text("属性值名称")}', width:200, align:"center"},
+		{header:'行数据', name:'rowData', hidden:true, formatter: function(val, obj, row, act){
+			return JSON.stringify(row);
+		}}
+	],
+	autoGridHeight: function(){
+		var height = $(window).height() - $('#searchForm').height() - $('#dataGridPage').height() - 75;
+		$('.tags-input').height($('.ui-jqgrid').height() - 10);
+		return height;
+	},
+	showCheckbox: '${parameter.checkbox}' == 'true',
+	multiboxonly: false, // 单击复选框时再多选
+	ajaxSuccess: function(data){
+		$.each(selectData, function(key, value){
+			dataGrid.dataGrid('setSelectRow', key);
+		});
+		initSelectTag();
+	},
+	onSelectRow: function(id, isSelect, event){
+		if ('${parameter.checkbox}' == 'true'){
+			if(isSelect){
+				selectData[id] = JSON.parse(dataGrid.dataGrid('getRowData', id).rowData);
+			}else{
+				delete selectData[id];
+			}
+		}else{
+			selectData = {};
+			selectData[id] = JSON.parse(dataGrid.dataGrid('getRowData', id).rowData);
+		}
+		initSelectTag();
+	},
+	onSelectAll: function(ids, isSelect){
+		if ('${parameter.checkbox}' == 'true'){
+			for (var i=0; i<ids.length; i++){
+				if(isSelect){
+					selectData[ids[i]] = JSON.parse(dataGrid.dataGrid('getRowData', ids[i]).rowData);
+				}else{
+					delete selectData[ids[i]];
+				}
+			}
+		}
+		initSelectTag();
+	},
+	ondblClickRow: function(id, rownum, colnum, event){
+		if ('${parameter.checkbox}' != 'true'){
+			js.layer.$('#' + window.name).closest('.layui-layer')
+				.find(".layui-layer-btn0").trigger("click");
+		}
+		initSelectTag();
+	}
+});
+function initSelectTag(){
+	selectNum = 0;
+	var html = [];
+	$.each(selectData, function(key, value){
+		selectNum ++;
+		html.push('<span class="tag" id="'+key+'_tags-input"><span>'+value.peijian+' </span>'
+			+ '<a href="#" onclick="removeSelectTag(\''+key+'\');" title="${text("取消选择")}">x</a></span>');
+	});
+	html.unshift('<div class="title">${text("当前已选择 {0\} 项", "<span id=\"selectNum\">'+selectNum+'</span>")}：</div>');
+	$('#selectData').empty().append(html.join(''));
+}
+function removeSelectTag(key){
+	delete selectData[key];
+	dataGrid.dataGrid('resetSelection', key);
+	$('#selectNum').html(--selectNum);
+	$('#'+key+'_tags-input').remove();
+}
+function getSelectData(){
+	return selectData;
+}
+
+
+</script>

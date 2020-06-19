@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.policy.dao.JxPolicyInfoDao">
+
+	<!-- 查询数据
+	<select id="findList" resultType="JxPolicyInfo">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+	</select> -->
+
+
+
+	<select id="findNewList" resultType="JxPolicyInfo">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+		not exists (select id from jx_convert b where a.id = b.id )
+		and a.dateeffectivedate is not null
+		and a.dateenddate is not null
+		</where>
+		ORDER BY a.createdate desc
+		limit 10
+	</select>
+
+</mapper>

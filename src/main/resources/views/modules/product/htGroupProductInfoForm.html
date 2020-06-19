@@ -1,0 +1,138 @@
+<% layout('/layouts/default.html', {title: '组合产品表管理', libs: ['validate']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-title">
+				<i class="fa icon-note"></i> ${text(htGroupProductInfo.isNewRecord ? '新增组合产品表' : '编辑组合产品表')}
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${htGroupProductInfo}" action="${ctx}/product/htGroupProductInfo/next" method="post" class="form-horizontal">
+			<div class="box-body">
+				<div class="form-unit">${text('基本信息')}</div>
+                <div class="row">
+                    <div class="col-xs-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" title="">
+                                <span class="required ">*</span> ${text('组合产品名称')}：<i
+                                    class="fa icon-question hide"></i></label>
+                            <div class="col-sm-8">
+                                <#form:input path="productName" maxlength="255" class="form-control required"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" title="">
+                                <span class="required ">*</span> ${text('组合产品ID')}：<i
+                                    class="fa icon-question hide"></i></label>
+                            <div class="col-sm-8">
+                                <#form:input path="id" maxlength="64" class="form-control required"
+                                disabled="disabled"/>
+                                <#form:hidden path="id"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-xs-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" title="">
+                                <span class="required ">*</span> ${text('组合方式')}：<i
+                                    class="fa icon-question hide"></i></label>
+                            <div class="col-sm-8">
+                                <#form:checkbox path="combinationType" dictType="combination_type" class="form-control required"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-7" title="">
+                                <span class="required ">*</span> ${text('产品有效期是否单独设置(维修、换新、数据保)')}<i
+                                    class="fa icon-question hide"></i></label>
+                            <div class="col-sm-5">
+                                <#form:radio path="isSingleValidity" dictType="common_status" class="form-control required"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-xs-4">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" title="">
+                                <span class="required ">*</span> ${text('终止规则')}：<i class="fa icon-question hide"></i></label>
+                            <div class="col-sm-8">
+                                <#form:radio path="terminationRules" dictType="termination_rules" class="form-control required" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                </div>
+
+
+			</div>
+
+
+
+			<div class="box-footer">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('product:htGroupProductInfo:edit')){ %>
+                        <#form:input id="isNewRecord" name="isNewRecord" value="true"  style="display: none"/>
+							<button type="button" class="btn btn-sm btn-primary" id="btnSubmit" onclick="sub()"><i class="fa fa-check"></i> ${text('下一步')}</button>&nbsp;
+						<% } %>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script>
+    function sub() {
+      var productName =  $("#productName").val();
+      var id =  $("#id").val();
+      var combinationType =  $("input:checkbox[name='combinationType']:checked").val();
+      console.log("组合方式："+combinationType)
+      var isSingleValidity =  $("input:radio[name='isSingleValidity']:checked").val();
+        console.log("生效规则："+isSingleValidity)
+      var terminationRules =  $("input:radio[name='terminationRules']:checked").val();
+        console.log("终止规则："+terminationRules)
+        if (productName == null || productName == "" || productName == undefined) {
+            js.showMessage("请输入产品名称！", "", 'warning', 4000);
+            return;
+        }
+        if (id == null || id == "" || id == undefined) {
+            js.showMessage("请输入产品ID！", "", 'warning', 4000);
+            return;
+        }
+        if (combinationType == null || combinationType == "" || combinationType == undefined) {
+            js.showMessage("请选择产品组合方式！", "", 'warning', 4000);
+            return;
+        }
+        if (isSingleValidity == null || isSingleValidity == "" || isSingleValidity == undefined) {
+            js.showMessage("请选择产品有效期规则！", "", 'warning', 4000);
+            return;
+        }
+        if (terminationRules == null || terminationRules == "" || terminationRules == undefined) {
+            js.showMessage("请选择产品终止规则！", "", 'warning', 4000);
+            return;
+        }
+            $("#inputForm").submit();
+    }
+</script>

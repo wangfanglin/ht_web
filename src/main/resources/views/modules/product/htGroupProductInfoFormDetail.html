@@ -1,0 +1,826 @@
+<% layout('/layouts/default.html', {title: '组合产品表管理', libs: ['validate','dataGrid']}){ %>
+<script>
+    $(function () {
+        let flag =  $("input:radio[name='priceFlag']:checked").val();
+            //保额是否为主商品金额   1：是0：否
+        console.log("qian"+flag);
+            if(flag == '1'){
+                $('#coverage').attr("disabled",true)
+            }
+            if(flag == '0'){
+                $('#coverage').attr("disabled",false)
+            }
+
+        let WXSX =  $("input:radio[name='weiXiuOverResult.isImmediately']:checked").val();
+            // 是否立即生效 1：是0：否
+             console.log("weiixu"+WXSX);
+            if(WXSX == '1'){
+                $('#WXDAY').attr("disabled",true)
+            }
+            if(WXSX == '0'){
+                $('#WXDAY').attr("disabled",false)
+            }
+
+
+
+
+            let HXSX =  $("input:radio[name='huanJiOverResult.isImmediately']:checked").val();
+            // 是否立即生效 1：是0：否
+        console.log("huanxin"+HXSX);
+            if(HXSX == '1'){
+                $('#HXDAY').attr("disabled",true)
+            }
+            if(HXSX == '0'){
+                $('#HXDAY').attr("disabled",false)
+            }
+
+
+            let YBSX =  $("input:radio[name='yanBaoOverResult.isImmediately']:checked").val();
+            console.log("yanbao"+YBSX);
+            // 是否立即生效 1：是0：否
+            if(YBSX == '1'){
+                $('#YXDAY').attr("disabled",true)
+            }
+            if(YBSX == '0'){
+                $('#YXDAY').attr("disabled",false)
+            }
+
+
+            let SJBSX =  $("input:radio[name='shuJuBaoOverResult.isImmediately']:checked").val();
+            console.log("shujuba"+SJBSX);
+            // 是否立即生效 1：是0：否
+            if(SJBSX == '1'){
+                $('#SJBDAY').attr("disabled",true)
+            }
+            if(SJBSX == '0'){
+                $('#SJBDAY').attr("disabled",false)
+            }
+
+    })
+</script>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-title">
+				<i class="fa icon-note"></i> ${text(htGroupProductInfo.isNewRecord ? '新增组合产品表' : '编辑组合产品表')}
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${htGroupProductInfo}" action="${ctx}/product/htGroupProductInfo/save" method="post" class="form-horizontal">
+			<div class="box-body">
+                <#form:hidden path="id"/>
+                <#form:hidden path="combinationType"/>
+                <#form:hidden path="isSingleValidity"/>
+                <#form:hidden path="terminationRules"/>
+                <#form:hidden path="productName"/>
+
+
+
+                <%if(huanji!){%>
+                <div id="huanJiList" >
+                    <div class="form-unit">${text('请选择换机产品')}</div>
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4" title="">
+                                    <span class="required ">*</span> ${text('产品名称/id')}<i
+                                        class="fa icon-question hide"></i></label>
+                                <div class="col-sm-8">
+                                    <#form:select id="huanJiProduct"  path="huanJiProductIds"   items="${hList}"  itemLabel="proName"  itemValue="id"  multiple="false" blankOption="true" blankOptionLabel="请选择" class="form-control required"
+                                    onchange="findHuanJiData()"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <table id="huanJiDataGrid"></table>
+                    <script>
+
+                    </script>
+                    <!--换新终止规则------------------------------------------------------------------>
+                    <%if('1'==isSingleValidity!){%>
+                    <div id="huanxinesc" class="zhongzhi">
+                        <div class="form-unit">${text('产品终止规则配置')}</div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2" title="">
+                                        <span class="required ">*</span> ${text('生效规则')}：<i class="fa icon-question hide"></i></label>
+                                    <div class="col-sm-10">
+                                        <% var day = [{label:'2',value:'2'},{label:'3',value:'3'}, {label:'4',value:'4'}, {label:'5',value:'5'}, {label:'6',value:'6'}, {label:'7',value:'7'}, {label:'8',value:'8'}, {label:'9',value:'9'}, {label:'10',value:'10'}, {label:'11',value:'11'}, {label:'12',value:'12'}, {label:'13',value:'13'}, {label:'14',value:'14'}, {label:'15',value:'15'}]; %>
+                                        <p><label><#form:radio id="HXSX"  path="huanJiOverResult.isImmediately" dictType="isImmediately" class="form-control required" /></label><label><#form:select id="HXDAY" path="huanJiOverResult.takeDay" items="${day}" itemLabel="label" itemValue="value" blankOption="true" blankOptionLabel="请选择"  class="form-control required" style="width: 30px" /></label><label>日生效</label></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2" title="">
+                                        <span class="required ">*</span> ${text('服务有效期')}：<i class="fa icon-question hide"></i></label>
+                                    <div class="col-sm-5">
+                                        <#form:select path="huanJiOverResult.validity" dictType="months" blankOption="true"  blankOptionLabel="请选择" class="form-control required" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <%}%>
+                </div>
+                <%}%>
+
+                <%if(weixiu!){%>
+                <div id="weiXiuList">
+                    <div class="form-unit">${text('请选择维修产品')}</div>
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4" title="">
+                                    <span class="required ">*</span> ${text('产品名称/id')}：<i
+                                        class="fa icon-question hide"></i></label>
+                                <div class="col-sm-8">
+                                    <#form:select id="weiXiuProduct" path="weiXiuProductIds" items="${wList}" itemLabel="proName" itemValue="id" multiple="true" blankOption="true" blankOptionLabel="请选择"  class="form-control required"
+                                    onchange="findWeiXiuData()"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <table id="weiXiuDataGrid"></table>
+                    <script>
+
+                    </script>
+                    <!--维修终止规则------------------------------------------------------------------>
+                    <%if('1'==isSingleValidity!){%>
+                    <div id="weixiuesc"  class="zhongzhi">
+                        <div class="form-unit">${text('产品终止规则配置')}</div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2" title="">
+                                        <span class="required ">*</span> ${text('生效规则')}：<i class="fa icon-question hide"></i></label>
+                                    <div class="col-sm-10">
+                                        <% var day = [{label:'2',value:'2'},{label:'3',value:'3'}, {label:'4',value:'4'}, {label:'5',value:'5'}, {label:'6',value:'6'}, {label:'7',value:'7'}, {label:'8',value:'8'}, {label:'9',value:'9'}, {label:'10',value:'10'}, {label:'11',value:'11'}, {label:'12',value:'12'}, {label:'13',value:'13'}, {label:'14',value:'14'}, {label:'15',value:'15'}]; %>
+                                        <p><label><#form:radio id="WXSX"  path="weiXiuOverResult.isImmediately" dictType="isImmediately" class="form-control required" /></label><label><#form:select  id="WXDAY" path="weiXiuOverResult.takeDay" items="${day}" itemLabel="label" itemValue="value" blankOption="true" blankOptionLabel="请选择"  class="form-control required" style="width: 30px" /></label><label>日生效</label></p>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2" title="">
+                                        <span class="required ">*</span> ${text('服务有效期')}：<i class="fa icon-question hide"></i></label>
+                                    <div class="col-sm-5">
+                                        <#form:select path="weiXiuOverResult.validity" dictType="months" blankOption="true"  blankOptionLabel="请选择" class="form-control required" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <%}%>
+                </div>
+        <%}%>
+
+                <%if(yanbao!){%>
+                <div id="yanBaoList">
+                    <div class="form-unit">${text('请选择延保产品')}</div>
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4" title="">
+                                    <span class="required ">*</span> ${text('产品名称/id')}：<i
+                                        class="fa icon-question hide"></i></label>
+                                <div class="col-sm-8">
+                                    <#form:select id="yanBaoProduct" path="yanBaoProductIds" items="${yList}" itemLabel="proName" itemValue="id" multiple="false" blankOption="true" blankOptionLabel="请选择"  class="form-control required"
+                                    onchange="findYanBaoData()"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <table id="yanBaoDataGrid"></table>
+                    <script>
+
+                    </script>
+                    <!--延保终止规则------------------------------------------------------------------>
+                    <%if('1'==isSingleValidity!){%>
+                    <div id="yanbaoesc"  class="zhongzhi">
+                        <div class="form-unit">${text('产品终止规则配置')}</div>
+                        <div class="row">
+                            <div class="col-xs-12" >
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2" title="">
+                                        <span class="required ">*</span> ${text('生效规则')}：<i class="fa icon-question hide"></i></label>
+                                    <div class="col-sm-10">
+                                        <% var day = [{label:'2',value:'2'},{label:'3',value:'3'}, {label:'4',value:'4'}, {label:'5',value:'5'}, {label:'6',value:'6'}, {label:'7',value:'7'}, {label:'8',value:'8'}, {label:'9',value:'9'}, {label:'10',value:'10'}, {label:'11',value:'11'}, {label:'12',value:'12'}, {label:'13',value:'13'}, {label:'14',value:'14'}, {label:'15',value:'15'}]; %>
+                                        <p><label><#form:radio id="YBSX" path="yanBaoOverResult.isImmediately"  dictType="effectTime" class="form-control required" /></label><label > <#form:input id="YXDAY"  path="yanBaoOverResult.effectTime" readonly="true" maxlength="20" class="form-control Wdate required" value="请选择年月日" dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:false});" style="width: 80px" /></label></p>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2" title="">
+                                        <span class="required ">*</span> ${text('服务有效期')}：<i class="fa icon-question hide"></i></label>
+                                    <div class="col-sm-5">
+                                        <#form:select path="yanBaoOverResult.validity" dictType="months" blankOption="true"  blankOptionLabel="请选择" class="form-control required" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <%}%>
+                </div>
+    <%}%>
+
+<%if(shujubao!){%>
+                <div id="shuJuBaoList" >
+                    <div class="form-unit">${text('请选择数据保产品')}</div>
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4" title="">
+                                    <span class="required ">*</span> ${text('产品名称/id')}：<i
+                                        class="fa icon-question hide"></i></label>
+                                <div class="col-sm-8">
+                                    <#form:select id="shuJuBaoProduct" path="shuJuBaoProductIds" items="${sList}" itemLabel="proName" itemValue="id"  multiple="false" blankOption="true" blankOptionLabel="请选择"  class="form-control required"
+                                    onchange="findShuJuBaoData()"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <table id="shuJuBaoDataGrid"></table>
+                    <script>
+
+                    </script>
+
+                    <!--数据保终止规则------------------------------------------------------------------>
+                    <%if('1'==isSingleValidity!){%>
+                    <div id="shujubaoesc"  class="zhongzhi">
+                        <div class="form-unit">${text('产品终止规则配置')}</div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2" title="">
+                                        <span class="required ">*</span> ${text('生效规则')}：<i class="fa icon-question hide"></i></label>
+                                    <div class="col-sm-10">
+                                        <% var day = [{label:'2',value:'2'},{label:'3',value:'3'}, {label:'4',value:'4'}, {label:'5',value:'5'}, {label:'6',value:'6'}, {label:'7',value:'7'}, {label:'8',value:'8'}, {label:'9',value:'9'}, {label:'10',value:'10'}, {label:'11',value:'11'}, {label:'12',value:'12'}, {label:'13',value:'13'}, {label:'14',value:'14'}, {label:'15',value:'15'}]; %>
+                                        <p><label><#form:radio id="SJBSX"  path="shuJuBaoOverResult.isImmediately" dictType="effectTime" class="form-control required" onchange="shuJuBaoOverResult.isImmediately()"/></label><label > <#form:input id="SJBDAY"  path="shuJuBaoOverResult.effectTime" readonly="true" maxlength="20" class="form-control Wdate required" value="请选择年月日" dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:false});" style="width: 80px" /></label></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2" title="">
+                                        <span class="required ">*</span> ${text('服务有效期')}：<i class="fa icon-question hide"></i></label>
+                                    <div class="col-sm-5">
+                                        <#form:select path="shuJuBaoOverResult.validity" dictType="months" blankOption="true"  blankOptionLabel="请选择" class="form-control required" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <%}%>
+                </div>
+<%}%>
+
+
+
+                <%if('0'==isSingleValidity!){%>
+                <div id="zongzhongzhi" >
+                    <div class="form-unit">${text('产品终止规则配置')}</div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-2" title="">
+                                    <span class="required ">*</span> ${text('生效规则')}：<i class="fa icon-question hide"></i></label>
+                                <div class="col-sm-10">
+                                    <% var day = [{label:'2',value:'2'},{label:'3',value:'3'}, {label:'4',value:'4'}, {label:'5',value:'5'}, {label:'6',value:'6'}, {label:'7',value:'7'}, {label:'8',value:'8'}, {label:'9',value:'9'}, {label:'10',value:'10'}, {label:'11',value:'11'}, {label:'12',value:'12'}, {label:'13',value:'13'}, {label:'14',value:'14'}, {label:'15',value:'15'}]; %>
+                                    <p><label><#form:radio id="HXSX"  path="isImmediately" dictType="isImmediately" class="form-control required" /></label><label><#form:select id="HXDAY" path="takeDay" items="${day}" itemLabel="label" itemValue="value" blankOption="true" blankOptionLabel="请选择"  class="form-control" style="width: 30px" /></label><label>日生效</label></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-2" title="">
+                                    <span class="required ">*</span> ${text('服务有效期')}：<i class="fa icon-question hide"></i></label>
+                                <div class="col-sm-5">
+                                    <#form:select path="validity" dictType="months" blankOption="true"  blankOptionLabel="请选择" class="form-control required" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <%}%>
+
+                <div class="form-unit">${text('服务标的配置')}</div>
+                <div class="row">
+                    <div class="col-xs-4">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" title="">
+                                <span class="required">*</span> ${text('标的销售价格区间:')}<i class="fa icon-question hide"></i></label>
+                            <div >
+                                <p><label><#form:input path="minPrice" maxlength="7"  class="form-control zheng required" style="width: 50px"/></label>＜标的价格≤<label><#form:input path="maxPrice" maxlength="7"  class="form-control zheng required" style="width: 50px"/></label></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-4">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" title="">
+                                <span class="required">*</span> ${text('使用标的型号')}：<i class="fa icon-question hide"></i></label>
+                            <div class="col-sm-8">
+                                <#form:select path="phoneModelId"  items="${phoneModels}" itemLabel="model" itemValue="id" multiple="true" blankOption="true" blankOptionLabel="请选择" class="form-control required"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-4">
+                        <div class="form-group" >
+                            <label class="control-label col-sm-4" title="">
+                                <span class="required ">*</span> ${text('保额是否为主商品金额:')}<i class="fa icon-question hide"></i></label>
+                            <div class="col-sm-8">
+                                <p><label><#form:radio path="priceFlag" dictType="price_flag" class="form-control required"  /></label><label><#form:input path="coverage" maxlength="7"  class="form-control zheng required" style="width: 50px;" /></label></p>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <%if('1'==terminationRules!){%>
+                <div class="row">
+                    <div class="col-xs-4">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" title="">
+                                <span class="required ">*</span> ${text('简述终止规则')}：<i class="fa icon-question hide"></i></label>
+                            <div class="col-sm-8">
+                                <#form:textarea path="terminationRulesSketch" rows="3" maxlength="200"
+                                class="form-control"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <%}%>
+
+                <%if('0'==terminationRules!){%>
+                    <div class="row" >
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" title="">
+                                    <span class="required ">*</span> ${text('终止规则检测项')}：<i class="fa icon-question hide"></i></label>
+                                <div class="col-sm-9">
+                                    <#form:checkbox path="terminationRulesItem" dictType="termination_rules_item"  class="form-control required" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <%}%>
+                <% if (htGroupProductInfo.isNewRecord){ %>
+                <div class="row">
+                    <div class="col-xs-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-6" title="">
+                                <span class="required ">*</span> ${text('立即启用')}<i class="fa icon-question hide"></i></label>
+                            <div class="col-sm-6">
+                                <#form:radio path="isStart" dictType="common_status" class="form-control required" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+                </div>
+
+
+			</div>
+
+
+
+			<div class="box-footer">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('product:htGroupProductInfo:edit')){ %>
+							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+						<% } %>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script>
+    jQuery.validator.addMethod("zheng", function(value, element) {
+        var tel = /^(\+)?\d+(\.\d+)?$/;
+        return this.optional(element) || (tel.test(value));
+    }, '请输入一个正数');
+
+    function findYanBaoData() {
+        var itemValue1 = $("#yanBaoProduct").val();
+        console.log(itemValue1)
+        $.ajax({
+            type: "get",
+            url: "${ctx}/product/productInfo/findByIds?ids=" + itemValue1,
+            success: function (data) {
+                var productList = data.data
+                console.log(productList)
+
+                $('#yanBaoDataGrid').jqGrid('clearGridData')
+                $.each(productList, function (index, value) {
+                    $('#yanBaoDataGrid').jqGrid('addRow', {
+                        position: 'last',
+                        addRowParams: {keys: false, focusField: true},
+                        initdata: {
+                            proName: value.proName,
+                            proCode: value.proCode,
+                            mixPrice: value.mixPrice,
+                            maxPrice: value.maxPrice,
+                            restrictPrice: value.restrictPrice,
+                            isImmediately: value.isImmediately,
+                            validity: value.validity,
+                            premium: value.premium,
+                            serveCostPrice: value.serveCostPrice,
+                            rate: value.rate,
+                            suggestedRetailPrice: value.suggestedRetailPrice
+                        }
+                    });
+                })
+
+            }
+        });
+        // console.log(productData)
+        // 初始化DataGrid对象
+    }
+    function findShuJuBaoData() {
+        var itemValue1 = $("#shuJuBaoProduct").val();
+        console.log(itemValue1)
+        $.ajax({
+            type: "get",
+            url: "${ctx}/product/productInfo/findByIds?ids=" + itemValue1,
+            success: function (data) {
+                var productList = data.data
+                console.log(productList)
+
+                $('#shuJuBaoDataGrid').jqGrid('clearGridData')
+                $.each(productList, function (index, value) {
+                    $('#shuJuBaoDataGrid').jqGrid('addRow', {
+                        position: 'last',
+                        addRowParams: {keys: false, focusField: true},
+                        initdata: {
+                            proName: value.proName,
+                            proCode: value.proCode,
+                            mixPrice: value.mixPrice,
+                            maxPrice: value.maxPrice,
+                            restrictPrice: value.restrictPrice,
+                            isImmediately: value.isImmediately,
+                            validity: value.validity,
+                            premium: value.premium,
+                            serveCostPrice: value.serveCostPrice,
+                            rate: value.rate,
+                            suggestedRetailPrice: value.suggestedRetailPrice
+                        }
+                    });
+                })
+
+            }
+        });
+        // console.log(productData)
+        // 初始化DataGrid对象
+    }
+    function findWeiXiuData() {
+        var itemValue1 = $("#weiXiuProduct").val();
+        console.log(itemValue1)
+        $.ajax({
+            type: "get",
+            url: "${ctx}/product/productInfo/findByIds?ids=" + itemValue1,
+            success: function (data) {
+                var productList = data.data
+                console.log(productList)
+
+                $('#weiXiuDataGrid').jqGrid('clearGridData')
+                $.each(productList, function (index, value) {
+                    $('#weiXiuDataGrid').jqGrid('addRow', {
+                        position: 'last',
+                        addRowParams: {keys: false, focusField: true},
+                        initdata: {
+                            proName: value.proName,
+                            proCode: value.proCode,
+                            proCode: value.proCode,
+                            mixPrice: value.mixPrice,
+                            maxPrice: value.maxPrice,
+                            restrictPrice: value.restrictPrice,
+                            isImmediately: value.isImmediately,
+                            validity: value.validity,
+                            premium: value.premium,
+                            serveCostPrice: value.serveCostPrice,
+                            rate: value.rate,
+                            suggestedRetailPrice: value.suggestedRetailPrice
+                        }
+                    });
+                })
+
+            }
+        });
+        // console.log(productData)
+        // 初始化DataGrid对象
+
+    }
+    function findHuanJiData() {
+        var itemValue1 = $("#huanJiProduct").val();
+        // if ( itemValue1.length >=2){
+        //     js.showErrorMessage("不可多选")
+        //     return;
+        // }
+        console.log(itemValue1)
+        $.ajax({
+            type: "get",
+            url: "${ctx}/product/productInfo/findByIds?ids=" + itemValue1,
+            success: function (data) {
+                var productList = data.data
+                console.log(productList)
+
+                $('#huanJiDataGrid').jqGrid('clearGridData')
+                $.each(productList, function (index, value) {
+                    $('#huanJiDataGrid').jqGrid('addRow', {
+                        position: 'last',
+                        addRowParams: {keys: false, focusField: true},
+                        initdata: {
+                            proName: value.proName,
+                            proCode: value.proCode,
+                            mixPrice: value.mixPrice,
+                            maxPrice: value.maxPrice,
+                            changePayment: value.changePayment,
+                            basisDepreciation: value.basisDepreciation,
+                            monthlyDepreciation: value.monthlyDepreciation,
+                            isImmediately: value.isImmediately,
+                            validity: value.validity,
+                            premium: value.premium,
+                            serveCostPrice: value.serveCostPrice,
+                            rate: value.rate,
+                            suggestedRetailPrice: value.suggestedRetailPrice
+                        }
+                    });
+                })
+
+            }
+        });
+        // console.log(productData)
+        // 初始化DataGrid对象
+
+    }
+
+   $(function(){
+            var weiXiuProducts = [];
+            $('#weiXiuDataGrid').dataGrid({
+                data: weiXiuProducts,
+                datatype: "local",
+                columnModel: [
+                    {header: '${text("产品名称")}', name: 'proName', index: 'a.pro_name', width: 150, align: "left"},
+                    {header: '${text("产品编码")}', name: 'proCode', index: 'a.pro_code', width: 150, align:"center"},
+                    {header: '${text("维修部件")}', name: 'proCode', index: 'a.pro_code', width: 150, align:"center"},
+                    // {header: '${text("手机销售价格下限")}', name: 'minPrice', index: 'a.min_price', width: 150, align: "center", formatter: function(val, obj, row, act){
+                    //         return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                    //     }},
+                    // {header: '${text("手机销售价格上限")}', name: 'maxPrice', index: 'a.max_price', width: 150, align: "center", formatter: function(val, obj, row, act){
+                    //         return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                    //     }},
+                    {header: '${text("维修上限")}', name: 'restrictPrice', index: 'a.restrict_price', width: 150,align: "center", formatter: function(val, obj, row, act){
+                            return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                        }},
+                    // {header: '${text("生效规则")}', name: 'isImmediately', index: 'a.is_immediately', width: 150, align: "center"},
+                    // {header: '${text("服务有效期")}', name: 'validity', index: 'a.validity', width: 150, align: "center"},
+                    {header: '${text("保费")}', name: 'premium', index: 'a.premium', width: 150, align: "center", formatter: function(val, obj, row, act){
+                            return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                        }},
+                    {header: '${text("服务成本")}', name: 'serveCostPrice', index: 'a.serve_cost_price', width: 150, align: "center", formatter: function(val, obj, row, act){
+                            return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                        }},
+                    {header: '${text("费率")}', name: 'rate', index: 'a.rate', width: 150, align: "center"},
+                    {header: '${text("建议零售价")}', name: 'suggestedRetailPrice', index: 'a.suggested_retailPrice', width: 150, align: "center", formatter: function(val, obj, row, act){
+                            return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                        }}
+                ],
+                // 加载成功后执行事件
+                ajaxSuccess: function (data) {
+
+                }
+            });
+            // console.log(data);
+
+
+            var huanJiProducts = [];
+            $('#huanJiDataGrid').dataGrid({
+                data: huanJiProducts,
+                datatype: "local",
+                autoGridHeight: true,
+                autoGridHeightFix: 10,
+                columnModel: [
+                    {header: '${text("产品名称")}', name: 'proName', index: 'a.pro_name', width: 150, align: "left"},
+                    {header: '${text("产品编码")}', name: 'proCode', index: 'a.pro_code', width: 150, align:"center"},
+                    // {header: '${text("手机销售价格下限")}', name: 'minPrice', index: 'a.min_price', width: 150, align: "center", formatter: function(val, obj, row, act){
+                    //         return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                    //     }},
+                    // {header: '${text("手机销售价格上限")}', name: 'maxPrice', index: 'a.max_price', width: 150, align: "center", formatter: function(val, obj, row, act){
+                    //         return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                    //     }},
+                    {header: '${text("换机自付额")}', name: 'changePayment', index: 'a.change_payment', width: 150,align: "center", formatter: function(val, obj, row, act){
+                            return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                        }},
+                    {header: '${text("基础折旧率")}', name: 'basisDepreciation', index: 'a.basis_depreciation', width: 150, align: "right"},
+                    {header: '${text("每月折旧率")}', name: 'monthlyDepreciation', index: 'a.monthly_depreciation', width: 150, align: "center"},
+                    // {header: '${text("生效规则")}', name: 'isImmediately', index: 'a.is_immediately', width: 150, align: "center"},
+                    // {header: '${text("服务有效期")}', name: 'validity', index: 'a.validity', width: 150, align: "center"},
+                    {header: '${text("保费")}', name: 'premium', index: 'a.premium', width: 150, align: "center", formatter: function(val, obj, row, act){
+                            return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                        }},
+                    {header: '${text("服务成本")}', name: 'serveCostPrice', index: 'a.serve_cost_price', width: 150, align: "center", formatter: function(val, obj, row, act){
+                            return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                        }},
+                    {header: '${text("费率")}', name: 'rate', index: 'a.rate', width: 150, align: "center"},
+                    {header: '${text("建议零售价")}', name: 'suggestedRetailPrice', index: 'a.suggested_retailPrice', width: 150, align: "center", formatter: function(val, obj, row, act){
+                            return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                        }}
+                ],
+                // 加载成功后执行事件
+                ajaxSuccess: function (data) {
+
+                }
+            });
+            // console.log(data);
+
+
+            var shuJuBaoProducts = [];
+            $('#shuJuBaoDataGrid').dataGrid({
+                data: shuJuBaoProducts,
+                datatype: "local",
+                columnModel: [
+                    {header: '${text("产品名称")}', name: 'proName', index: 'a.pro_name', width: 150, align: "left"},
+                    {header: '${text("产品编码")}', name: 'proCode', index: 'a.pro_code', width: 150, align:"center"},
+                    // {header: '${text("手机销售价格下限")}', name: 'minPrice', index: 'a.min_price', width: 150, align: "center", formatter: function(val, obj, row, act){
+                    //         return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                    //     }},
+                    // {header: '${text("手机销售价格上限")}', name: 'maxPrice', index: 'a.max_price', width: 150, align: "center", formatter: function(val, obj, row, act){
+                    //         return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                    //     }},
+                    {header: '${text("维修上限")}', name: 'restrictPrice', index: 'a.restrict_price', width: 150,align: "center", formatter: function(val, obj, row, act){
+                            return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                        }},
+                    // {header: '${text("生效规则")}', name: 'isImmediately', index: 'a.is_immediately', width: 150, align: "center"},
+                    // {header: '${text("服务有效期")}', name: 'validity', index: 'a.validity', width: 150, align: "center"},
+                    {header: '${text("保费")}', name: 'premium', index: 'a.premium', width: 150, align: "center", formatter: function(val, obj, row, act){
+                            return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                        }},
+                    {header: '${text("服务成本")}', name: 'serveCostPrice', index: 'a.serve_cost_price', width: 150, align: "center", formatter: function(val, obj, row, act){
+                            return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                        }},
+                    {header: '${text("费率")}', name: 'rate', index: 'a.rate', width: 150, align: "center"},
+                    {header: '${text("建议零售价")}', name: 'suggestedRetailPrice', index: 'a.suggested_retailPrice', width: 150, align: "center", formatter: function(val, obj, row, act){
+                            return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                        }}
+                ],
+                // 加载成功后执行事件
+                ajaxSuccess: function (data) {
+
+                }
+            });
+            // console.log(data);
+
+
+            var yanBaoProducts = [];
+            $('#yanBaoDataGrid').dataGrid({
+                data: yanBaoProducts,
+                datatype: "local",
+                columnModel: [
+                    {header: '${text("产品名称")}', name: 'proName', index: 'a.pro_name', width: 150, align: "left"},
+                    {header: '${text("产品编码")}', name: 'proCode', index: 'a.pro_code', width: 150, align:"center"},
+                    // {header: '${text("手机销售价格下限")}', name: 'minPrice', index: 'a.min_price', width: 150, align: "center", formatter: function(val, obj, row, act){
+                    //         return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                    //     }},
+                    // {header: '${text("手机销售价格上限")}', name: 'maxPrice', index: 'a.max_price', width: 150, align: "center", formatter: function(val, obj, row, act){
+                    //         return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                    //     }},
+                    {header: '${text("维修上限")}', name: 'restrictPrice', index: 'a.restrict_price', width: 150,align: "center", formatter: function(val, obj, row, act){
+                            return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                        }},
+                    // {header: '${text("生效规则")}', name: 'isImmediately', index: 'a.is_immediately', width: 150, align: "center"},
+                    // {header: '${text("服务有效期")}', name: 'validity', index: 'a.validity', width: 150, align: "center"},
+                    {header: '${text("保费")}', name: 'premium', index: 'a.premium', width: 150, align: "center", formatter: function(val, obj, row, act){
+                            return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                        }},
+                    {header: '${text("服务成本")}', name: 'serveCostPrice', index: 'a.serve_cost_price', width: 150, align: "center", formatter: function(val, obj, row, act){
+                            return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                        }},
+                    {header: '${text("费率")}', name: 'rate', index: 'a.rate', width: 150, align: "center"},
+                    {header: '${text("建议零售价")}', name: 'suggestedRetailPrice', index: 'a.suggested_retailPrice', width: 150, align: "center", formatter: function(val, obj, row, act){
+                            return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                        }}
+                ],
+                // 加载成功后执行事件
+                ajaxSuccess: function (data) {
+
+                }
+            });
+            // console.log(data);
+
+
+       findWeiXiuData()
+       findHuanJiData()
+       findYanBaoData()
+       findShuJuBaoData()
+
+
+
+
+
+   })
+
+
+
+    $("#inputForm").validate({
+        submitHandler: function (form) {
+            js.ajaxSubmitForm($(form), function (data) {
+                js.showMessage(data.message);
+                if (data.result == Global.TRUE) {
+                    js.closeCurrentTabPage(function (contentWindow) {
+                        contentWindow.page();
+                    });
+                }
+            }, "json");
+        }
+    });
+
+   $("input:radio[name='priceFlag']").on('ifChecked', function(){
+       let flag = $(this).val();
+       //保额是否为主商品金额   1：是0：否
+       if(flag == '1'){
+           $('#coverage').attr("disabled",true)
+       }
+       if(flag == '0'){
+           $('#coverage').attr("disabled",false)
+       }
+
+   });
+   $("#WXSX1,#WXSX2").on('ifChecked', function(){
+
+       let flag = $(this).val();
+       // 是否立即生效 1：是0：否
+       if(flag == '1'){
+           $('#WXDAY').attr("disabled",true)
+       }
+       if(flag == '0'){
+           $('#WXDAY').attr("disabled",false)
+       }
+
+   });
+
+
+
+   $("#HXSX1,#HXSX2").on('ifChecked', function(){
+       let flag = $(this).val();
+       // 是否立即生效 1：是0：否
+       if(flag == '1'){
+           $('#HXDAY').attr("disabled",true)
+       }
+       if(flag == '0'){
+           $('#HXDAY').attr("disabled",false)
+       }
+
+   });
+
+   $("#YBSX1,#YBSX2").on('ifChecked', function(){
+       let flag = $(this).val();
+       console.log(flag);
+       // 是否立即生效 1：是0：否
+       if(flag == '1'){
+           $('#YXDAY').attr("disabled",true)
+       }
+       if(flag == '0'){
+           $('#YXDAY').attr("disabled",false)
+       }
+
+   });
+
+   $("#SJBSX1,#SJBSX2").on('ifChecked', function(){
+       let flag = $(this).val();
+       console.log(flag);
+       // 是否立即生效 1：是0：否
+       if(flag == '1'){
+           $('#SJBDAY').attr("disabled",true)
+       }
+       if(flag == '0'){
+           $('#SJBDAY').attr("disabled",false)
+       }
+
+   });
+</script>

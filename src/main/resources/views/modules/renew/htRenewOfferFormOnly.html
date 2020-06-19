@@ -1,0 +1,396 @@
+<% layout('/layouts/default.html', {title: '换新工单-待审核', libs: ['validate']}){ %>
+<div class="main-content">
+	<% include('/modules/common/policyDetail.html', {commonFromId:commonFromId}){} %>
+
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${htRenewForm}" action="${ctx}/renew/htRenewForm/save" method="post" class="form-horizontal">
+		<div class="box-body">
+			<div class="form-unit">${text('核实用户实际信息')}</div>
+			<#form:hidden path="id"/>
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('客户姓名')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="htClaimSettlementForm.userName" readonly="true" maxlength="64" class="form-control"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('联系电话')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="htClaimSettlementForm.phone" readonly="true" class="form-control"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('手机品牌')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="htClaimSettlementForm.phoneBrand" disabled="true" items="${brandList}" blankOption="true" blankOptionLabel="请选择" itemLabel="name" itemValue="id" class="form-control required" />
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('手机型号')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="htClaimSettlementForm.phoneModel" disabled="true" items="${typeList}" blankOption="true" blankOptionLabel="请选择"  itemLabel="model" itemValue="id" class="form-control required" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('是否同型号换机')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="isModel" disabled="true" onchange="changeIsModel()" dictType="is_model" class="form-control required" />
+						</div>
+					</div>
+				</div>
+				<div class="old col-xs-3 hide">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('换机品牌')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="changeBrand" disabled="true" onchange="findPhoneModel()" items="${brandList}" blankOption="true" blankOptionLabel="请选择" itemLabel="name" itemValue="id" class="form-control required" />
+						</div>
+					</div>
+				</div>
+				<div class="old col-xs-3 hide">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('换机型号')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="changeModel" disabled="true" items="${typeList}" blankOption="true" blankOptionLabel="请选择"  itemLabel="model" itemValue="id" class="form-control required" />
+
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('制式')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="changeNet" disabled="true" dictType="change_net" blankOption="true" blankOptionLabel="请选择" class="form-control" />
+
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('换机颜色')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="changeColor" disabled="true" dictType="phone_color" blankOption="true" blankOptionLabel="请选择" class="form-control" />
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('换机内存')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="changeMemory" disabled="true" dictType="change_memory" blankOption="true" blankOptionLabel="请选择" class="form-control" />
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('原购机价格')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input id="oldPhonePrice" name="oldPhonePrice"  value="${@NumberUtils.formatNumber(htRenewForm.oldPhonePrice/100,'0.00')}" readonly="true" min="0" class="form-control number required"/>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('采购渠道')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="purchaseChannel" disabled="true" items="${channelsList}" blankOption="true" blankOptionLabel="请选择"  itemLabel="strname" itemValue="id" class="form-control required" />
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('渠道考核价')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input id="channelPrice" name="channelPrice" value="${@NumberUtils.formatNumber(htRenewForm.channelPrice/100,'0.00')}" readonly="true" min="0" class="form-control number"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('采购价')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input id="purchasePrice" name="purchasePrice" value="${@NumberUtils.formatNumber(htRenewForm.purchasePrice/100,'0.00')}" readonly="true" min="0" class="form-control number required"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('手机报价')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input id="phonePrice" name="phonePrice" value="${@NumberUtils.formatNumber(htRenewForm.phonePrice/100,'0.00')}" readonly="true" min="0" class="form-control number required"/>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('平均市场价')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input id="marketPrice" name="marketPrice" value="${@NumberUtils.formatNumber(htRenewForm.marketPrice/100,'0.00')}"  readonly="true" min="0" class="form-control number"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('其他金额')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input id="otherPrice" name="otherPrice" value="${@NumberUtils.formatNumber(htRenewForm.otherPrice/100,'0.00')}"  readonly="true" min="0" class="form-control number required"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('其他金额说明')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="otherRemarks" readonly="true" maxlength="255" class="form-control"/>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="old row hide">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('折旧月数')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="oldMonth" readonly="true" min="0" class="form-control number required"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('折旧后新机价格')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input id="oldNewPrice" name="oldNewPrice" value="${@NumberUtils.formatNumber(htRenewForm.oldNewPrice/100,'0.00')}" readonly="true" min="0" class="form-control number required"/>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('自付额')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input id="selfPrice" name="selfPrice" value="${@NumberUtils.formatNumber(htRenewForm.selfPrice/100,'0.00')}" readonly="true"  min="0" class="form-control number required"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('自付额是否代收')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:radio path="isSelfPrice"  disabled="true" dictType="sys_yes_no" class="form-control required" />
+
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('快递到付金额')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input id="expressPrice" name="expressPrice" value="${@NumberUtils.formatNumber(htRenewForm.expressPrice/100,'0.00')}" readonly="true" min="0" class="form-control number "/>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('收货人姓名')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="receiveName" readonly="true" maxlength="15" class="form-control required"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('收货人手机号')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="receivePhone" readonly="true" class="form-control required"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('收货人地址')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="receiveAddress" readonly="true" class="form-control required"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('明细地址')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="receiveAddressDetail" readonly="true" maxlength="255" class="form-control required"/>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="form-group">
+						<label class="control-label col-sm-2" title="">
+							<span class="required hide">*</span> ${text('备注信息')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-10">
+							<#form:textarea path="remarks" rows="4" maxlength="500" class="form-control"/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="box-footer">
+			<div class="row">
+				<div class="col-sm-offset-2 col-sm-10">
+					<% if (hasPermi('renew:htRenewForm:edit')){ %>
+					<#form:hidden id="formInfoStatus" path="htFormInfo.status"/>
+					<#form:hidden path="htFormInfo.id"/>
+					<#form:hidden path="operationType" value="0"/>
+
+					<% if (!htRenewForm.bpm.isView){ %>
+						<button type="button" onclick="bhButton(this)" class="btn btn-sm btn-danger mr3" data-type="back" data-layer="true" data-layer-width="800" data-layer-height="455"><i class="fa fa-reply"></i> 驳回</button>
+					<% } %>
+
+
+					<#bpm:button bpmEntity="${htRenewForm}" formKey="hd_form_claim" completeText="${text('提 交')}"/>
+					<% } %>
+					<script>
+
+						function bhButton(b) {
+							var $bt=$(b);
+
+							let formId = "${htRenewForm.htFormInfo.id}";
+							let procInsId = "${htRenewForm.bpm.procInsId}";
+							let activityId = "${htRenewForm.bpm.activityId}";
+							let taskId = "${htRenewForm.bpm.taskId}";
+							js.addTabPage($bt,"","${ctx}/forminfo/htFormOperation/backOne?id=${htRenewForm.id}&formId="+formId+"&activityId="+activityId+"&procInsId="+procInsId+"&taskId="+taskId);
+
+						}
+
+						// 流程按钮提交事件
+						BpmButton = window.BpmButton || {};
+						BpmButton.complete = function($this, task){
+							$('#formInfoStatus').val(Global.STATUS_AUDIT);
+						};
+					</script>
+					<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+				</div>
+			</div>
+		</div>
+	</#form:form>
+</div>
+</div>
+<% } %>
+<script>
+
+
+	$(function(){
+		changeIsModel();
+	});
+
+
+	function changeIsModel(){
+		let isModel= $("#isModel").val();
+		//0异型号1同型号
+		if(isModel == '0'){
+
+			$(".old").removeClass("hide");
+			$("#oldMonth").removeAttr("disabled");
+			$("#oldNewPrice").removeAttr("disabled");
+			$("#changeBrand").removeAttr("disabled");
+			$("#changeModel").removeAttr("disabled");
+
+		}else{
+
+			$(".old").addClass("hide");
+			$("#oldMonth").attr("disabled",true);
+			$("#oldNewPrice").attr("disabled",true);
+			$("#changeBrand").attr("disabled",true);
+			$("#changeModel").attr("disabled",true);
+
+		}
+	}
+
+	function findPhoneModel() {
+		var option=$('#changeBrand option:selected').val(); //获取选中的项
+		$.ajax({
+			type:"get",
+			url:"${ctx}/phonemodelinfo/htPhoneModelInfo/findByPhoneModel?brandId="+option,
+			success: function(data) {
+				var options = [];
+				$.each(data, function (index, value) {
+					options.push("<option value='" + value.id + "'> " + value.model + "</option>");
+				});
+				$("#changeModel option").remove();
+				$("#changeModel").append(options.join(''));
+				$('#changeModel').attr("disabled",false);
+			}
+		});
+	}
+
+
+	$("#inputForm").validate({
+		submitHandler: function(form){
+			js.ajaxSubmitForm($(form), function(data){
+				js.showMessage(data.message);
+				if(data.result == Global.TRUE){
+					js.closeCurrentTabPage(function(contentWindow){
+						contentWindow.page();
+					});
+				}
+			}, "json");
+		}
+	});
+</script>

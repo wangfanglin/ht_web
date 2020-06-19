@@ -1,0 +1,154 @@
+<% layout('/layouts/default.html', {title: '咨询工单-待联系客户管理', libs: ['validate']}){ %>
+<div class="main-content">
+	<%if(commonForm!){%>
+	<% include('/modules/common/policyDetail.html', {commonFromId:commonFromId}){} %>
+	<%}%>
+	<%if(commonButton!){%>
+	<% include('/modules/common/historyButton.html', {commonButtonId:commonButtonId}){} %>
+	<%}%>
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${htAdvisoryInfo}" action="${ctx}/advisory/htAdvisoryInfo/dutySave" method="post" class="form-horizontal">
+		<div class="box-body">
+
+			<#form:hidden path="id"/>
+			<#form:input path="callId" style="display: none" class="call"/>
+
+			<#form:hidden path="htFormInfo.id"/>
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="form-group">
+						<label class="control-label col-sm-1" title="">
+							<span class="required">*</span> ${text('联系情况')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-9">
+							<#form:radio path="contactStatus" dictType="contact_status" class="form-control required" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="againDateDiv">
+			<div class="row" >
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required ">*</span> ${text('再次沟通的时间')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="againDate" readonly="true" maxlength="20" class="form-control Wdate "
+							dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:true});" />
+						</div>
+					</div>
+				</div>
+			</div>
+			</div>
+			<div id="dutyDiv">
+			<div  class="row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('责任判定')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:radio path="duty"  dictType="duty" class="form-control required"/>
+						</div>
+					</div>
+				</div>
+			</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('备注')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:textarea path="remark" rows="4" maxlength="500" class="form-control"/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="box-footer">
+			<div class="row">
+				<div class="col-sm-offset-2 col-sm-10">
+
+                    <#bpm:button bpmEntity="${htAdvisoryInfo}" formKey="hd_advisory_info" completeText="${text('提 交')}"/>
+                    <script>
+                        // 流程按钮提交事件
+                        BpmButton = window.BpmButton || {};
+                        BpmButton.complete = function($this, task){
+                            $('#formInfoStatus').val(Global.STATUS_AUDIT);
+                        };
+                    </script>
+					<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+				</div>
+			</div>
+		</div>
+	</#form:form>
+</div>
+</div>
+<% } %>
+<script>
+    $("#inputForm").validate({
+        submitHandler: function(form){
+            js.ajaxSubmitForm($(form), function(data){
+                if(data.result == Global.TRUE){js.showMessage(data.message);}
+                if(data.result == Global.FALSE){js.showMessage(data.message,'','warning',4000);}
+                if(data.result == Global.TRUE){
+                    js.closeCurrentTabPage(function(contentWindow){
+                        contentWindow.page();
+                    });
+                }
+            }, "json");
+        }
+    });
+$(function () {
+    let flag =  $("input:radio[name='contactStatus']:checked").val();
+        //保额是否为主商品金额   1：是0：否
+        if(flag != '1'){   //
+            log("联系不成功")
+            $('#againDateDiv').show();
+            $('#againDate').attr("disable",false);
+
+
+
+            $('#dutyDiv').hide();
+            $('#duty').iCheck('disable');
+        }else{
+            log("联系成功")
+            //$('#againDateDiv').hide();
+            //$('#againDate').attr("disable",true);
+           // $("#againDate").removeClass("required");
+
+            $('#dutyDiv').show();
+            $('#duty').iCheck('enable');
+        }
+
+})
+
+    $("input:radio[name='contactStatus']").on('ifChecked', function(){
+        let flag = $(this).val();
+        //保额是否为主商品金额   1：是0：否
+		log(flag)
+        if(flag != '1'){   //
+            log("联系不成功")
+           // $('#againDateDiv').show();
+           // $('#againDate').attr("disable",false);
+
+
+
+            $('#dutyDiv').hide();
+            $('#duty').iCheck('disable');
+        }else{
+            log("联系成功")
+           // $('#againDateDiv').hide();
+           // $('#againDate').attr("disable",true);
+           // $("#againDate").removeClass("required");
+
+            $('#dutyDiv').show();
+            $('#duty').iCheck('enable');
+		}
+    });
+</script>

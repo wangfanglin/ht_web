@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.product.dao.HtGroupProductInfoDao">
+	
+	<!-- 查询数据
+	<select id="findList" resultType="HtGroupProductInfo">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+	</select> -->
+
+    <insert id="insertMiddle">
+        insert into ht_product_child_middle (id,group_product_id,group_product_child_id)
+        values (
+        null,
+        #{groupProductId},
+        #{productChildId}
+        )
+    </insert>
+    <select id="findProductInfo" resultType="com.jeesite.modules.product.entity.ProductInfo">
+select
+        c.id as "id",
+		c.pro_name as"proName",
+		c.pro_code  as "proCode",
+		c.category  as "category",
+		c.system_type as "systemType",
+		c.product_type as "productType",
+		c.price_flag  as "priceFlag",
+		c.maintain_standard  as "maintainStandard",
+		c.equity_intro  as "equityIntro",
+		c.equity_url  as "equityUrl",
+		c.into_market_date  as "intoMarketDate",
+		c.exit_market_date as "exitMarketDate",
+		c.min_price as "minPrice",
+		c.max_price as "maxPrice",
+		c.phone_model_id as "phoneModelId",
+		c.maintenance_frequency as "maintenanceFrequency",
+		c.is_restrict as "isRestrict",
+		c.restrict_price as "restrictPrice",
+		c.insurance_restrict_price as "insuranceRestrictPrice",
+		c.change_frequency as "changeFrequency",
+		c.change_condition as "changeCondition",
+		c.change_payment as "changePayment",
+		c.basis_depreciation as "basisDepreciation",
+		c.monthly_depreciation as "monthlyDepreciation",
+		c.serve_cost_price as "serveCostPrice",
+		c.rate as "rate",
+		c.premium as "premium",
+		c.suggested_retail_price as "suggestedRetailPrice",
+		c.insurance_provider_id as "insuranceProviderId",
+		c.intermediary_service_id as "intermediaryServiceId",
+		c.is_start as "isStart",
+		c.coverage as "coverage",
+        c.status as "status",
+        b.is_immediately as "isImmediately",
+        b.take_day as "takeDay",
+        b.validity as "validity",
+        b.effect_time as "effectTime"
+
+from  ht_product_child_middle a left join ht_group_product_child b on a.group_product_child_id =b.id
+  left join ht_product_info c on c.id=b.product_id where a.group_product_id=#{productId}
+
+    </select>
+    <select id="findProductName" resultType="java.util.Map">
+		select GROUP_CONCAT(`pro_name`) as name , `product_type` as type from ht_product_info where id in (select b.product_id  from  ht_product_child_middle a  inner join ht_group_product_child b on a.group_product_child_id=b.id
+inner join ht_product_info p on p.id =b.product_id
+where a.group_product_id=#{id}) group by product_type
+	</select>
+</mapper>

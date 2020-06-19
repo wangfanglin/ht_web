@@ -1,0 +1,101 @@
+<% layout('/layouts/default.html', {title: '换新工单-待确认自付款', libs: ['validate']}){ %>
+<div class="main-content">
+	<% include('/modules/common/policyDetail.html', {commonFromId:commonFromId}){} %>
+
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${htRenewForm}" action="${ctx}/renew/htRenewForm/save" method="post" class="form-horizontal">
+		<div class="box-body">
+			<div class="form-unit">${text('付款信息')}</div>
+			<#form:hidden path="id"/>
+
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('微信昵称')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input value="${HtDeductibleInfo.wxNick}" readonly="true" maxlength="64" class="form-control required"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('客户姓名')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input value="${HtDeductibleInfo.userName}" readonly="true" maxlength="64" class="form-control required"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('自付款额度')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input value="${@NumberUtils.formatNumber(HtDeductibleInfo.deductiblesLimit/100,'0.00')}" readonly="true" maxlength="64" class="form-control required"/>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('付款时间')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input value="${HtDeductibleInfo.payDate}" dataFormat="datetime2" readonly="true" maxlength="64" class="form-control required"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('支付方式')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select value="${HtDeductibleInfo.payType}" disabled="true" dictType="pay_type" blankOption="true" blankOptionLabel="请选择" class="form-control required" />
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('支付状态')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select value="${HtDeductibleInfo.payStatus}" disabled="true" dictType="pay_status" blankOption="true" blankOptionLabel="请选择" class="form-control required" />
+						</div>
+					</div>
+				</div>
+			</div>
+		<div class="box-footer">
+			<div class="row">
+				<div class="col-sm-offset-2 col-sm-10">
+					<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+				</div>
+			</div>
+		</div>
+	</#form:form>
+</div>
+</div>
+<% } %>
+<script>
+
+
+	$("#inputForm").validate({
+		submitHandler: function(form){
+			js.ajaxSubmitForm($(form), function(data){
+				js.showMessage(data.message);
+				if(data.result == Global.TRUE){
+					js.closeCurrentTabPage(function(contentWindow){
+						contentWindow.page();
+					});
+				}
+			}, "json");
+		}
+	});
+</script>

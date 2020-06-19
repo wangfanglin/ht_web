@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.htassemblyunit.dao.HtAssemblyUnitDao">
+    <insert id="insertProductAssemblyMiddle">
+		insert into ht_assembly_product (
+		id,
+		product_id,
+		assembly_id
+		)values
+		<foreach collection="assemblyIds" item="item" index="item" separator=",">
+			(
+			null,
+			#{productInfoId},
+			#{item}
+			)
+		</foreach>
+	</insert>
+	<delete id="deleteProductAssemblyMiddle">
+		delete from ht_assembly_product where product_id=#{productInfoId}
+	</delete>
+
+	<!-- 查询数据
+    <select id="findList" resultType="HtAssemblyUnit">
+        SELECT ${sqlMap.column.toSql()}
+        FROM ${sqlMap.table.toSql()}
+        <where>
+            ${sqlMap.where.toSql()}
+        </where>
+        ORDER BY ${sqlMap.order.toSql()}
+    </select> -->
+	<select id="findListByStart" resultType="HtAssemblyUnit">
+		SELECT * FROM ht_assembly_unit WHERE `status` = '0' AND main_flag = #{isMainFlag}
+	</select>
+	<select id="findIdsByProductId" resultType="java.lang.String">
+		select assembly_id from ht_assembly_product where product_id=#{productInfoId}
+	</select>
+	<select id="findAssemblyByProductId" resultType="com.jeesite.modules.htassemblyunit.entity.HtAssemblyUnit">
+		select
+		 b.id as"id",
+		 b.name as "name",
+		 b.main_flag as "mainFlag",
+		 b.category as "category",
+		 b.status as "status"
+		from ht_assembly_product  a inner join ht_assembly_unit b on a.assembly_id=b.id
+		where a.product_id=#{productInfo}
+	</select>
+</mapper>

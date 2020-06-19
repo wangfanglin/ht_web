@@ -1,0 +1,94 @@
+<% layout('/layouts/default.html', {title: '保单信息查询管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa icon-notebook"></i> ${text('保单信息查询')}
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+				<% if(hasPermi('advisory:htAdvisoryInfo:edit')){ %>
+					<a href="${ctx}/advisory/htAdvisoryInfo/form" class="btn btn-default btnTool" title="${text('新增咨询工单')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
+				<% } %>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${htFormInfo}" action="${ctx}/advisory/htAdvisoryInfo/listData?flag=0" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="form-group">
+					<label class="control-label">${text('客户姓名')}：</label>
+					<div class="control-inline">
+						<#form:input path="policyInfo.strName" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('联系电话')}：</label>
+					<div class="control-inline">
+						<#form:input path="policyInfo.strContactNum" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+			    <div class="form-group">
+				<label class="control-label">${text('工单ID')}：</label>
+				<div class="control-inline">
+					<#form:input path="id" maxlength="64" class="form-control width-120"/>
+				</div>
+			</div>
+			    <div class="form-group">
+				<label class="control-label">${text('保单ID')}：</label>
+				<div class="control-inline">
+					<#form:input path="policyInfo.id" maxlength="64" class="form-control width-120"/>
+				</div>
+			</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="reset" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'${text("保单ID ")}',  dataId:'policyId', name:'policyInfo.id', index:'p.id', width:150, align:"left"},
+		{header:'${text("工单ID")}', name:'id', index:'a.id', width:150, align:"left"},
+		{header:'${text("渤海报案号")}', name:'idNumber', index:'a.id_number', width:150, align:"left"},
+        {header:'${text("客户姓名")}', name:'policyInfo.strName', index:'p.str_name', width:150, align:"left"},
+        {header:'${text("联系电话")}', name:'policyInfo.strContactNum', index:'p.str_contact_num', width:150, align:"left"},
+		{header:'${text("手机品牌")}', name:'policyInfo.strPhoneBrand', index:'p.str_phone_brand', width:150, align:"left"},
+		{header:'${text("手机型号")}', name:'policyInfo.strPhoneModel', index:'p.str_phone_model', width:150, align:"left"},
+        {header:'${text("产品名称")}', name:'policyInfo.channelProductName', index:'p.channel_product_name', width:150, align:"left"},
+        {header:'${text("工单类型")}', name:'formType', index:'a.form_type', width:150, align:"left" , formatter: function(val, obj, row, act){
+                return js.getDictLabel(${@DictUtils.getDictListJson('form_type')}, val, '${text("--")}', true);
+            }},
+		{header:'${text("保单状态")}', name:'policyInfo.policyStatus', index:'', width:150, align:"left", formatter: function(val, obj, row, act){
+                return js.getDictLabel(${@DictUtils.getDictListJson('equity_status')}, val, '${text("--")}', true);
+            }},
+		{header:'${text("销售渠道商")}', name:'policyInfo.strChannelName', index:'p.str_channel_name', width:150, align:"left"},
+		{header:'${text("工单处理状态")}', name:'manageStatus', index:'p.manage_status', width:150, align:"left", formatter: function(val, obj, row, act){
+                return js.getDictLabel(${@DictUtils.getDictListJson('manage_status')}, val, '${text("--")}', true);
+            }},
+		{header:'${text("工单状态")}', name:'formStatus', index:'a.form_status', width:150, align:"left", formatter: function(val, obj, row, act){
+                return js.getDictLabel(${@DictUtils.getDictListJson('form_status')}, val, '${text("--")}', true);
+            }},
+		{header:'${text("操作")}', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			console.log(row.policyId);
+			<% if(hasPermi('advisory:htAdvisoryInfo:edit')){ %>
+                        actions.push('<a href="${ctx}/advisory/htAdvisoryInfo/form?formId='+row.id+'&flag=1" class="btnList" title="${text("查看详情")}">查看详情</a>&nbsp;');
+
+			<% } %>
+			return actions.join('');
+		}}
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>

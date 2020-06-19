@@ -1,0 +1,203 @@
+<% layout('/layouts/default.html', {title: '维修工单-待维修管理', libs: ['validate','dataGrid','fileupload']}){ %>
+<div class="main-content">
+	<% include('/modules/common/policyDetail.html', {commonFromId:commonFromId}){} %>
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-title">
+				<i class="fa icon-note"></i> ${text(htRepairClientForm.isNewRecord ? '维修工单管理' : '维修工单管理')}
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${htRepairClientForm}" action="${ctx}/repair/htRepairClientForm/save" method="post" class="form-horizontal">
+		<div class="box-body">
+			<div class="form-unit">${text('核实用户实际信息')}</div>
+				<#form:hidden path="id"/>
+
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('客户姓名')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="htClaimSettlementForm.userName" readonly="true" maxlength="64" class="form-control"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('联系电话')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="htClaimSettlementForm.phone" readonly="true" class="form-control"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('手机品牌')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="htClaimSettlementForm.phoneBrand" disabled="true" items="${brandList}" blankOption="true" blankOptionLabel="请选择" itemLabel="name" itemValue="id" class="form-control required" />
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('手机型号')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="htClaimSettlementForm.phoneModel" disabled="true" items="${typeList}" blankOption="true" blankOptionLabel="请选择"  itemLabel="model" itemValue="id" class="form-control required" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('手机IMEI')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input value="${htFormInfo.policyInfo.strImeiNum}" readonly="true" maxlength="64" class="form-control"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('产品名称')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input value="${htFormInfo.policyInfo.channelProductName}" readonly="true" maxlength="10" class="form-control"/>
+						</div>
+					</div>
+				</div>
+<!--				<div class="col-xs-3">-->
+<!--					<div class="form-group">-->
+<!--						<label class="control-label col-sm-4" title="">-->
+<!--							<span class="required hide">*</span> ${text('信息类型')}：<i class="fa icon-question hide"></i></label>-->
+<!--						<div class="col-sm-8">-->
+<!--							<#form:select path="htClaimSettlementForm.phoneBrand" disabled="true" items="${brandList}" blankOption="true" blankOptionLabel="请选择" itemLabel="name" itemValue="id" class="form-control required" />-->
+<!--						</div>-->
+<!--					</div>-->
+<!--				</div>-->
+			</div>
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('预期维修完成时间')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="repairEndDate"  disabled="true" readonly="true" maxlength="20" class="form-control Wdate"
+							dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:true});"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('维修是否完成')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:radio path="isEnd" disabled="true" dictType="repair_is_end" class="form-control required" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="offer row hide">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('是否修改维修方案')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:radio path="isYes" disabled="true"  dictType="sys_yes_no" defaultValue="0" class="form-control required" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="offer row hide">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('新发现损坏部件相关照片')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-12">
+							<ul class="picView-magnify-list" style="padding: 0px">
+								<% for(imgs in newImageList!){ %>
+								<li>
+									<a href="javascript:void(0)" data-magnify="gallery" data-group="g1" data-src="${imgs}" data-caption="">
+										<img src="${imgs}" width="100px" height="100px">
+									</a>
+								</li>
+								<% } %>
+							</ul>
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('备注')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:textarea path="remarks" readonly="true" rows="4" maxlength="500" class="form-control"/>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="box-footer">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+
+	</div>
+</div>
+<% } %>
+
+
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+
+$(function(){
+	changeEnd();
+});
+
+$("input:radio[name='isEnd']").on('ifChecked', function(event){
+	changeEnd();
+});
+
+function changeEnd(){
+	let isEnd = $("input[name='isEnd']:checked").val();
+	//1是0否
+	if(isEnd == '1'){
+		$(".offer").removeClass("hide");
+		$("#isYes").iCheck("enable");
+		$("#newImageId").removeAttr("disabled");
+	}else{
+		$(".offer").addClass("hide");
+		$('#isYes').iCheck('disable');
+		$("#newImageId").attr("disabled",true)
+	}
+	if (typeof window.webuploaderRefresh == 'function'){
+		window.webuploaderRefresh();
+	}
+}
+</script>

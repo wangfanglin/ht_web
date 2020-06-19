@@ -1,0 +1,150 @@
+<% layout('/layouts/default.html', {title: '组合产品子表管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa icon-notebook"></i> ${text('组合产品子表管理')}
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+				<% if(hasPermi('product:htGroupProductChild:edit')){ %>
+					<a href="${ctx}/product/htGroupProductChild/form" class="btn btn-default btnTool" title="${text('新增组合产品子表')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
+				<% } %>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${htGroupProductChild}" action="${ctx}/product/htGroupProductChild/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="form-group">
+					<label class="control-label">${text('product_id')}：</label>
+					<div class="control-inline">
+						<#form:input path="productId" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('是否购买立即生效1是0否')}：</label>
+					<div class="control-inline">
+						<#form:radio path="isImmediately" dictType="" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('购买。。。天后生效')}：</label>
+					<div class="control-inline">
+						<#form:input path="takeDay" maxlength="11" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('有效期')}：</label>
+					<div class="control-inline width-120">
+						<#form:select path="validity" dictType="" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('终止规则')}：</label>
+					<div class="control-inline">
+						<#form:radio path="changeFrequency" dictType="" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('终止规则')}：</label>
+					<div class="control-inline">
+						<#form:radio path="remainCoverage" dictType="" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('终止规则')}：</label>
+					<div class="control-inline">
+						<#form:radio path="serveValidity" dictType="" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('终止规则')}：</label>
+					<div class="control-inline">
+						<#form:radio path="maintenanceFrequency" dictType="" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('终止规则')}：</label>
+					<div class="control-inline">
+						<#form:radio path="maintenanceAmount" dictType="" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('终止规则')}：</label>
+					<div class="control-inline">
+						<#form:radio path="recoverFrequency" dictType="" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('reamrk')}：</label>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('0正常 1删除 2停用')}：</label>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="reset" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'${text("product_id")}', name:'productId', index:'a.product_id', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			return '<a href="${ctx}/product/htGroupProductChild/form?id='+row.id+'" class="btnList" data-title="${text("编辑组合产品子表")}">'+(val||row.id)+'</a>';
+		}},
+		{header:'${text("是否购买立即生效1是0否")}', name:'isImmediately', index:'a.is_immediately', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("购买。。。天后生效")}', name:'takeDay', index:'a.take_day', width:150, align:"center"},
+		{header:'${text("有效期")}', name:'validity', index:'a.validity', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("终止规则")}', name:'changeFrequency', index:'a.change_frequency', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("终止规则")}', name:'remainCoverage', index:'a.remain_coverage', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("终止规则")}', name:'serveValidity', index:'a.serve_validity', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("终止规则")}', name:'maintenanceFrequency', index:'a.maintenance_frequency', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("终止规则")}', name:'maintenanceAmount', index:'a.maintenance_amount', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("终止规则")}', name:'recoverFrequency', index:'a.recover_frequency', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("update_date")}', name:'updateDate', index:'a.update_date', width:150, align:"center"},
+		{header:'${text("reamrk")}', name:'reamrk', index:'a.reamrk', width:150, align:"left"},
+		{header:'${text("0正常 1删除 2停用")}', name:'status', index:'a.status', width:150, align:"left"},
+		{header:'${text("操作")}', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('product:htGroupProductChild:edit')){ %>
+				actions.push('<a href="${ctx}/product/htGroupProductChild/form?id='+row.id+'" class="btnList" title="${text("编辑组合产品子表")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+				if (row.status == Global.STATUS_NORMAL){
+					actions.push('<a href="${ctx}/product/htGroupProductChild/disable?id='+row.id+'" class="btnList" title="${text("停用组合产品子表")}" data-confirm="${text("确认要停用该组合产品子表吗？")}"><i class="glyphicon glyphicon-ban-circle"></i></a>&nbsp;');
+				} else if (row.status == Global.STATUS_DISABLE){
+					actions.push('<a href="${ctx}/product/htGroupProductChild/enable?id='+row.id+'" class="btnList" title="${text("启用组合产品子表")}" data-confirm="${text("确认要启用该组合产品子表吗？")}"><i class="glyphicon glyphicon-ok-circle"></i></a>&nbsp;');
+				}
+				actions.push('<a href="${ctx}/product/htGroupProductChild/delete?id='+row.id+'" class="btnList" title="${text("删除组合产品子表")}" data-confirm="${text("确认要删除该组合产品子表吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			<% } %>
+			return actions.join('');
+		}}
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>

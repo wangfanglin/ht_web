@@ -1,0 +1,31 @@
+<% layout('/layouts/default.html', {title: '维修工单管理', libs: ['validate','fileupload']}){ %>
+
+
+<% include('/modules/common/policyDetail.html', {commonFromId:htFormInfo.id}){} %>
+
+<% } %>
+
+<div class="box-footer">
+	<div class="row">
+		<div class="col-sm-offset-2 col-sm-10">
+
+
+
+			<% if ('1' == htFormInfo.isRun! && '2027' != htFormInfo.manageStatus! && '2037' != htFormInfo.manageStatus!){ %>
+			<button type="button" data-layer="true" data-layer-width="725" data-layer-height="420" onclick="openTabCQ(this)"  class="btn btn-sm btn-info mr3"><i class="fa   icon-clock"></i> 重新开启</button>
+			<% } %>
+			<script>
+
+				function openTabCQ(b) {
+					var $bt=$(b);
+					let formId = "${htFormInfo.id!}";
+					js.addTabPage($bt,"","${ctx}/forminfo/htFormOperation/reopen?formId="+formId);
+				}
+
+			</script>
+		</div>
+	</div>
+</div>
+<script>
+
+</script>

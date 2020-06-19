@@ -1,0 +1,6 @@
+/.idea/
+/jeesite-web-bpm.iml
+/jeesite.lic
+/target/
+/src/main/webapp/WEB-INF/classes
+*.DS_Store

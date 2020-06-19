@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.period.dao.HtMonthTableDao">
+	
+	<!-- 查询数据 网点平均维修周期
+	<select id="findList" resultType="HtMonthTable">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+	</select> -->
+	<select id="findList" resultType="com.jeesite.modules.period.entity.HtMonthTable">
+		select
+			  c.maintenance_point_name as maintenance_point_name,
+			  sum(CASE a.monthes WHEN 1 THEN a.days ELSE 0 END )as  january ,
+			  sum(CASE a.monthes WHEN 2 THEN a.days ELSE 0 END )as  february ,
+			  sum(CASE a.monthes WHEN 3 THEN a.days ELSE 0 END )as  march ,
+			  sum(CASE a.monthes WHEN 4 THEN a.days ELSE 0 END )as  april ,
+			  sum(CASE a.monthes WHEN 5 THEN a.days ELSE 0 END )as  may ,
+			  sum(CASE a.monthes WHEN 6 THEN a.days ELSE 0 END )as  june ,
+			  sum(CASE a.monthes WHEN 7 THEN a.days ELSE 0 END )as  july ,
+			  sum(CASE a.monthes WHEN 8 THEN a.days ELSE 0 END )as  august ,
+			  sum(CASE a.monthes WHEN 9 THEN a.days ELSE 0 END )as  september ,
+			  sum(CASE a.monthes WHEN 10 THEN a.days ELSE 0 END )as  october ,
+			  sum(CASE a.monthes WHEN 11 THEN a.days ELSE 0 END )as  november ,
+			  sum(CASE a.monthes WHEN 12 THEN a.days ELSE 0 END )as  december
+			FROM
+				ht_maintenance_point c
+				LEFT JOIN (
+			SELECT
+				b.office_id AS id,
+			ROUND(AVG(TIMESTAMPDIFF(DAY,a.start_date,a.end_date)+1)) AS days,
+				a.start_date,
+				a.end_date,
+				IFNULL(MONTH(a.start_date),'0') AS monthes
+			FROM
+				ht_time_efficiency a
+				INNER JOIN ht_form_info b ON a.form_id = b.id
+			WHERE
+				YEAR ( a.start_date ) = YEAR ( NOW( ) )
+				AND a.end_date IS NOT NULL
+				AND b.form_type = '2'
+			GROUP BY
+				b.office_id,
+				MONTH ( a.start_date )
+				) a ON a.id = c.organization_id
+				LEFT JOIN (
+			SELECT
+				b.office_id AS id,
+			IF
+				(
+				ROUND( AVG( TIMESTAMPDIFF( DAY, a.start_date, a.end_date ) + 1 ) ) IS NULL,
+				0,
+				ROUND( AVG( TIMESTAMPDIFF( DAY, a.start_date, a.end_date ) + 1 ) )
+				) AS days
+			FROM
+				ht_time_efficiency a
+				INNER JOIN ht_form_info b ON a.form_id = b.id
+			WHERE
+				YEAR ( a.start_date ) = YEAR ( NOW( ) )
+				AND a.end_date IS NOT NULL
+				AND b.form_type = '2'
+			GROUP BY
+				b.office_id
+				) d ON d.id = c.organization_id
+				GROUP BY c.maintenance_point_name
+			ORDER BY
+				d.days DESC
+				limit 3
+		</select>
+	<select id="getPeriodList" resultType="com.jeesite.modules.period.entity.HtMonthTable">
+			select
+			  c.maintenance_point_name as maintenance_point_name,
+			  sum(CASE a.monthes WHEN 1 THEN a.days ELSE 0 END )as  january ,
+			  sum(CASE a.monthes WHEN 2 THEN a.days ELSE 0 END )as  february ,
+			  sum(CASE a.monthes WHEN 3 THEN a.days ELSE 0 END )as  march ,
+			  sum(CASE a.monthes WHEN 4 THEN a.days ELSE 0 END )as  april ,
+			  sum(CASE a.monthes WHEN 5 THEN a.days ELSE 0 END )as  may ,
+			  sum(CASE a.monthes WHEN 6 THEN a.days ELSE 0 END )as  june ,
+			  sum(CASE a.monthes WHEN 7 THEN a.days ELSE 0 END )as  july ,
+			  sum(CASE a.monthes WHEN 8 THEN a.days ELSE 0 END )as  august ,
+			  sum(CASE a.monthes WHEN 9 THEN a.days ELSE 0 END )as  september ,
+			  sum(CASE a.monthes WHEN 10 THEN a.days ELSE 0 END )as  october ,
+			  sum(CASE a.monthes WHEN 11 THEN a.days ELSE 0 END )as  november ,
+			  sum(CASE a.monthes WHEN 12 THEN a.days ELSE 0 END )as  december
+			FROM
+				ht_maintenance_point c
+				LEFT JOIN (
+			SELECT
+				b.office_id AS id,
+			IF
+				(
+				ROUND( AVG( TIMESTAMPDIFF( DAY, a.start_date, a.end_date ) + 1 ) ) IS NULL,
+				0,
+				ROUND( AVG( TIMESTAMPDIFF( DAY, a.start_date, a.end_date ) + 1 ) )
+				) AS days,
+				a.start_date,
+				a.end_date,
+				IFNULL(MONTH(a.start_date),'0') AS monthes
+			FROM
+				ht_time_efficiency a
+				INNER JOIN ht_form_info b ON a.form_id = b.id
+			WHERE
+				YEAR ( a.start_date ) = YEAR ( NOW( ) )
+				AND a.end_date IS NOT NULL
+				AND b.form_type = '2'
+			GROUP BY
+				b.office_id,
+				MONTH ( a.start_date )
+				) a ON a.id = c.organization_id
+				LEFT JOIN (
+			SELECT
+				b.office_id AS id,
+			IF
+				(
+				ROUND( AVG( TIMESTAMPDIFF( DAY, a.start_date, a.end_date ) + 1 ) ) IS NULL,
+				0,
+				ROUND( AVG( TIMESTAMPDIFF( DAY, a.start_date, a.end_date ) + 1 ) )
+				) AS days
+			FROM
+				ht_time_efficiency a
+				INNER JOIN ht_form_info b ON a.form_id = b.id
+			WHERE
+				YEAR ( a.start_date ) = YEAR ( NOW( ) )
+				AND a.end_date IS NOT NULL
+				AND b.form_type = '2'
+			GROUP BY
+				b.office_id
+				) d ON d.id = c.organization_id
+				GROUP BY c.maintenance_point_name
+			ORDER BY
+				d.days DESC,c.id
+				limit 3
+	</select>
+	<select id="pricesList" resultType="com.jeesite.modules.period.entity.HtMonthTable">
+		SELECT
+		c.maintenance_point_name as maintenance_point_name,
+		sum(CASE monthes WHEN 1 THEN price ELSE 0 END )as  january ,
+		sum(CASE monthes WHEN 2 THEN price ELSE 0 END )as  february ,
+		sum(CASE monthes WHEN 3 THEN price ELSE 0 END )as  march ,
+		sum(CASE monthes WHEN 4 THEN price ELSE 0 END )as  april ,
+		sum(CASE monthes WHEN 5 THEN price ELSE 0 END )as  may ,
+		sum(CASE monthes WHEN 6 THEN price ELSE 0 END )as  june ,
+		sum(CASE monthes WHEN 7 THEN price ELSE 0 END )as  july ,
+		sum(CASE monthes WHEN 8 THEN price ELSE 0 END )as  august ,
+		sum(CASE monthes WHEN 9 THEN price ELSE 0 END )as  september ,
+		sum(CASE monthes WHEN 10 THEN price ELSE 0 END )as  october ,
+		sum(CASE monthes WHEN 11 THEN price ELSE 0 END )as  november ,
+		sum(CASE monthes WHEN 12 THEN price ELSE 0 END )as  december
+		from
+		(select b.office_id,
+		ROUND(AVG(d.sum_price)/100,0)as price,
+		month(a.start_date) as monthes
+		from ht_time_efficiency a
+		inner join ht_form_info b on a.form_id = b.id
+		inner join ht_repair_client_form d on a.form_id = d.form_id
+		where
+		year(#{startTime})=year(#{endTime})
+		and
+		a.start_date BETWEEN #{startTime} AND #{endTime}
+		and a.end_date is not null
+	    AND b.form_type = '2'
+		group by b.office_id,
+        MONTH ( a.start_date )) a
+		inner join ht_maintenance_point c on a.office_id = c.organization_id
+		group by c.maintenance_point_name
+		</select>
+	<select id="getPricesList" resultType="com.jeesite.modules.period.entity.HtMonthTable">
+		SELECT
+	c.maintenance_point_name AS maintenance_point_name,
+	sum( CASE a.monthes WHEN 1 THEN a.price ELSE 0 END ) AS january,
+	sum( CASE a.monthes WHEN 2 THEN a.price ELSE 0 END ) AS february,
+	sum( CASE a.monthes WHEN 3 THEN a.price ELSE 0 END ) AS march,
+	sum( CASE a.monthes WHEN 4 THEN a.price ELSE 0 END ) AS april,
+	sum( CASE a.monthes WHEN 5 THEN a.price ELSE 0 END ) AS may,
+	sum( CASE a.monthes WHEN 6 THEN a.price ELSE 0 END ) AS june,
+	sum( CASE a.monthes WHEN 7 THEN a.price ELSE 0 END ) AS july,
+	sum( CASE a.monthes WHEN 8 THEN a.price ELSE 0 END ) AS august,
+	sum( CASE a.monthes WHEN 9 THEN a.price ELSE 0 END ) AS september,
+	sum( CASE a.monthes WHEN 10 THEN a.price ELSE 0 END ) AS october,
+	sum( CASE a.monthes WHEN 11 THEN a.price ELSE 0 END ) AS november,
+	sum( CASE a.monthes WHEN 12 THEN a.price ELSE 0 END ) AS december
+FROM
+	ht_maintenance_point c
+	LEFT JOIN (
+SELECT
+	b.office_id AS id,
+ROUND(AVG(d.sum_price)/100,0)as price,
+	a.start_date,
+	a.end_date,
+	MONTH ( a.start_date ) AS monthes
+FROM
+	ht_time_efficiency a
+	INNER JOIN ht_form_info b ON a.form_id = b.id
+	INNER JOIN ht_repair_client_form d ON a.form_id = d.form_id
+WHERE
+	YEAR ( a.start_date ) = YEAR ( NOW( ) )
+	AND a.end_date IS NOT NULL
+	AND b.form_type = '2'
+GROUP BY
+	b.office_id,
+	MONTH ( a.start_date )
+	) a ON a.id = c.organization_id
+GROUP BY
+	c.maintenance_point_name
+ORDER BY
+	a.price DESC,c.id
+	limit 3
+		</select>
+</mapper>

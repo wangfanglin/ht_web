@@ -1,0 +1,78 @@
+<% layout('/layouts/default.html', {title: '申请改派', libs: ['validate']}){ %>
+
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-title">
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+
+		<#form:form id="inputForm" model="${htFormOperation}" action="${ctx}/forminfo/htFormOperation/save" method="post" class="form-horizontal">
+			<div class="box-body">
+				<div  style="text-align:center;"><h3>申请改派</h3></div>
+				<#form:input path="formId" style="display: none"/>
+				<#form:input path="bdId" style="display: none"/>
+				<#form:input path="bpm.taskId" style="display: none"/>
+				<#form:input path="bpm.procInsId" style="display: none"/>
+				<#form:input path="bpm.activityId" style="display: none"/>
+                <#form:input id="operationType"  name="operationType" value="2" style="display: none"/>
+				<#form:input id="type"  name="type" value="1" style="display: none"/>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-1" title="">
+								<span class="required ">*</span> ${text('理赔资料:')}<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-11">
+								<#form:radio  path="claimType" dictType="claim_status"  class="form-control required"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('改派原因:')}<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:textarea  path="reason" class="form-control required" />
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+			<div class="box-footer">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script>
+    $("#inputForm").validate({
+        submitHandler: function(form){
+            js.ajaxSubmitForm($(form), function(data){
+                js.showMessage(data.message);
+                if(data.result == Global.TRUE){
+                    js.closeCurrentTabPage(function(contentWindow){
+                        if (contentWindow.BpmButton){
+                            contentWindow.BpmButton.callback();
+                        }else{
+                            contentWindow.page();
+                        }
+                    });
+                }
+            }, "json");
+        }
+    });
+
+</script>

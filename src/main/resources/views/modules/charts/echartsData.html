@@ -1,0 +1,1118 @@
+<% layout('/layouts/default.html', {title: '', bodyClass: ''}){ %>
+<!-- <link rel="stylesheet" href="${ctxStatic}/modules/sys/sysDesktop.css?${_version}"> -->
+
+<div class="content pb0">
+   <!-- <div class="row">
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-aqua"><i class="fa fa-cog"></i></span>
+                <div class="info-box-content" >
+                    <span class="info-box-text">日报案量</span>
+                    <span class="info-box-number">${day}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-red"><i class="fa fa-google-plus"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">渠道总数</span>
+                    <span class="info-box-number">${channel}</span>
+                </div>
+            </div>
+        </div>
+        <div class="clearfix visible-sm-block"></div>
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-green"><i class="fa fa-internet-explorer"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">用户总数</span>
+                    <span class="info-box-number">${user}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-yellow"><i class="fa fa-users"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">员工数</span>
+                    <span class="info-box-number">${staff}</span>
+
+                </div>
+            </div>
+        </div>
+    </div>-->
+    <div class="row">
+        <section class="col-md-12 ui-sortable">
+            <div class="box box-widget">
+                <div class="box-header with-border" >
+                    <h3 class="box-title" onclick="data()" style="cursor:pointer;font-size: 20px;color: #4d98c3;font-weight:bold ;font-family:STXinwei;">&nbsp&nbsp报案量</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                            <i class="fa fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-box-tool" data-widget="remove">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="chart">
+                            <div id="myChart1" style="height:260px;width:95%"></div><script>
+                            $(function(){
+                                var myChart1 = echarts.init(document.getElementById('myChart1'), 'default');
+                                myChart1.setOption({
+                                    title: {
+                                        text:js.formatDate(new Date(), '    yyyy-MM'),
+                                        textStyle: {
+                                            fontSize: 15,
+                                            bolder:2
+                                        }
+                                    },
+                                    tooltip: {
+                                        trigger: 'axis',
+                                        axisPointer: {
+                                            type: 'cross',
+                                            crossStyle: {
+                                                color: '#999'
+                                            }
+                                        }
+                                    },
+                                    toolbox: {
+                                        show: true,
+                                        orient: 'vertical',
+                                        left: 'right',
+                                        top: 'center',
+                                        feature: {
+                                            dataView: {show: true, readOnly: false},
+                                            magicType: {show: true, type: ['line', 'bar']},
+                                            restore: {show: true},
+                                            saveAsImage: {show: true}
+                                        },
+                                        itemSize:13,
+                                        itemGap:10
+                                    },
+                                    legend: {
+                                        data: ['日报案量', '月报案量'],
+                                        textStyle: {
+                                            color: '#177cb0',
+                                            fontSize: 14,
+                                            bolder:2
+                                        }
+                                    },
+                                    grid: {
+                                        left: '10%',
+                                        right: '7%',
+                                        bottom: '6%',
+                                        top:'16%',
+                                        containLabel: true
+                                    },
+                                    xAxis: [
+                                        { type: 'category',
+
+                                            axisLabel: {
+                                                textStyle: {
+                                                    color: '#000000'
+                                                },
+                                                formatter: function(val) {
+                                                    var strs = val.split(''); //字符串数组
+                                                    var str ='';
+                                                    for(var i = 0, s; s = strs[i++];) {//遍历字符串数组
+                                                        if(i<21){
+                                                            str += s;
+                                                            if(!(i % 5)) str +='\n'; //按需要求余
+                                                        }
+                                                    }
+                                                    return str
+                                                },
+                                                fontSize:11,
+                                                bolder:2
+                                            },
+                                            axisTick: {
+                                                show: false
+                                            },
+                                            axisLine: {
+                                                show: false
+                                            },
+                                            textStyle: {
+                                                //更改坐标轴文字颜色
+                                                fontSize : 10    //更改坐标轴文字大小
+                                            },
+                                            z: 10
+
+                                        }
+                                    ],
+                                    yAxis: [
+                                        {
+                                            type: 'value',
+                                            name: '日报案量',
+                                            min: 0,
+                                            max: 25,
+                                            interval: 5,
+                                            axisLabel: {
+                                                formatter: '{value} 件',
+                                                fontSize:12
+                                            },
+                                            nameTextStyle: {
+                                                fontSize: 15
+                                            }
+                                        },
+                                        {
+                                            type: 'value',
+                                            name: '月报案量',
+                                            min: 0,
+                                            max: 100,
+                                            interval: 20,
+                                            axisLabel: {
+                                                formatter: '{value} 件',
+                                                fontSize:12
+                                            },
+                                            nameTextStyle: {
+                                                fontSize: 15
+                                            }
+
+                                        }
+                                    ],
+                                    series: [
+                                        {
+                                            name: '日报案量',
+                                            type:  'line',
+                                            barWidth:'23%',
+                                            smooth: true,
+                                            symbolSize: 10,
+                                            lineStyle:{
+                                                width:2//设置线条粗细
+                                            },
+                                            markPoint: {
+                                                data: [
+                                                    {type: 'max', name: '最大值'},
+                                                    {type: 'min', name: '最小值'}
+                                                ]
+                                            },
+                                            color:"#98c6fa"
+                                        },
+                                        {
+                                            name: '月报案量',
+                                            type:'bar',
+                                            smooth: true,
+                                            symbolSize: 10,
+                                            lineStyle:{
+                                                width:2//设置线条粗细
+                                            },
+                                            yAxisIndex: 1,
+                                            markPoint: {
+                                                data: [
+                                                    {type: 'max', name: '最大值'},
+                                                    {type: 'min', name: '最小值'}
+                                                ]
+                                            },
+                                            data: [],
+                                            color:"#8590eb",
+                                            barWidth:"20%",
+                                            barGap:0
+                                        }
+                                    ]
+                                }); // 异步加载数据
+                                $.get('${ctx}/charts/getReportAmount').done(function (data) {
+                                    // 填入数据
+                                    myChart1.setOption({
+                                        xAxis: {
+                                            data: data.officeName
+                                        },
+                                        yAxis: [{
+                                            // 根据名字对应到相应的系列
+                                            name: '日报案量',
+                                            max: data.dayMaxNumber,
+                                            interval:data.dayLevel
+                                        }, {
+                                            // 根据名字对应到相应的系列
+                                            name: '月报案量',
+                                            max: data.monthMaxNumber,
+                                            interval:data.monthLevel
+                                        }],
+                                        series: [{
+                                            // 根据名字对应到相应的系列
+                                            name: '日报案量',
+                                            data: data.daySalesList
+                                        }, {
+                                            // 根据名字对应到相应的系列
+                                            name: '月报案量',
+                                            data: data.monthSalesList
+                                        }]
+                                    });
+                                });
+                            });
+                        </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="col-md-7 ui-sortable">
+            <div class="box box-widget">
+                <div class="box-header with-border" >
+                    <h3 class="box-title" onclick="refuse()" style="cursor:pointer;font-size: 20px;color: #4d98c3;font-weight:bold ;font-family:STXinwei;">&nbsp&nbsp拒单量</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                            <i class="fa fa-minus"></i>
+                        </button>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown"></button>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-box-tool" data-widget="remove">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div id="myChart2" style="height:200px;width:100%"></div><script>
+                            $(function() {
+                                var myChart2 = echarts.init(document.getElementById('myChart2'), 'default');
+                                // 显示标题，图例和空的坐标轴
+                                myChart2.setOption({
+                                    title: {
+                                        text: js.formatDate(new Date(), '   yyyy'),
+                                        textStyle: {
+                                            fontSize: 15,
+                                            bold:2
+                                        }
+                                    },
+                                    tooltip: {
+                                        trigger: 'axis',
+                                        axisPointer: {
+                                            type: 'cross',
+                                            crossStyle: {
+                                                color: '#999'
+                                            }
+                                        }
+                                    },
+                                    toolbox: {
+                                        show:true,
+                                        feature: {
+                                            dataView: {show: true, readOnly: false},
+                                            magicType: {show: true, type: ['line', 'bar']},
+                                            restore: {show: true},
+                                            saveAsImage: {show: true}
+                                        },
+                                        itemSize:13,
+                                        itemGap:10,
+                                        right: '3%'
+                                    },
+                                    grid: {
+                                        left: '2%',
+                                        right: '2%',
+                                        bottom: '0%',
+                                        containLabel: true
+                                    },
+                                    xAxis: {
+                                        name: '',
+                                        data: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+                                        axisLabel:{
+                                            textStyle:{
+                                            },
+                                            fontSize:10,
+                                            bolder:30
+                                        },
+                                        boundaryGap: false,
+                                        nameTextStyle: {
+                                            fontSize : 15,
+                                            bolder:2     //更改坐标轴文字大小
+                                        }
+                                    },
+                                    yAxis: [
+                                        {
+                                            type: 'value',
+                                            name: '拒单量',
+                                            min: 0,
+                                            max: 20,
+                                            interval: 4,
+                                            axisLabel: {
+                                                formatter: '{value} 件',
+                                                fontSize:10,
+                                                bolder:2
+                                            },
+                                            nameTextStyle: {
+                                                fontSize: 12,
+                                                bolder:2
+                                            }
+                                        }
+
+                                    ],
+                                    series: [{
+                                        name: '拒单数量',
+                                        type: 'line',
+                                        smooth: true,
+                                        lineStyle:{
+                                            width:1//设置线条粗细
+                                        },
+                                        symbol: 'none',
+                                        sampling: 'average',
+                                        areaStyle: {
+                                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [ {
+                                                offset: 1,
+                                                color: '#F0FCFF'
+                                            },
+                                                {
+                                                    offset: 0.7,
+                                                    color: '#D6ECF0'
+                                                },{
+                                                    offset: 0,
+                                                    color: '#83bff6'
+                                                }
+                                                ])
+                                        },
+                                        barWidth:'25%',
+                                        itemStyle: {
+                                            color:  '#83bff6'
+                                        }
+
+                                    }]
+                                });
+                                // 异步加载数据
+                                $.get('${ctx}/charts/getRefuseNumber').done(function (data) {
+                                    // 填入数据
+                                    myChart2.setOption({
+                                        yAxis: [
+                                            {
+                                                name: '拒单量',
+                                                min: 0,
+                                                max: data.MaxNumber,
+                                                interval:data.Level
+                                            }],
+                                        series: [{
+                                            // 根据名字对应到相应的系列
+                                            name: '拒单数量',
+                                            data: data.Num
+                                        }]
+                                    });
+                                });
+                            });
+                        </script>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div></section>
+        <section class="col-md-5 ui-sortable ui-sortable">
+            <div class="box box-widget">
+                <div class="box-header with-border"  >
+                    <h3 class="box-title" onclick="call()" style="cursor:pointer;font-size: 20px;color: #4d98c3;font-weight:bold ;font-family:STXinwei;">&nbsp&nbsp通话量</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                            <i class="fa fa-minus"></i>
+                        </button>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown">
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-box-tool" data-widget="remove">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="box-footer no-border">
+                    <div class="row">
+                        <div class="tab-content no-padding">
+                            <div class="chart tab-pane active" id="chart-3">
+                                <div id="myChart3" style="height:200px;width:100%"></div><script>
+                                $(function(){
+                                    var myChart3 = echarts.init(document.getElementById('myChart3'), 'default');
+                                    myChart3.setOption({
+                                        title: {
+                                            text: js.formatDate(new Date(), '     yyyy-MM'),
+                                            left: 'left',
+                                            textStyle: {
+                                                fontSize: 15,
+                                                bolder:2
+                                            }
+                                        },
+                                        tooltip: {
+                                            trigger: 'item',
+                                            formatter: '{a} <br/>{b} : {c} ({d}%)'
+                                        },
+                                        toolbox: {
+                                            feature: {
+                                                dataView: {show: true, readOnly: false},
+                                                restore: {show: true},
+                                                saveAsImage: {show: true}
+                                            },
+                                            itemSize:13,
+                                            itemGap:10,
+                                            right: '4%'
+
+                                        },
+                                        /*legend: {
+                                            type: 'scroll',
+                                            orient: 'vertical',
+                                            right: 20,
+                                            top: 90,
+                                            bottom: 20,
+                                            data: ['接入量', '呼出量'],
+                                            textStyle:{
+                                                fontSize:14,
+                                                color:'#4b5cc4',
+                                                bolder:2
+                                            }
+                                        },*/
+                                        grid: {
+                                            left: '20%',
+                                            right: '14%',
+                                            bottom: '50%',
+                                            top:'top',
+                                            containLabel: true
+                                        },
+                                        series: [
+                                            {
+                                                name: '通话量',
+                                                type: 'pie',
+                                                left:'center',//离容器左侧的距离
+                                                top: 'top',//距离容器上测的距离
+                                                center: ['50%', '50%'],
+                                                radius: ['40%', '60%'],
+                                                itemStyle: {
+                                                    normal: {
+                                                        color: function (params) {
+                                                            //自定义颜色
+                                                            var colorList = [
+                                                                '#FFA07A', '#8590eb'
+                                                            ];
+                                                            return colorList[params.dataIndex]
+                                                        }
+                                                    }
+                                                },
+                                                label : {
+                                                    normal : {
+                                                        formatter: '{b}:{c}: ({d}%)',
+                                                        textStyle : {
+                                                            fontWeight : 'normal',
+                                                            fontSize : 14,
+                                                            bolder:2
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    });
+                                    $.get('${ctx}/charts/getCallVolumeAmount').done(function (data) {
+                                        var servicedata=[];
+                                        var objs=new Object();
+                                        objs.name="接入量";
+                                        objs.value=data.incomingCall;
+                                        var obj1=new Object();
+                                        obj1.name="呼出量";
+                                        obj1.value=data.callOut;
+                                        servicedata[0] = objs;
+                                        servicedata[1] = obj1;
+                                        // 填入数据
+                                        myChart3.setOption({
+                                            series:[{
+                                                name: '通话量',
+                                                type: 'pie',
+                                                data:servicedata
+
+                                            }]
+                                        });
+                                    });
+                                });
+                            </script>
+
+                            </div>
+                        </div>
+                    </div>
+                </div></div></section>
+        <section class="col-md-12 ui-sortable">
+            <table style="height: 500px;width: 100%">
+                <tr>
+                    <td style="height:300%;width:40%">
+                        <div class="box box-widget">
+                            <div class="box-header with-border" >
+                                <h3 class="box-title" onclick="over()" style="cursor:pointer;font-size: 20px;color: #4d98c3;font-weight:bold ;font-family:STXinwei;">&nbsp&nbsp超期件数</h3>
+                                <div class="box-tools pull-right">
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-box-tool" data-widget="remove">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="box-body">
+                                <div class="row" >
+                                    <div class="chart">
+                                        <div id="myChart5" style="height:260%;width:110%"></div>
+                                        <script>
+                                            $(function(){
+                                                var myChart5 = echarts.init(document.getElementById('myChart5'), 'default');
+                                                myChart5.setOption({
+                                                    title: {
+                                                        text: js.formatDate(new Date(), '    yyyy-MM'),
+                                                        textStyle: {
+                                                            fontSize: 15,
+                                                            bolder:2
+                                                        }
+                                                    },
+                                                    color: ['#4b5cc4'],
+                                                    tooltip: {
+                                                        trigger: 'axis',
+                                                        axisPointer: {
+                                                            type: 'cross',
+                                                            crossStyle: {
+                                                                color: '#999'
+                                                            }
+                                                        }
+                                                    },
+                                                    toolbox: {
+                                                        feature: {
+                                                            dataView: {show: true, readOnly: false},
+                                                            magicType: {show: true, type: ['line', 'bar']},
+                                                            restore: {show: true},
+                                                            saveAsImage: {show: true}
+                                                        },
+                                                        itemSize:13,
+                                                        itemGap:10
+                                                    },
+                                                    grid: {
+                                                        left: '5%',
+                                                        right: '5%',
+                                                        bottom: '3%',
+                                                        top:60,
+                                                        containLabel: true
+                                                    },
+                                                    xAxis: [
+                                                        {type: 'category',
+                                                            boundaryGap: true,
+                                                            name: '',
+                                                            axisLabel: {
+                                                                formatter: function(val) {
+                                                                    var strs = val.split(''); //字符串数组
+                                                                    var str ='';
+                                                                    for(var i = 0, s; s = strs[i++];) {//遍历字符串数组
+                                                                        if(i<21){
+                                                                            str += s;
+                                                                            if(!(i % 5)) str +='\n'; //按需要求余
+                                                                        }
+                                                                    }
+                                                                    return str
+                                                                },
+                                                                fontSize:10,
+                                                                bolder:2
+                                                            }
+                                                        }
+                                                    ],
+                                                    yAxis: [
+                                                        {
+                                                            type: 'value',
+                                                            name: '超期件数',
+                                                            min: 0,
+                                                            max: 20,
+                                                            textStyle: {
+                                                                //更改坐标轴文字颜色
+                                                                fontSize : 10,
+                                                                bolder:2     //更改坐标轴文字大小
+                                                            },
+                                                            interval: 4,
+                                                            axisLabel: {
+                                                                formatter: '{value} 件',
+                                                                fontSize:10,
+                                                                bolder:2
+                                                            },
+                                                            nameTextStyle:{
+                                                                fontSize:12,
+                                                                bolder:2
+                                                            }
+                                                        }
+                                                    ],
+                                                    series: [
+                                                        {
+                                                            name: '超期件数',
+                                                            smooth: true,
+                                                            symbolSize: 10,
+                                                            lineStyle:{
+                                                                color:"#44cef6",
+                                                                width:2//设置线条粗细
+                                                            },
+                                                            type: 'bar',
+                                                            barGap:'100%',
+                                                            itemStyle: {
+                                                                normal:{
+                                                                    color: function (params){
+                                                                        var colorList = ['#FFB3A7','#ffc076','#B0A4E3','#7BCFA6','#98c6fa'];
+                                                                        return colorList[params.dataIndex];
+                                                                    },
+                                                                    label: {
+                                                                        show: true,		//开启显示
+                                                                        position: 'top',
+                                                                        textStyle: {	    //数值样式
+                                                                            fontSize: 16,
+                                                                            bolder:2
+                                                                        }
+                                                                    }
+                                                                }
+                                                            },
+                                                            barWidth:"22px"
+                                                        }
+                                                    ]
+                                                });
+                                                $.get('${ctx}/charts/getPastdueAmount').done(function (data) {
+                                                    // 填入数据
+                                                    myChart5.setOption({
+                                                        xAxis: {
+                                                            name:'',
+                                                            data: data.officeName
+                                                        },
+                                                        yAxis: [{
+                                                            // 根据名字对应到相应的系列
+                                                            name: '超期件数',
+                                                            max: data.MaxNumber,
+                                                            interval:data.Level
+                                                        }],
+                                                        series: [{
+                                                            // 根据名字对应到相应的系列
+                                                            name: '超期件数',
+                                                            data: data.pastdueList
+                                                        }]
+                                                    });
+                                                });
+                                            });
+                                        </script>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td rowspan="2"  >
+                        <div style="height:350px;width:10px">
+                        </div>
+                    </td>
+                    <td rowspan="2">
+                        <div class="box box-widget">
+                            <div class="box-header with-border" >
+                                <h3 class="box-title" onclick="prices()" style="cursor:pointer;font-size: 20px;color: #4d98c3;font-weight:bold ;font-family:STXinwei;">&nbsp&nbsp网点平均维修金额</h3>
+                                <div class="box-tools pull-right">
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-box-tool" data-widget="remove">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="box-body">
+                                <div class="row" style="height:700%;width:100%">
+                                    <div class="chart">
+                                        <div id="myChart6" style="height:650%;width:90%"></div><script>
+                                        $(function(){
+                                            var myChart6 = echarts.init(document.getElementById('myChart6'), 'default');
+                                            myChart6.setOption({
+                                                title: {
+                                                    text: js.formatDate(new Date(), '    yyyy'),
+                                                    textStyle: {
+                                                        fontSize: 15,
+                                                        bolder:2
+                                                    }
+                                                },
+                                                legend: {
+                                                    orient: 'vertical',
+                                                    x: 'center',
+                                                    y: 'top',
+                                                    top:0,
+                                                    data: [],
+                                                    textStyle:{
+                                                        fontSize:10,
+                                                        bolder:2
+                                                    },
+                                                    formatter: function (name) {
+                                                        return echarts.format.truncateText(name, 200, '14px Microsoft Yahei', '…');
+                                                    },
+                                                    tooltip: {
+                                                        show: true
+                                                    }
+                                                },
+                                                grid: {
+                                                    left: '3%',
+                                                    right: '9%',
+                                                    bottom: '2%',
+                                                    top:'15%',
+                                                    containLabel: true
+                                                },
+                                                color: ['#FFB3A7', '#8590eb', '#ffc64b'],
+                                                tooltip: {
+                                                    trigger: 'axis',
+                                                    axisPointer: {
+                                                        type: 'cross',
+                                                        crossStyle: {
+                                                            color: '#999'
+                                                        }
+                                                    }
+                                                },
+                                                toolbox: {
+                                                    orient: 'vertical',
+                                                    top: 'center',
+                                                    feature: {
+                                                        dataView: {show: true, readOnly: false},
+                                                        magicType: {show: true, type: ['line', 'bar', 'stack', 'tiled']},
+                                                        restore: {show: true},
+                                                        saveAsImage: {show: true}
+                                                    },
+                                                    itemSize:13,
+                                                    itemGap:10,
+                                                    right:'0%'
+
+                                                },
+                                                xAxis: {
+                                                    name: '金额',
+                                                    type: 'value',
+                                                    min: 0,
+                                                    max: 200,
+                                                    interval: 40,
+                                                    textStyle: {
+                                                        //更改坐标轴文字颜色
+                                                        fontSize : 10 ,
+                                                        bolder:2
+                                                    },
+                                                    axisLabel: {
+                                                        formatter: '{value} 元',
+                                                        fontSize:10,
+                                                        bolder:2
+                                                    },
+                                                    nameTextStyle:{
+                                                        fontSize:12,
+                                                        bolder:2
+                                                    }
+                                                },
+                                                yAxis: {
+                                                    type: 'category',
+                                                    name: '月份',
+                                                    data: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+                                                    axisLabel: {
+                                                        fontSize: 10,
+                                                        bolder:2
+                                                    },
+                                                    nameTextStyle:{
+                                                        fontSize:12,
+                                                        bolder:2
+                                                    }
+                                                },
+                                                series: [
+                                                    {
+                                                        type: 'bar',
+                                                        barWidth:'30%',
+                                                        barGap: 0,
+                                                        smooth: true,
+                                                        symbolSize: 10,
+                                                        lineStyle:{
+                                                            width:2//设置线条粗细
+                                                        },
+                                                        stack: 'sum'
+                                                    },
+                                                    {
+                                                        type: 'bar',
+                                                        barGap: 0,
+                                                        smooth: true,
+                                                        symbolSize: 10,
+                                                        lineStyle:{
+                                                            width:2//设置线条粗细
+                                                        },
+                                                        barWidth:'30%',
+                                                        stack: 'sum'
+                                                    },
+                                                    {
+                                                        type: 'bar',
+                                                        barGap: 0,
+                                                        smooth: true,
+                                                        symbolSize: 10,
+                                                        lineStyle:{
+                                                            width:2//设置线条粗细
+                                                        },
+                                                        barWidth:'30%',
+                                                        stack: 'sum'
+                                                    }
+                                                ]
+                                            } );
+                                            $.get('${ctx}/charts/getPricesList').done(function (data) {
+                                                myChart6.setOption ({
+                                                    legend: {
+                                                        data:data.officeName
+                                                    },
+                                                    xAxis: [
+                                                        {
+                                                            name:'金额',
+                                                            min: 0,
+                                                            interval: data.Level,
+                                                            max: data.maxData
+                                                        }
+                                                    ],
+                                                    series: [
+                                                        {
+                                                            name:data.officeNameOne,
+                                                            data:data.officeDataOne
+                                                        },
+                                                        {
+                                                            name: data.officeNameTwo,
+                                                            data:data.officeDataTwo
+                                                        },
+                                                        {
+                                                            name: data.officeNameThr,
+                                                            data:data.officeDataThr
+                                                        }
+                                                    ]
+                                                })
+                                            });
+                                        });
+                                    </script>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="box box-widget">
+                            <div class="box-header with-border" >
+                                <h3 class="box-title" onclick="period()" style="cursor:pointer;font-size: 20px;color: #4d98c3;font-weight:bold ;font-family:STXinwei;">&nbsp&nbsp网点平均维修周期</h3>
+                                <div class="box-tools pull-right">
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-box-tool" data-widget="remove">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="box-body">
+                                <div class="row"  style="height:290%;width:120%">
+                                    <div class="chart">
+                                        <div id="myChart4" style="height:300%;width:100%"></div><script>
+                                        $(function() {
+                                            var myChart4 = echarts.init(document.getElementById('myChart4'), 'default');
+                                            // 显示标题，图例和空的坐标轴
+                                            myChart4.setOption({
+                                                color: ['#FFA07A', '#8590eb', '#98c6fa'],
+                                                title: {
+                                                    text: js.formatDate(new Date(), '   yyyy'),
+                                                    textStyle: {
+                                                        fontSize: 15,
+                                                        bolder:2
+                                                    }
+                                                },
+                                                legend: {
+                                                    orient: 'vertical',
+                                                    x: 'center',
+                                                    y: 'top',
+                                                    top: 0,
+                                                    data: [],
+                                                    textStyle: {
+                                                        fontSize: 10,
+                                                        bolder: 2
+                                                    },
+                                                    formatter: function (name) {
+                                                        return echarts.format.truncateText(name, 200, '14px Microsoft Yahei', '…');
+                                                    },
+                                                    tooltip: {
+                                                        show: true
+                                                    }
+                                                },
+
+                                                grid: {
+                                                    left: '4%',
+                                                    right: '12%',
+                                                    bottom: '-2%',
+                                                    top:80,
+                                                    containLabel: true
+                                                },
+                                                tooltip: {
+                                                    trigger: 'axis',
+                                                    axisPointer: {
+                                                        type: 'cross',
+                                                        crossStyle: {
+                                                            color: '#999'
+                                                        }
+                                                    }
+                                                },
+                                                toolbox: {
+                                                    show: true,
+                                                    orient: 'vertical',
+                                                    top: 'center',
+                                                    feature: {
+                                                        dataView: {show: true, readOnly: false},
+                                                        magicType: {show: true, type: ['line', 'bar', 'stack', 'tiled']},
+                                                        restore: {show: true},
+                                                        saveAsImage: {show: true}
+                                                    },
+                                                    right:'4%',
+                                                    itemSize:13,
+                                                    itemGap:10
+                                                },
+                                                xAxis: {
+                                                    type: 'category',
+                                                    name: '',
+                                                    nameTextStyle: {
+                                                        //更改坐标轴文字颜色
+                                                        fontSize : 12 ,
+                                                        bolder:2    //更改坐标轴文字大小
+                                                    },
+                                                    data: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+                                                    axisLabel: {
+                                                        textStyle: {
+                                                            color: '#000000'
+                                                        },
+                                                        formatter: function(val) {
+                                                            var strs = val.split(''); //字符串数组
+                                                            var str ='';
+                                                            for(var i = 0,s; s = strs[i++];) { //遍历字符串数组
+                                                                str += s;
+                                                                if(!(i %1)) str +='\n'; //按需要求余
+                                                            }
+                                                            return str;
+                                                        },
+                                                        fontSize:10,
+                                                        bolder:2
+                                                    }
+                                                },
+                                                yAxis: {
+                                                    name: '平均周期',
+                                                    type: 'value',
+                                                    nameTextStyle: {
+                                                        //更改坐标轴文字颜色
+                                                        fontSize : 12,
+                                                        bolder:2   //更改坐标轴文字大小
+                                                    },
+                                                    min: 0,
+                                                    max: 200,
+                                                    interval: 40,
+                                                    axisLabel: {
+                                                        formatter: '{value} 天',
+                                                        fontSize:10,
+                                                        bolder:2
+                                                    }
+                                                },
+                                                series: [
+                                                    {
+                                                        type: 'bar',
+                                                        barGap: 0,
+                                                        smooth: false,
+                                                        symbolSize: 10,
+                                                        lineStyle:{
+                                                            width:2//设置线条粗细
+                                                        },
+                                                        barWidth:'20%'
+
+                                                    },
+                                                    {
+                                                        type: 'bar',
+                                                        barGap: 0,
+                                                        smooth: false,
+                                                        symbolSize: 10,
+                                                        lineStyle:{
+                                                            width:2//设置线条粗细
+                                                        },
+                                                        barWidth:'20%'
+                                                    },
+                                                    {
+                                                        type: 'bar',
+                                                        barGap: 0,
+                                                        smooth: false,
+                                                        symbolSize: 10,
+                                                        lineStyle:{
+                                                            width:2//设置线条粗细
+                                                        },
+                                                        barWidth:'20%'
+                                                    }
+                                                ]
+                                            });
+                                            $.get('${ctx}/charts/getPeriodList').done(function (data) {
+                                                myChart4.setOption({
+                                                    yAxis: [
+                                                        {
+                                                            name: '平均周期',
+                                                            type: 'value',
+                                                            min: 0,
+                                                            max: data.Max,
+                                                            interval: data.Level
+                                                        }
+                                                    ],
+                                                    legend: {
+                                                        data: data.officeName
+                                                    },
+                                                    series: [
+                                                        {
+                                                            name: data.officeNameOne,
+                                                            data: data.officeDataOne
+                                                        },
+                                                        {
+                                                            name: data.officeNameTwo,
+                                                            data: data.officeDataTwo
+
+                                                        },
+                                                        {
+                                                            name: data.officeNameThr,
+                                                            data: data.officeDataThr
+                                                        }
+                                                    ]
+                                                })
+                                            });
+                                        });
+                                    </script>
+
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </td>
+                </tr>
+
+            </table>
+        </section>
+    </div>
+</div>
+<% } %>
+<script src="${ctxStatic}/jquery/jquery-ui-sortable-1.12.1.min.js"></script>
+<script src="${ctxStatic}/echarts/4.2/echarts.min.js"></script>
+<script>
+    $(function(){
+        $(window).resize(function(){
+            var footerHeight = $('.main-footer').outerHeight() || 0;
+            var windowHeight = $(window).height();
+            $('.content').css('min-height', windowHeight - footerHeight);
+            myChart1.resize(); myChart2.resize(); myChart3.resize();
+        }).resize();
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            $(window).resize();
+        });
+        $('.ui-sortable').sortable({
+            connectWith : '.ui-sortable',
+            handle      : '.box-header, .nav-tabs',
+            placeholder : 'sort-highlight',
+            forcePlaceholderSize: true,
+            zIndex : 999999
+        }).find('.box-header, .nav-tabs').css('cursor', 'move');
+    });
+</script>
+<script>
+    function data(){
+        js.addTabPage($('<a class="box-title"></a>'), '报案量',"${ctx}/number/htDateTable/list?type=0", true, false);
+    }
+    function over(){
+        js.addTabPage($('<a class="point-over-number"></a>'), '网点超期件数',"${ctx}/number/htDateTable/list?type=1", true, false);
+    }
+    function call(){
+        js.addTabPage($('<a class="phone-num"></a>'), '通话量',"${ctx}/number/htDateTable/list?type=3", true, false);
+    }
+    function refuse(){
+        js.addTabPage($('<a class="refuse-number"></a>'), '拒单量',"${ctx}/number/htDateTable/list?type=2", true, false);
+    }
+    function period(){
+        js.addTabPage($('<a class="average-period"></a>'), '网点平均维修周期',"${ctx}/period/htMonthTable/list?type=0", true, false);
+    }
+    function prices(){
+        js.addTabPage($('<a class="average-price"></a>'), '网点平均维修金额',"${ctx}/period/htMonthTable/list?type=1", true, false);
+
+    }
+
+</script>
+

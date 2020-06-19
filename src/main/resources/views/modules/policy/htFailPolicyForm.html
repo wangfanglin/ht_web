@@ -1,0 +1,216 @@
+<% layout('/layouts/default.html', {title: '映射失败保单管理', libs: ['validate']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-title">
+				<i class="fa icon-note"></i> ${text(htFailPolicy.isNewRecord ? '新增映射失败保单' : '编辑映射失败保单')}
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${htFailPolicy}" action="${ctx}/policy/htFailPolicy/save" method="post" class="form-horizontal">
+			<div class="box-body">
+				<div class="form-unit">${text('基本信息')}</div>
+				<#form:hidden path="id"/>
+				<#form:hidden path="policyInfo.id"/>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-6" title="">
+								<span class="required ">*</span><font style="color: red" >${htFailPolicy.remarks!}</font><i class="fa icon-question hide"></i></label>
+							<div class="col-sm-0">
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('原始保单号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${htFailPolicy.policyId!}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('原始品牌')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${htFailPolicy.originalBrand!}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('原始型号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${htFailPolicy.originalModel!}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('原始渠道')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${htFailPolicy.originalChannel!}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('原始产品')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${htFailPolicy.originalChannelProduct!}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-unit">${text('订正数据')}</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('订正品牌')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select id="newestBrand"  path="newestBrand"  items="${brandList}" itemLabel="name" itemValue="id" blankOption="true"  blankOptionLabel="请选择" class="form-control required"  onchange="findPhoneModel()"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required">*</span> ${text('订正机型')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select id="newestModel"  path="newestModel"  items="${phoneModelList}" itemLabel="model" itemValue="id" blankOption="true"  blankOptionLabel="请选择" class="form-control required" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('订正渠道')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:treeselect id="testOffice" title="${text('渠道选择')}"
+								path="newestChannel" labelPath="newestChannelName"
+								url="${ctx}/product/channelProductInfo/treeData?parentCode=0_XS001"
+								allowClear="true" callbackFuncName="treeselectCallback()" checkbox="false" class="form-control required" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('订正产品')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="newestChannelProduct"  items="${channelProductList}" itemLabel="name" itemValue="id" blankOption="true"  blankOptionLabel="请选择" class="form-control required" />
+							</div>
+						</div>
+					</div>
+				</div>
+
+				</div>
+			<div class="box-footer">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('policy:htFailPolicy:edit')){ %>
+							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+						<% } %>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+                js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+
+
+function findPhoneModel() {
+    var option=$('#newestBrand option:selected').val(); //获取选中的项
+    console.log(option);
+    if (option==null||option==undefined||option==""){
+        //$("#newestModel option").remove();
+        $('#newestModel').attr("disabled",true)
+        return;
+    }
+    var model=$('#newestModel option:selected').val();
+    if (model==null||model==undefined||model==""){
+        //$("#newestModel option").remove();
+        //$('#newestModel').attr("disabled",true)
+        return;
+    }
+    $.ajax({
+        type:"get",
+        url:"${ctx}/phonemodelinfo/htPhoneModelInfo/findByPhoneModel?brandId="+option,
+        success: function(data) {
+            var options = [];
+            $.each(data, function (index, value) {
+                options.push("<option value='" + value.id + "'> " + value.model + "</option>");
+            });
+            $("#newestModel option").remove();
+            $("#newestModel").append(options.join(''));
+            $('#newestModel').attr("disabled",false)
+            console.log(data);
+        }
+    });
+}
+function treeselectCallback(id, act, index, layero, nodes){
+    var dis= $('#testOffice').val();
+    console.log(dis);
+
+    var pro=$('#newestChannelProduct option:selected').val();
+    if (pro==null||pro==undefined||pro==""){
+        return;
+	}
+
+    if (dis!=null||dis!=""|dis!=undefined){
+        $.ajax({
+            type:'post',
+            async: false,
+            url:'${ctx}/policy/policyInfo/findChannelProduct?distributionId='+dis,
+            dataType:'json',
+            success:function(data){
+                if(data.status=="success"){
+                    console.log(data.data);
+                    //   $('#groupProductName').attr("items",data.data);
+                    var options = [];
+                    var jsonobj =data.data;
+                    $.each(jsonobj, function (index, value) {
+                        options.push("<option value='" + value.id + "'> " + value.name + "</option>");
+                    });
+                    $("#newestChannelProduct").append(options.join(''));
+
+                    $('#newestChannelProduct').removeAttr("disabled");
+                }else{
+                    alert(data.msg)
+                }
+            }
+        });
+    }
+}
+</script>

@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.repair.dao.HtRepairClientFormDao">
+	
+	<!-- 查询数据
+	<select id="findList" resultType="HtRepairClientForm">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+	</select> -->
+
+
+	<select id="findRepairList" resultType="RepairListEntity">
+		<![CDATA[
+			SELECT DISTINCT
+			fs.id as 'htRepairClientForm.id',f.id as 'htFormInfo.id',f.form_status as 'htFormInfo.formStatus',f.form_type as 'htFormInfo.formType',f.manage_status as 'htFormInfo.manageStatus',
+			  f.update_date AS 'htFormInfo.updateDate',fs.remarks AS 'htRepairClientForm.remarks',t.PRIORITY_ AS 'level',
+			  t.ASSIGNEE_ as 'ASSIGNEE',t.NAME_ as 'taskName',uses.user_name as 'user.userName',t.DESCRIPTION_ AS 'description',
+			 res.NAME_ AS 'executionName',RES.ID_ AS 'executionId',t.ID_ AS 'taskId',
+					po.str_channel_name as 'policyInfo.strChannelName',
+					po.channel_product_name as 'policyInfo.channelProductName',
+					o.office_name as 'office.officeName',
+					b.name as 'htBrandInfo.name',
+					fs.is_all as 'htRepairClientForm.isAll',
+					m.model as 'htPhoneModelInfo.model',
+					sf.user_name as 'htClaimSettlementForm.userName',sf.phone as 'htClaimSettlementForm.phone',
+					fs.contact_status as 'htRepairClientForm.contactStatus',fs.is_qualified as 'htRepairClientForm.isQualified'
+			FROM
+				ht_form_info f
+				LEFT JOIN ht_claim_settlement_form sf on f.id = sf.form_id
+				LEFT JOIN ht_repair_client_form fs on f.id = fs.form_id
+				LEFT JOIN js_sys_office o on o.office_code = sf.maintain_branch_id
+				LEFT JOIN ht_brand_info b on b.id = sf.phone_brand
+				LEFT JOIN ht_phone_model_info m on m.id = sf.phone_model
+				LEFT JOIN ht_policy_info po ON po.id = f.policy_id
+				LEFT JOIN ACT_RU_EXECUTION RES ON CONCAT("hd_form_claim:",f.id )= RES.BUSINESS_KEY_
+				LEFT JOIN ACT_RU_TASK t ON t.PROC_INST_ID_ = RES.PROC_INST_ID_
+				LEFT JOIN js_sys_user uses ON t.ASSIGNEE_ = uses.user_code
+			]]>
+		where
+		f.form_type = '2'
+		<if test="htRepairClientForm.isRun !=null and htRepairClientForm.isRun !=''">
+			and f.is_run = '1'
+		</if>
+		<if test="htRepairClientForm.htFormInfo.id !=null and htRepairClientForm.htFormInfo.id !=''">
+			and f.id = #{htRepairClientForm.htFormInfo.id}
+		</if>
+		<if test="htRepairClientForm.policyInfo.strChannelName !=null and htRepairClientForm.policyInfo.strChannelName !=''">
+			and po.str_channel_name = #{htRepairClientForm.policyInfo.strChannelName}
+		</if>
+		<if test="htClaimSettlementForm !=null and htClaimSettlementForm.userName !=null and htClaimSettlementForm.userName !='' ">
+			and sf.user_name LIKE CONCAT('%',#{htClaimSettlementForm.userName},'%')
+		</if>
+
+		<if test="htRepairClientForm.htFormInfo.formStatus !=null and htRepairClientForm.htFormInfo.formStatus !=''">
+			and f.form_status = #{htRepairClientForm.htFormInfo.formStatus}
+		</if>
+		<if test="htRepairClientForm.htFormInfo.manageStatus !=null and htRepairClientForm.htFormInfo.manageStatus !=''">
+			and f.manage_status = #{htRepairClientForm.htFormInfo.manageStatus}
+		</if>
+		<if test="page.orderBy == null">
+			order by f.update_date desc
+		</if>
+		<if test="page != null and page.orderBy != null and page.orderBy != ''">
+			ORDER BY ${page.orderBy}
+		</if>
+	</select>
+
+
+	<select id="findHistory" resultType="HtRepairClientForm">
+		SELECT t.id,t.form_id AS 'formId',h.form_type AS 'htFormInfo.formType',
+		t.repair_end_date AS 'repairEndDate',t.surplus_price AS 'surplusPrice',
+		(
+		   SELECT
+			GROUP_CONCAT(`name`)
+		   FROM
+			ht_assembly_unit
+		   WHERE
+			CONCAT('%',sf.master_unit,'%') LIKE CONCAT('%',id,'%')
+		  ) AS 'zhuUnit',
+		  (
+		   SELECT
+			GROUP_CONCAT(`name`)
+		   FROM
+			ht_assembly_unit
+		   WHERE
+			 CONCAT('%',sf.vice_parts,'%') LIKE CONCAT('%',id,'%')
+		   ) AS 'fuUnit'
+		FROM ht_repair_client_form t
+		LEFT JOIN ht_claim_settlement_form sf on sf.form_id = t.form_id
+		LEFT JOIN ht_form_info h on h.id = t.form_id
+		WHERE
+		t.form_id IN (
+		SELECT o.id FROM ht_form_info o
+		WHERE o.form_status = #{formStatus}
+		AND o.form_type = #{formType} AND o.policy_id = #{policyInfo.id}
+		)
+
+	</select>
+
+	<select id="findClaimData" resultType="java.util.Map">
+		SELECT * FROM ht_claim_data a
+		WHERE a.id IN(${claimId})
+	</select>
+
+
+	<select id="findBuJian" resultType="HtAssemblyUnit">
+		SELECT * FROM ht_assembly_unit a
+		WHERE a.id IN(${bujianId})
+	</select>
+
+
+	<select id="findEndList" resultType="HtRepairEndForm">
+		SELECT f.form_id AS 'id' ,f.phone_brand AS 'htRepairClientForm.htBrandInfo.id',f.phone_type AS 'htRepairClientForm.htPhoneModelInfo.id',
+		bi.name AS 'htRepairClientForm.htBrandInfo.name',mi.model AS 'htRepairClientForm.htPhoneModelInfo.model',
+		sf.user_name AS 'htClaimSettlementForm.userName',sf.phone AS 'htClaimSettlementForm.phone',
+		po.id AS 'policyInfo.id',po.channel_product_name AS 'policyInfo.channelProductName',
+		po.str_channel_name AS 'policyInfo.strChannelName',f.contact_status AS 'htRepairClientForm.contactStatus',
+		f.is_qualified AS 'htRepairClientForm.isQualified',i.manage_status AS 'manageStatus',
+		f.is_all AS 'htRepairClientForm.isAll',
+		o.office_name as 'office.officeName',
+		i.form_status AS 'formStatus',
+		t.reopen_type AS 'htFormOperation.reopenType',
+		i.update_date AS 'updateDate'
+		FROM ht_repair_client_form f
+		LEFT JOIN ht_form_info i ON i.id = f.form_id
+		LEFT JOIN ht_claim_settlement_form sf ON i.id = sf.form_id
+		LEFT JOIN ht_brand_info bi ON f.phone_brand = bi.id
+		LEFT JOIN ht_phone_model_info mi ON f.phone_type = mi.id
+		LEFT JOIN ht_policy_info po ON i.policy_id = po.id
+		LEFT JOIN js_sys_office o ON o.office_code = sf.maintain_branch_id
+		LEFT JOIN (
+		SELECT b.reopen_type,b.form_id FROM
+		(SELECT * FROM ht_form_operation n ORDER BY n.create_date desc) b
+		WHERE b.operation_type = '3'
+		AND b.type = '1'
+		GROUP BY b.form_id
+		) t ON t.form_id = f.form_id
+
+		<where>
+			f.status = '0'
+			<if test="id !=null and id !=''">
+				and f.form_id = #{id}
+			</if>
+			<if test="htClaimSettlementForm.userName !=null and htClaimSettlementForm.userName !=''">
+				and sf.user_name = #{htClaimSettlementForm.userName}
+			</if>
+			<if test="policyInfo.strChannelName !=null and policyInfo.strChannelName !=''">
+				and po.str_channel_name LIKE CONCAT('%',#{policyInfo.strChannelName},'%')
+			</if>
+
+			<if test="formStatus !=null and formStatus !=''">
+				and i.form_status = #{formStatus}
+			</if>
+			<if test="htFormOperation.reopenType !=null and htFormOperation.reopenType !=''">
+				and t.reopen_type = #{htFormOperation.reopenType}
+			</if>
+
+		</where>
+		<if test="page != null and page.orderBy != null and page.orderBy != ''">
+			ORDER BY ${page.orderBy}
+		</if>
+	</select>
+
+
+	<select id="findAllList" resultType="HtRepairEndForm">
+		SELECT f.form_id AS 'id',f.phone_brand AS 'htRepairClientForm.htBrandInfo.id',f.phone_type AS 'htRepairClientForm.htPhoneModelInfo.id',
+		bi.name AS 'htRepairClientForm.htBrandInfo.name',mi.model AS 'htRepairClientForm.htPhoneModelInfo.model',
+		sf.user_name AS 'htClaimSettlementForm.userName',sf.phone AS 'htClaimSettlementForm.phone',
+		po.id AS 'policyInfo.id',po.channel_product_name AS 'policyInfo.channelProductName',
+		po.str_channel_name AS 'policyInfo.strChannelName',f.contact_status AS 'htRepairClientForm.contactStatus',
+		f.is_qualified AS 'htRepairClientForm.isQualified',i.manage_status AS 'manageStatus',
+		f.is_all AS 'htRepairClientForm.isAll',
+		o.office_name as 'office.officeName',
+		i.form_status AS 'formStatus',
+		t.reopen_type AS 'htFormOperation.reopenType',
+		f.update_date AS 'updateDate'
+		FROM ht_repair_client_form f
+		LEFT JOIN ht_form_info i ON i.id = f.form_id
+		LEFT JOIN ht_claim_settlement_form sf ON i.id = sf.form_id
+		LEFT JOIN ht_brand_info bi ON f.phone_brand = bi.id
+		LEFT JOIN ht_phone_model_info mi ON f.phone_type = mi.id
+		LEFT JOIN ht_policy_info po ON i.policy_id = po.id
+		LEFT JOIN js_sys_office o on o.office_code = sf.maintain_branch_id
+		LEFT JOIN (
+		SELECT b.reopen_type,b.form_id FROM
+		(SELECT * FROM ht_form_operation n ORDER BY n.create_date desc) b
+		WHERE b.operation_type = '3'
+		AND b.type = '1'
+		GROUP BY b.form_id
+		) t ON t.form_id = f.form_id
+		WHERE f.status = '0'
+		<if test="id !=null and id !=''">
+			and i.id = #{id}
+		</if>
+		<if test="isRun !=null and isRun !=''">
+			and i.is_run = #{isRun}
+		</if>
+		<if test="htClaimSettlementForm.userName !=null and htClaimSettlementForm.userName !=''">
+			and sf.user_name = #{htClaimSettlementForm.userName}
+		</if>
+		<if test="policyInfo.strChannelName !=null and policyInfo.strChannelName !=''">
+			and po.str_channel_name LIKE CONCAT('%',#{policyInfo.strChannelName},'%')
+
+		</if>
+		<if test="formStatus !=null and formStatus !=''">
+			and i.form_status = #{formStatus}
+		</if>
+		<if test="htFormOperation.reopenType !=null and htFormOperation.reopenType !=''">
+			and t.reopen_type = #{htFormOperation.reopenType}
+		</if>
+		<if test="page.orderBy == null">
+			order by f.update_date desc
+		</if>
+		<if test="page != null and page.orderBy != null and page.orderBy != ''">
+			ORDER BY ${page.orderBy}
+		</if>
+	</select>
+</mapper>

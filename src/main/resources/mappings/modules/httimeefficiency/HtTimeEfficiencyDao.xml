@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.httimeefficiency.dao.HtTimeEfficiencyDao">
+
+    <!-- 查询数据
+    <select id="findList" resultType="HtTimeEfficiency">
+        SELECT ${sqlMap.column.toSql()}
+        FROM ${sqlMap.table.toSql()}
+        <where>
+            ${sqlMap.where.toSql()}
+        </where>
+        ORDER BY ${sqlMap.order.toSql()}
+    </select> -->
+    <update id="updateFirst">
+		update ht_time_efficiency set end_date = NOW() where form_id = #{formId} order by start_date DESC LIMIT 1
+	</update>
+
+    <select id="getTimelinessSum" resultType="java.lang.Integer">
+        SELECT IF(SUM(TIMESTAMPDIFF(DAY,start_date,end_date)) is NULL,0,SUM(TIMESTAMPDIFF(DAY,start_date,end_date)))
+          FROM ht_time_efficiency WHERE form_id =#{formId} AND end_date is not NULL;
+    </select>
+
+    <select id="getFormPastDueAmount" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM ht_time_efficiency WHERE form_id in
+               (SELECT id FROM ht_form_info where office_id = #{officeId})
+        AND ISNULL(end_date)
+        <if test="type !='' and type=='day' ">
+            AND <![CDATA[ TIMESTAMPDIFF(DAY,start_date,NOW()) >3 ]]>
+        </if>
+        <if test="type !='' and type=='yesterday' ">
+            and <![CDATA[ TO_DAYS(NOW()) - TO_DAYS(create_date) <= 1 ]]>
+        </if>
+        <if test="type !='' and type=='month' ">
+            and DATE_FORMAT( create_date, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' )
+        </if>
+    </select>
+</mapper>

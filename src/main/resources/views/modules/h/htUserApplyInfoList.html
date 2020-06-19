@@ -1,0 +1,236 @@
+<% layout('/layouts/default.html', {title: '用户在线申请表管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa icon-notebook"></i> ${text('用户在线申请表管理')}
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+				<% if(hasPermi('h:htUserApplyInfo:edit')){ %>
+					<a href="${ctx}/h/htUserApplyInfo/form" class="btn btn-default btnTool" title="${text('新增用户在线申请表')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
+				<% } %>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${htUserApplyInfo}" action="${ctx}/h/htUserApplyInfo/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="form-group">
+					<label class="control-label">${text('保单id')}：</label>
+					<div class="control-inline">
+						<#form:input path="policyId" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('设备品牌')}：</label>
+					<div class="control-inline">
+						<#form:input path="facilityBrandId" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('工单id')}：</label>
+					<div class="control-inline">
+						<#form:input path="formId" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('设备型号')}：</label>
+					<div class="control-inline">
+						<#form:input path="facilityModelId" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('设备颜色')}：</label>
+					<div class="control-inline">
+						<#form:input path="facilityColor" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('地域')}：</label>
+					<div class="control-inline">
+						<#form:input path="areaId" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('故障发生时间')}：</label>
+					<div class="control-inline">
+						<#form:input path="malfunctionDate" readonly="true" maxlength="20" class="form-control Wdate-datetime"
+							dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:false});"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('故障原因')}：</label>
+					<div class="control-inline">
+						<#form:input path="malfunctionId" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('身份姓名')}：</label>
+					<div class="control-inline">
+						<#form:input path="cardName" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('身份证号')}：</label>
+					<div class="control-inline">
+						<#form:input path="cardId" maxlength="18" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('身份证开始时间')}：</label>
+					<div class="control-inline">
+						<#form:input path="cardStartDate" readonly="true" maxlength="20" class="form-control Wdate-datetime"
+							dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:false});"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('身份证失效时间')}：</label>
+					<div class="control-inline">
+						<#form:input path="cardEndDate" readonly="true" maxlength="20" class="form-control Wdate-datetime"
+							dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:false});"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('损坏部位')}：</label>
+					<div class="control-inline">
+						<#form:input path="badPartImg" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('身份证照片')}：</label>
+					<div class="control-inline">
+						<#form:input path="cardImg" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('购买凭证')}：</label>
+					<div class="control-inline">
+						<#form:input path="voucherImg" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('是否为最新')}：</label>
+					<div class="control-inline">
+						<#form:input path="isMain" maxlength="1" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('产品名称')}：</label>
+					<div class="control-inline">
+						<#form:input path="productName" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('投保设备')}：</label>
+					<div class="control-inline">
+						<#form:input path="insuranceFacilityName" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('user_phone')}：</label>
+					<div class="control-inline">
+						<#form:input path="userPhone" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('侧面照2')}：</label>
+					<div class="control-inline">
+						<#form:input path="badSideWimg" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('侧面照1')}：</label>
+					<div class="control-inline">
+						<#form:input path="badSideOimg" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('损坏反面')}：</label>
+					<div class="control-inline">
+						<#form:input path="badReverseImg" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('损坏部位正面照')}：</label>
+					<div class="control-inline">
+						<#form:input path="badFrontImg" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('身份证反面照')}：</label>
+					<div class="control-inline">
+						<#form:input path="cardReverseImg" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('身份证正面照')}：</label>
+					<div class="control-inline">
+						<#form:input path="cardFrontImg" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('身份证手持照片')}：</label>
+					<div class="control-inline">
+						<#form:input path="cardHandImg" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="reset" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'${text("保单id")}', name:'policyId', index:'a.policy_id', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			return '<a href="${ctx}/h/htUserApplyInfo/form?id='+row.id+'" class="btnList" data-title="${text("编辑用户在线申请表")}">'+(val||row.id)+'</a>';
+		}},
+		{header:'${text("设备品牌")}', name:'facilityBrandId', index:'a.facility_brand_id', width:150, align:"left"},
+		{header:'${text("工单id")}', name:'formId', index:'a.form_id', width:150, align:"left"},
+		{header:'${text("设备型号")}', name:'facilityModelId', index:'a.facility_model_id', width:150, align:"left"},
+		{header:'${text("设备颜色")}', name:'facilityColor', index:'a.facility_color', width:150, align:"left"},
+		{header:'${text("地域")}', name:'areaId', index:'a.area_id', width:150, align:"left"},
+		{header:'${text("故障发生时间")}', name:'malfunctionDate', index:'a.malfunction_date', width:150, align:"center"},
+		{header:'${text("故障原因")}', name:'malfunctionId', index:'a.malfunction_id', width:150, align:"left"},
+		{header:'${text("身份姓名")}', name:'cardName', index:'a.card_name', width:150, align:"left"},
+		{header:'${text("身份证号")}', name:'cardId', index:'a.card_id', width:150, align:"left"},
+		{header:'${text("身份证开始时间")}', name:'cardStartDate', index:'a.card_start_date', width:150, align:"center"},
+		{header:'${text("身份证失效时间")}', name:'cardEndDate', index:'a.card_end_date', width:150, align:"center"},
+		{header:'${text("损坏部位")}', name:'badPartImg', index:'a.bad_part_img', width:150, align:"left"},
+		{header:'${text("身份证照片")}', name:'cardImg', index:'a.card_img', width:150, align:"left"},
+		{header:'${text("购买凭证")}', name:'voucherImg', index:'a.voucher_img', width:150, align:"left"},
+		{header:'${text("是否为最新")}', name:'isMain', index:'a.is_main', width:150, align:"left"},
+		{header:'${text("产品名称")}', name:'productName', index:'a.product_name', width:150, align:"left"},
+		{header:'${text("投保设备")}', name:'insuranceFacilityName', index:'a.insurance_facility_name', width:150, align:"left"},
+		{header:'${text("user_phone")}', name:'userPhone', index:'a.user_phone', width:150, align:"left"},
+		{header:'${text("侧面照2")}', name:'badSideWimg', index:'a.bad_side_wimg', width:150, align:"left"},
+		{header:'${text("侧面照1")}', name:'badSideOimg', index:'a.bad_side_oimg', width:150, align:"left"},
+		{header:'${text("损坏反面")}', name:'badReverseImg', index:'a.bad_reverse_img', width:150, align:"left"},
+		{header:'${text("损坏部位正面照")}', name:'badFrontImg', index:'a.bad_front_img', width:150, align:"left"},
+		{header:'${text("身份证反面照")}', name:'cardReverseImg', index:'a.card_reverse_img', width:150, align:"left"},
+		{header:'${text("身份证正面照")}', name:'cardFrontImg', index:'a.card_front_img', width:150, align:"left"},
+		{header:'${text("身份证手持照片")}', name:'cardHandImg', index:'a.card_hand_img', width:150, align:"left"},
+		{header:'${text("update_date")}', name:'updateDate', index:'a.update_date', width:150, align:"center"},
+		{header:'${text("操作")}', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('h:htUserApplyInfo:edit')){ %>
+				actions.push('<a href="${ctx}/h/htUserApplyInfo/form?id='+row.id+'" class="btnList" title="${text("编辑用户在线申请表")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+				actions.push('<a href="${ctx}/h/htUserApplyInfo/delete?id='+row.id+'" class="btnList" title="${text("删除用户在线申请表")}" data-confirm="${text("确认要删除该用户在线申请表吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			<% } %>
+			return actions.join('');
+		}}
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>

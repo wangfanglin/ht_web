@@ -1,0 +1,236 @@
+<% layout('/layouts/default.html', {title: '维修工单-维修完成待审核详情', libs: ['validate','fileupload']}){ %>
+<% include('/modules/common/policyDetail.html', {commonFromId:commonFromId}){} %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-title">
+				<i class="fa icon-note"></i> ${text(htRepairClientForm.isNewRecord ? '维修完成待审核工单详情' : '维修完成待审核工单详情')}
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${htRepairClientForm}" action="${ctx}/repair/htRepairClientForm/" method="post" class="form-horizontal">
+			<div class="box-body">
+
+				<#form:hidden path="id"/>
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('工单号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" id="createDate">
+								${htFormInfo.id!}
+							</div>
+						</div>
+					</div>
+
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('客户姓名')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${htFormInfo.policyInfo.userName!}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('联系电话')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${htFormInfo.policyInfo.strContactNum!}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('手机型号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${htFormInfo.policyInfo.strPhoneModel!}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('手机品牌')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${htFormInfo.policyInfo.strPhoneBrand!}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('手机IMEI')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${htFormInfo.policyInfo.strImeiNum!}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('产品名称')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${htFormInfo.policyInfo.strChannelName!}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('维修网点')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+                                ${htFormInfo.formStatus!}
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('取设备方式')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+							邮寄
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('快递公司')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${htRepairClientForm.expressCompany!}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('快递单号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${htRepairClientForm.expressNo!}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('快递日期')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${htRepairClientForm.mailDate!,"yyyy:MM:dd HH:mm:ss"}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('收件信息')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${htRepairClientForm.htClaimSettlementForm.returnName!}
+								${htRepairClientForm.htClaimSettlementForm.returnPhone!}
+					         	${htRepairClientForm.htClaimSettlementForm.returnAddress!}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group" >
+							<label class="control-label col-sm-5">留存照片：</label>
+							<div class="col-sm-7">
+								<#form:fileupload id="uploadImage2" returnPath="true" maxUploadNum="6"
+								filePathInputId="uploadImage2Path" fileNameInputId="uploadImage2Name"
+								uploadType="image" readonly="false" maxUploadNum="3" isMini="false" style="height: 30px"/>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('备注')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${htRepairClientForm.remark!}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row" >
+					<div class="col-xs-3" style="float: right">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('处理人')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${htRepairClientForm.maintainBranchName!}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3" style="float: right">
+					    <div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('创建时间')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							${htRepairClientForm.createDate!,"yyyy-MM-dd HH:mm:ss"}
+						</div>
+					</div>
+				</div>
+			</div>
+
+				<div id="forDiv" style="display: none" disabled="disabled">
+
+				</div>
+
+
+<hr/>
+				<div class="row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('备注')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:textarea path="" rows="4" maxlength="500" class="form-control"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="box-footer">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+					<button type="button" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('通 过')}</button>
+					&nbsp;&nbsp;&nbsp;&nbsp;
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+						&nbsp;&nbsp;&nbsp;&nbsp;
+						<button type="button" class="btn btn-sm btn-default" id="btnReturn"><i class="fa fa-reply-all"></i> ${text('驳 回')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+</script>

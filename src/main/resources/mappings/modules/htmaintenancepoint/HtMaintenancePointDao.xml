@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.htmaintenancepoint.dao.HtMaintenancePointDao">
+	
+	<!-- 查询数据
+	<select id="findList" resultType="HtMaintenancePoint">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+	</select> -->
+	<delete id="deleteByTableName">
+		delete from ${tableName} where maintenance_point_id = #{pointId}
+	</delete>
+
+	<insert id="saveTableInfo" parameterType="java.util.Map">
+		insert into ${tableName} (id,maintenance_point_id,${columnName},create_date)
+		values (UUID(),#{maintenance_point_id},#{columnValue},NOW())
+	</insert>
+	<select id="getStrListByTableName" resultType="String">
+		select ${columnName} from ${tableName} where maintenance_point_id = #{pointId}
+	</select>
+	<select id="getProvinceCityCode" resultType="String">
+		SELECT parent_codes FROM js_sys_area WHERE area_code = #{areaCode}
+	</select>
+	<select id="findListRewrite" resultType="HtMaintenancePoint">
+		<![CDATA[
+			SELECT
+			a.`id` AS "id",
+			a.`maintenance_point_name` AS "maintenancePointName",
+			a.`contact_one` AS "contactOne",
+			a.`contact_number_one` AS "contactNumberOne",
+			a.`contact_two` AS "contactTwo",
+			a.`contact_number_two` AS "contactNumberTwo",
+			a.`province` AS "province",
+			a.`city` AS "city",
+			a.`area` AS "area",
+			a.`address` AS "address",
+			a.`longitude_latitude` AS "longitudeLatitude",
+			a.`coverage_province` AS "coverageProvince",
+			a.`coverage_city` AS "coverageCity",
+			a.`contract_life_start` AS "contractLifeStart",
+			a.`contract_life_end` AS "contractLifeEnd",
+			a.`door_picture` AS "doorPicture",
+			a.`whether_order` AS "whetherOrder",
+			a.`organization_id` AS "organizationId",
+			a.`status` AS "status",
+			a.`create_by` AS "createBy",
+			a.`create_date` AS "createDate",
+			a.`update_by` AS "updateBy",
+			a.`update_date` AS "updateDate",
+			a.`remarks` AS "remarks",
+			IF(a.contract_life_end < NOW(),"已过期","未过期") AS "timeStatus",
+			(SELECT group_concat(h.`name` SEPARATOR ' ')
+				FROM
+				ht_brand_info h
+				WHERE
+				id IN (SELECT d.brand_id
+				FROM 	ht_maintain_brand_middle d
+				WHERE d.maintenance_point_id = a.id)) AS "phoneBrand",
+				 (SELECT
+						group_concat(j.office_name SEPARATOR ' ')
+					FROM
+						js_sys_office j
+					WHERE
+						j.office_code IN (
+							SELECT
+								d.distributor_id
+							FROM
+								ht_distributor_middle d
+							WHERE
+								d.maintenance_point_id = a.id
+						)
+				) AS "maintainQuality"
+			]]>
+			FROM
+			`ht_maintenance_point` a
+			LEFT JOIN ht_maintain_brand_middle b ON a.id = b.maintenance_point_id
+			WHERE
+			a.`status` = '0'
+				<if test="maintenancePointName !=null and maintenancePointName!='' ">
+					AND a.`maintenance_point_name` like CONCAT('%',#{maintenancePointName},'%')
+				</if>
+				<if test="brandSearch !=null and brandSearch!='' ">
+					AND b.brand_id = #{brandSearch}
+				</if>
+				<if test="maintenancePointName !=null and maintenancePointName!='' ">
+
+				</if>
+				<if test="contractLifeStartSearch !=null and contractLifeStart!=null ">
+					AND a.contract_life_start BETWEEN #{contractLifeStart} AND #{contractLifeStartSearch}
+				</if>
+				<if test="contractLifeEnd !=null and contractLifeEndSearch!=null ">
+					AND a.contract_life_end BETWEEN #{contractLifeEnd} AND #{contractLifeEndSearch}
+				</if>
+				<if test="whetherOrder !=null and whetherOrder!='' ">
+					AND a.whether_order = #{whetherOrder}
+				</if>
+				<if test="provinceSearch !=null and provinceSearch!='' ">
+					AND a.coverage_province like CONCAT('%',#{provinceSearch},'%')
+				</if>
+			GROUP BY a.id
+				<if test="page.orderBy == null">
+					order by a.update_date desc
+				</if>
+				<if test="page != null and page.orderBy != null and page.orderBy != ''">
+					ORDER BY ${page.orderBy}
+				</if>
+	</select>
+	<select id="getStatus" resultType="HtMaintenancePoint">
+		<![CDATA[
+			SELECT
+			a.`id` AS "id",
+			a.`maintenance_point_name` AS "maintenancePointName",
+			a.`contact_one` AS "contactOne",
+			a.`contact_number_one` AS "contactNumberOne",
+			a.`contact_two` AS "contactTwo",
+			a.`contact_number_two` AS "contactNumberTwo",
+			a.`province` AS "province",
+			a.`city` AS "city",
+			a.`area` AS "area",
+			a.`address` AS "address",
+			a.`longitude_latitude` AS "longitudeLatitude",
+			a.`coverage_province` AS "coverageProvince",
+			a.`coverage_city` AS "coverageCity",
+			a.`contract_life_start` AS "contractLifeStart",
+			a.`contract_life_end` AS "contractLifeEnd",
+			a.`door_picture` AS "doorPicture",
+			a.`whether_order` AS "whetherOrder",
+			a.`organization_id` AS "organizationId",
+			a.`status` AS "status",
+			a.`create_by` AS "createBy",
+			a.`create_date` AS "createDate",
+			a.`update_by` AS "updateBy",
+			a.`update_date` AS "updateDate",
+			a.`remarks` AS "remarks",
+			IF(a.contract_life_end < NOW(),"已过期","未过期") AS "timeStatus",
+			(SELECT group_concat(h.`name` SEPARATOR ' ')
+				FROM
+				ht_brand_info h
+				WHERE
+				id IN (SELECT d.brand_id
+				FROM 	ht_maintain_brand_middle d
+				WHERE d.maintenance_point_id = a.id)) AS "phoneBrand",
+				 (SELECT
+						group_concat(j.office_name SEPARATOR ' ')
+					FROM
+						js_sys_office j
+					WHERE
+						j.office_code IN (
+							SELECT
+								d.distributor_id
+							FROM
+								ht_distributor_middle d
+							WHERE
+								d.maintenance_point_id = a.id
+						)
+				) AS "maintainQuality"
+			]]>
+		FROM
+		`ht_maintenance_point` a
+		LEFT JOIN ht_maintain_brand_middle b ON a.id = b.maintenance_point_id
+		WHERE
+		a.`status` = '0'
+		<if test="maintenancePointName !=null and maintenancePointName!='' ">
+			AND a.`maintenance_point_name` like CONCAT('%',#{maintenancePointName},'%')
+		</if>
+		<if test="brandSearch !=null and brandSearch!='' ">
+			AND b.brand_id = #{brandSearch}
+		</if>
+		<if test="maintenancePointName !=null and maintenancePointName!='' ">
+
+		</if>
+		<if test="contractLifeStartSearch !=null and contractLifeStart!=null ">
+			AND a.contract_life_start BETWEEN #{contractLifeStart} AND #{contractLifeStartSearch}
+		</if>
+		<if test="contractLifeEnd !=null and contractLifeEndSearch!=null ">
+			AND a.contract_life_end BETWEEN #{contractLifeEnd} AND #{contractLifeEndSearch}
+		</if>
+		<if test="whetherOrder !=null and whetherOrder!='' ">
+			AND a.whether_order = #{whetherOrder}
+		</if>
+		<if test="provinceSearch !=null and provinceSearch!='' ">
+			AND a.coverage_province like CONCAT('%',#{provinceSearch},'%')
+		</if>
+		GROUP BY a.id
+
+	</select>
+	<select id="findPointConditionResult" resultType="java.util.Map">
+		SELECT
+			p.id,
+			p.organization_id as 'organizationId',
+			p.coverage_province AS 'provinceCode',
+			p.coverage_city AS 'cityCode',
+			bf.office_name as 'officeName',
+			GROUP_CONCAT(bm.authoriz_brand_id) AS 'phoneBrand',
+			(SELECT GROUP_CONCAT(dm.distributor_id)  FROM ht_distributor_middle dm WHERE dm.maintenance_point_id = p.id) AS 'channelId',
+			(SELECT GROUP_CONCAT(qm.maintain_quality_id) FROM ht_maintain_quality_middle qm WHERE qm.maintenance_point_id = p.id) AS 'maintainStandard',
+		 CONCAT(city.area_name,area.area_name,p.maintenance_point_name) as 'pointName'
+
+		FROM
+			ht_maintenance_point p
+		LEFT JOIN ht_brand_authorizing_middle bm ON p.id = bm.maintenance_point_id
+		LEFT JOIN js_sys_office bf ON p.organization_id = bf.office_code
+		LEFT JOIN js_sys_area city ON p.city = city.area_code
+		LEFT JOIN js_sys_area area ON p.area = area.area_code
+		WHERE
+			p.`status` = '0'
+			AND p.`whether_order` = '1'
+		GROUP BY
+			bm.maintenance_point_id
+	</select>
+	<select id="findInfoByJG" resultType="HtMaintenancePoint">
+		select * from ht_maintenance_point where status = '0' and organization_id = #{organizationId} limit 1
+	</select>
+	<select id="findPointOfficeList" resultType="HtMaintenancePoint">
+		select id,organization_id,maintenance_point_name FROM ht_maintenance_point where status = '0' and NOW() between contract_life_start and contract_life_end GROUP BY organization_id
+	</select>
+	<select id="getWhetherOrder" resultType="HtMaintenancePoint">
+
+	</select>
+</mapper>

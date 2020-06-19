@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.policy.dao.PolicyInfoDao">
+	
+	<!-- 查询数据
+	<select id="findList" resultType="PolicyInfo">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+	</select> -->
+    <insert id="insertBhLog">
+        insert into ht_bh_policy_log(id,policy_unique_mark,create_date)values(null,#{uniqueMark},NOW())
+    </insert>
+    <insert id="insertCoverageLog">
+          insert into ht_minus_coverage_log(id,form_id,policy_id,create_date,coverage)values(null,#{formId},#{policyId},NOW(),#{coverage})
+    </insert>
+    <update id="updateSurplusCoverage">
+        update ht_policy_info set surplus_coverage=#{price} where id=#{policyId}
+    </update>
+    <update id="updatePhone">
+          update ht_policy_info set str_phone_brand=#{strPhoneBrand} ,str_phone_model=#{strPhoneModel} where id=#{id}
+    </update>
+    <update id="updatePolicyFlag">
+         update ht_policy_info set policy_flag='1' where id=#{policyId}
+    </update>
+    <select id="check" resultType="java.lang.Integer">
+        select count(1) from ht_bh_policy_log where policy_unique_mark = #{uniqueMark}
+    </select>
+    <select id="findCountLast" resultType="java.lang.String">
+        select
+LEAST(MIN(c.maintenance_frequency),MIN(c.change_frequency)) AS min
+from  ht_policy_detail a inner join ht_group_product_child b on a.child_id = b. id
+inner join ht_product_info c on c.id = b.product_id
+where a.policy_id = #{policyId}
+    </select>
+    <select id="findCountWx" resultType="java.lang.String">
+        select count(1) from ht_form_info where policy_id = #{policyId} and form_type = '2' and form_status = '1014'
+    </select>
+    <select id="findCountHx" resultType="java.lang.String">
+          select count(1) from ht_form_info where policy_id = #{policyId} and form_type = '1' and form_status = '1014'
+    </select>
+</mapper>

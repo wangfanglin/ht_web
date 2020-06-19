@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.policy.dao.PolicyDetailDao">
+	
+	<!-- 查询数据
+	<select id="findList" resultType="PolicyDetail">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+	</select> -->
+
+    <update id="updateEquity">
+        update ht_policy_detail set equity_status ='2' where policy_id = #{policyId} and child_id = #{child}
+    </update>
+    <select id="findOrder" resultType="java.util.Map">
+        select * from  order_info where id=#{commonFromId}
+    </select>
+</mapper>

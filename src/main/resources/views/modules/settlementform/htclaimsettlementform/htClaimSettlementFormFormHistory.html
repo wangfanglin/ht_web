@@ -1,0 +1,479 @@
+<% layout('/layouts/default.html', {title: '在线理赔表管理', libs: ['validate','fileupload']}){ %>
+<link rel="stylesheet" href="${ctxStatic}/common/css/index.css">
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${htClaimSettlementFormHistory}" action="${ctx}/htclaimsettlementform/htClaimSettlementForm/save" method="post" class="form-horizontal">
+		<div class="box-body">
+			<div class="form-unit">${text('基本信息')}</div>
+			<#form:hidden path="id"/>
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="form-group">
+						<label class="control-label col-sm-1" title="">
+							<span class="required hide">*</span> ${text('联系结果')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-9">
+							<#form:radio path="contactStatus" dictType="contact_status" class="form-control required" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('再次联系时间')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="againContactDate" readonly="true" maxlength="20" class="form-control Wdate"
+							dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:true});"/>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="shows row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('客户名字')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="userName" maxlength="255" class="form-control required"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('手机号')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="phone" maxlength="255" class="form-control required"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('手机品牌')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="phoneBrand" items="${brandInfoList}" itemLabel="name" itemValue="id" maxlength="255" class="form-control required"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('手机型号')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="phoneModel" items="${htPhoneModelInfoList}" itemLabel="model" itemValue="id" maxlength="255" class="form-control required"/>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="shows row">
+				<div class="col-xs-5">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('身份证')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="idNumber" maxlength="20" class="form-control digits required"/>
+						</div>
+					</div>
+				</div><div class="col-xs-5">
+				<div class="form-group">
+					<label class="control-label col-sm-4" title="">
+						<span class="required hide">*</span> ${text('电话录音')}：<i class="fa icon-question hide"></i></label>
+					<div class="col-sm-8">
+						<audio src="${htCallLog.data!}" controls autoplay></audio>
+					</div>
+				</div>
+			</div>
+			</div>
+			<div class="shows row">
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-2" title="">
+							<span class="required hide">*</span> ${text('损坏部位')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-12">
+							<ul class="picView-magnify-list" style="padding: 0px">
+							<%for(imgs in damageImgsList!){ %>
+								<li>
+									<a href="javascript:void(0)" data-magnify="gallery" data-group="g1" data-src="${imgs}" data-caption="">
+										<img src="${imgs}" width="100px" height="100px">
+									</a>
+								</li>
+							<% } %>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-2" title="">
+							<span class="required hide">*</span> ${text('身份证')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-12">
+							<ul class="picView-magnify-list" style="padding: 30px">
+								<%for(imgs in identityCardImgsList!){ %>
+									<li>
+										<a href="javascript:void(0)" data-magnify="gallery" data-group="g1" data-src="${imgs}" data-caption="测试图片一">
+											<img src="${imgs}"  width="100px" height="100px">
+										</a>
+									</li>
+								<% } %>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-2" title="">
+							<span class="required hide">*</span> ${text('购买凭证')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-12">
+							<ul class="picView-magnify-list" style="padding: 30px">
+							<%for(imgs in purchaseImgsList!){ %>
+								<li>
+									<a href="javascript:void(0)" data-magnify="gallery" data-group="g1" data-src="${imgs}" data-caption="测试图片一">
+										<img src="${imgs}" width="100px" height="100px" >
+									</a>
+								</li>
+							<% } %>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="shows row">
+				<div class="col-xs-12">
+					<div class="form-group">
+						<label class="control-label col-sm-1" title="">
+							<span class="required hide">*</span> ${text('损坏原因')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-9">
+							<#form:textarea path="causeDamage" rows="4" placeholder="请描述设备损坏过程" maxlength="255" class="form-control required"/>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="shows row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('损坏部件*')}<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="shows row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> <i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							${text('主部件')}：<#form:checkbox path="masterUnit" items="${unitZhuList}" itemLabel="name" itemValue="id" class="form-control required" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="shows row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> <i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							${text('副部件')}：<#form:checkbox path="viceParts" items="${unitFuList}" itemLabel="name" itemValue="id" class="form-control required" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="shows row">
+				<div class="col-xs-12">
+					<div class="form-group">
+						<label class="control-label col-sm-1" title="">
+							<span class="required hide">*</span> ${text('修理类型')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-9">
+							<#form:radio path="maintainId" items="${breakDownList}" itemLabel="breakType" itemValue="id" class="form-control digits" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="shows row">
+				<div class="col-xs-12">
+					<div class="form-group">
+						<label class="control-label col-sm-1" title="">
+							<span class="required hide">*</span> ${text('需要邮寄理赔资料*')}<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-9">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="shows row">
+				<div class="col-xs-12">
+					<div class="form-group">
+						<label class="control-label col-sm-1" title="">
+							<span class="required hide">*</span> <i class="fa icon-question hide"></i></label>
+						<div class="col-sm-11">
+							<#form:checkbox path="claimDataStr" items="${claimDataList}" itemLabel="data_name" itemValue="id" class="form-control required" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="shows row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('资料是否合格')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:radio path="isQualified" dictType="is_qualified" class="form-control required" />
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<#form:input path="disqualificationDisqualification" placeholder="请描述不合格原因"  class="form-control"/>
+				</div>
+			</div>
+			<%if('1' == htClaimSettlementFormHistory.isQualified!){%>
+			<div class="shows row">
+				<div class="col-xs-12">
+					<div class="form-group">
+						<label class="control-label col-sm-1" title="">
+							<span class="required hide">*</span> ${text('维修类型')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-9">
+							<#form:radio path="maintainType" dictType="maintain_type" class="form-control required" />
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('服务方式')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:radio path="serveType" dictType="ht_service_mode" class="form-control required" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="shows row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('维修网点')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:treeselect id="maintainBranchId" title="${text('机构选择')}"
+							path="maintainBranchId" placeholder="请选择维修网点" labelPath="office.officeName"
+							url="${ctx}/product/channelProductInfo/treeData?parentCode=0_WXWD001"
+							allowClear="true"/>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="shows row">
+				<div class="col-xs-12">
+					<div class="form-group">
+						<label class="control-label col-sm-1" title="">
+							<span class="required hide">*</span> ${text('生成短信模板')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-9">
+							<#form:textarea path="sms" rows="4" placeholder="短信模板内容预览" maxlength="255" class="form-control"/>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="shows row">
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('是否需要给客户叫快递')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:radio path="isExpress" dictType="whether_express" class="form-control" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<%if('0' == htClaimSettlementFormHistory.isExpress!){%>
+			<div class="shows row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('联系人')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="returnName" maxlength="255" class="form-control required"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('联系电话')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="returnPhone" maxlength="20" class="form-control digits required"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('具体地址')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:treeselect id="returnAreaCode" title="${text('区域选择')}"
+							path="returnAreaCode" labelPath="area.areaName"
+							url="${ctx}/sys/area/treeData"
+							class="" allowClear="true"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<#form:input path="returnAddress" maxlength="20" class="form-control required"/>
+				</div>
+			</div>
+			<%}%>
+			<%}%>
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="form-group">
+						<label class="control-label col-sm-1" title="">
+							<span class="required hide">*</span> ${text('备注')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-9">
+							<#form:textarea path="remark" maxlength="255" class="form-control"/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="box-footer">
+			<div class="row">
+				<div class="col-sm-offset-2 col-sm-10">
+
+					<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+				</div>
+			</div>
+		</div>
+	</#form:form>
+</div>
+</div>
+<% } %>
+<script src="${ctxStatic}/common/js/index.js"></script>
+<script src="${ctxStatic}/common/js/jquery.rotate.min.js"></script>
+<script>
+    $("#inputForm").validate({
+        submitHandler: function(form){
+            js.ajaxSubmitForm($(form), function(data){
+                js.showMessage(data.message);
+                if(data.result == Global.TRUE){
+                    js.closeCurrentTabPage(function(contentWindow){
+                        contentWindow.page();
+                    });
+                }
+            }, "json");
+        }
+    });
+
+
+    $("input:checkbox[name='masterUnit']").on('ifChecked ifUnchecked', function(event){
+        var zhuStr = getZhuStr();
+        var fuStr = getFuStr();
+        ajaxGetmaintainId(zhuStr,fuStr);
+    });
+    $("input:checkbox[name='viceParts']").on('ifChecked ifUnchecked', function(event){
+        var zhuStr = getZhuStr();
+        var fuStr = getFuStr();
+        ajaxGetmaintainId(zhuStr,fuStr);
+
+    });
+
+    function getZhuStr(){
+        var valueZhu = "";
+        var zhuStr = "";
+        $("input:checkbox[name='masterUnit']:checked").each(function(i) {
+            zhuStr = $(this).val();
+            if (0 === i) {
+                valueZhu = zhuStr;
+            } else {
+                valueZhu += "," + zhuStr;
+            }
+        });
+        return valueZhu;
+    }
+    function getFuStr(){
+        var valueFu = "";
+        var fuStr = "";
+        $("input:checkbox[name='viceParts']:checked").each(function(i) {
+            fuStr = $(this).val();
+            if (0 === i) {
+                valueFu = fuStr;
+            } else {
+                valueFu += "," + fuStr;
+            }
+        });
+        return valueFu;
+    }
+    $("input:radio[name='contactStatus']").on('ifChecked', function(event){
+        let claimStatus = $(this).val();
+        //1联系成功
+        claStatus(claimStatus);
+    });
+    $(function(){
+        $("input:radio[name='contactStatus']:checked").each(function(i) {
+            let claimStatus = $(this).val();
+            //1联系成功
+            claStatus(claimStatus);
+        });
+    });
+    function claStatus(claimStatus) {
+        if(claimStatus == '1'){
+            $(".shows").removeClass("hide");
+            $("#contactStatus").iCheck('disable');
+            $('#masterUnit').iCheck('disable');
+            $('#viceParts').iCheck('disable');
+            $('#claimDataStr').iCheck('disable');
+            $('#isQualified').iCheck('disable');
+            $('#maintainType').iCheck('disable');
+            $('#serveType').iCheck('disable');
+            $('#isExpress').iCheck('disable');
+            $('#maintainId').iCheck('disable');
+            $("#againContactDate").attr("disabled",true);
+            $("#maintainBranchId").attr("disabled",true);
+            $("#returnAreaCode").attr("disabled",true);
+            $("#remark").attr("disabled",true);
+            $("#sms").attr("disabled",true);
+            $("#userName").attr("disabled",true);
+            $("#phone").attr("disabled",true);
+            $("#phoneBrand").attr("disabled",true);
+            $("#phoneModel").attr("disabled",true);
+            $("#idNumber").attr("disabled",true);
+            $("#causeDamage").attr("disabled",true)
+            $("#returnName").attr("disabled",true);
+            $("#returnPhone").attr("disabled",true);
+            $("#returnAddress").attr("disabled",true);
+            $("#returnAreaCode").attr("disabled",true);
+        }
+        if(claimStatus == '2' || claimStatus == '3' || claimStatus == '4'||claimStatus == '5'){
+            $(".shows").addClass("hide");
+            $("#contactStatus").iCheck('disable');
+            $('#masterUnit').iCheck('disable');
+            $('#viceParts').iCheck('disable');
+            $('#claimDataStr').iCheck('disable');
+            $('#isQualified').iCheck('disable');
+            $('#maintainType').iCheck('disable');
+            $('#serveType').iCheck('disable');
+            $('#isExpress').iCheck('disable');
+            $('#maintainId').iCheck('disable');
+            $("#againContactDate").attr("disabled",true);
+            $("#maintainBranchId").attr("disabled",true);
+            $("#returnAreaCode").attr("disabled",true);
+            $("#remark").attr("disabled",true);
+            $("#sms").attr("disabled",true);
+            $("#userName").attr("disabled",true);
+            $("#phone").attr("disabled",true);
+            $("#phoneBrand").attr("disabled",true);
+            $("#phoneModel").attr("disabled",true);
+            $("#idNumber").attr("disabled",true);
+            $("#causeDamage").attr("disabled",true)
+            $("#returnName").attr("disabled",true);
+            $("#returnPhone").attr("disabled",true);
+            $("#returnAddress").attr("disabled",true);
+            $("#returnAreaCode").attr("disabled",true);
+        }
+    }
+</script>

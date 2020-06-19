@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.forminfo.dao.HtFormOperationDao">
+	
+	<!-- 查询数据
+	<select id="findList" resultType="HtFormOperation">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+	</select> -->
+
+
+    <select id="findByFormId" resultType="com.jeesite.modules.forminfo.entity.HtFormOperation">
+        select
+        id    as id,
+        form_id    as formId,
+        recording    as recording,
+        bd_id as bdId,
+        claim_type    as claimType,
+        reason   as reason,
+        close_type     as closeType,
+        verifier     as verifier,
+        reopen_type     as reopenType,
+        other_reason      as otherReason,
+        operation_type    as operationType,
+        create_date    as createDate,
+        operation_type  as operationType,
+        audit_remark as  auditRemark,
+        type as type,
+        is_mail as isMail,
+		intermediary_service_id as intermediaryServiceId
+       from ht_form_operation  where form_id=#{formId} order by create_date desc  LIMIT 1
+
+    </select>
+    <select id="findUser" resultType="java.util.Map">
+        SELECT b.user_name, b.user_code  FROM `js_sys_user_role` a  left join js_sys_user  b on a.user_code=b.user_code
+where a.role_code =#{repair_charge}
+    </select>
+    <select id="findOpByFormId" resultType="com.jeesite.modules.forminfo.entity.HtFormOperation">
+          select
+        id    as id,
+        form_id    as formId,
+        recording    as recording,
+        bd_id as bdId,
+        claim_type    as claimType,
+        reason   as reason,
+        close_type     as closeType,
+        verifier     as verifier,
+        reopen_type     as reopenType,
+        other_reason      as otherReason,
+        operation_type    as operationType,
+        create_date    as createDate,
+        operation_type  as operationType,
+        audit_remark as  auditRemark,
+        type as type,
+        is_mail as isMail,
+		intermediary_service_id as intermediaryServiceId
+       from ht_form_operation  where form_id=#{formId}
+        and intermediary_service_id is not null and intermediary_service_id !=''
+        order by create_date desc  LIMIT 1
+    </select>
+</mapper>

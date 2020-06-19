@@ -1,0 +1,108 @@
+<% layout('/layouts/default.html', {title: '维修完成工单', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa icon-notebook"></i> ${text('维修完成工单')}
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${htRepairEndForm}" action="${ctx}/repair/htRepairClientForm/listDataEnd" method="post" class="form-inline"
+			data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+
+			<div class="form-group">
+				<label class="control-label">${text('工单ID')}：</label>
+				<div class="control-inline width-120">
+					<#form:input path="id" class="form-control width-120" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label">${text('渠道名称')}：</label>
+				<div class="control-inline width-120">
+					<#form:input path="policyInfo.strChannelName" class="form-control width-120" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label">${text('客户姓名')}：</label>
+				<div class="control-inline width-120">
+					<#form:input path="htClaimSettlementForm.userName" class="form-control width-120" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label">${text('重启原因')}：</label>
+				<div class="control-inline width-120">
+					<#form:select path="htFormOperation.reopenType" dictType="reopen" blankOption="true" class="form-control width-120" />
+				</div>
+			</div>
+
+
+<!--			<div class="form-group">-->
+<!--				<label class="control-label">${text('工单状态')}：</label>-->
+<!--				<div class="control-inline width-120">-->
+<!--					<#form:select path="formStatus" dictType="form_status" blankOption="true" class="form-control width-120" />-->
+<!--				</div>-->
+<!--			</div>-->
+
+			<div class="form-group">
+				<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+				<button type="reset" class="btn btn-default btn-sm">${text('重置')}</button>
+			</div>
+		</#form:form>
+		<table id="dataGrid"></table>
+		<div id="dataGridPage"></div>
+	</div>
+</div>
+</div>
+<% } %>
+<script>
+	// 初始化DataGrid对象
+	$('#dataGrid').dataGrid({
+		searchForm: $("#searchForm"),
+		columnModel: [
+			{header:'${text("工单ID")}', name:'id', index:'i.id', width:150, align:"center", frozen:true, formatter: function(val, obj, row, act){
+					return '<a href="${ctx}/repair/htRepairClientForm/formInfo?htFormInfo.id='+val+'" class="btnList" data-title="${text("查看维修工单")}">'+(val||row.id)+'</a>';
+				}},
+			// {header:'${text("工单来源")}', name:'htClaimSettlementForm.userName', width:150, align:"center"},
+			{header:'${text("客户姓名")}', name:'htClaimSettlementForm.userName', width:150, align:"center"},
+			{header:'${text("联系电话")}', name:'htClaimSettlementForm.phone', width:150, align:"center"},
+			{header:'${text("渠道名称")}', name:'policyInfo.strChannelName', width:150, align:"center"},
+			{header:'${text("手机品牌")}', name:'htRepairClientForm.htBrandInfo.name', width:150, align:"center"},
+			{header:'${text("手机型号")}', name:'htRepairClientForm.htPhoneModelInfo.model', width:150, align:"center"},
+			{header:'${text("产品名称")}', name:'policyInfo.channelProductName', width:150, align:"center"},
+			{header:'${text("联系情况")}', name:'htRepairClientForm.contactStatus', width:150, align:"center", formatter: function(val, obj, row, act){
+					return js.getDictLabel(${@DictUtils.getDictListJson('contact_status')}, val, '${text("---")}', true);
+				}},
+			{header:'${text("资料是否合格")}', name:'htRepairClientForm.isQualified', width:150, align:"center", formatter: function(val, obj, row, act){
+					return js.getDictLabel(${@DictUtils.getDictListJson('is_qualified')}, val, '${text("---")}', true);
+				}},
+			{header:'${text("处理状态")}', name:'manageStatus', width:150, align:"center", formatter: function(val, obj, row, act){
+					return js.getDictLabel(${@DictUtils.getDictListJson('manage_status')}, val, '${text("---")}', true);
+				}},
+			{header:'${text("理赔次数")}', name:'', width:150, align:"center"},
+			{header:'${text("案件状态")}', name:'', width:150, align:"center", formatter: function(val, obj, row, act){
+					return "开启";
+				}},
+			{header:'${text("重启原因")}', name:'htFormOperation.reopenType', width:150, align:"center", formatter: function(val, obj, row, act){
+					return js.getDictLabel(${@DictUtils.getDictListJson('reopen')}, val, '${text("---")}', true);
+				}},
+			{header:'${text("是否全损")}', name:'htRepairClientForm.isAll', width:150, align:"center", formatter: function(val, obj, row, act){
+					return js.getDictLabel(${@DictUtils.getDictListJson('is_all')}, val, '${text("---")}', true);
+				}},
+			{header:'${text("工单状态")}', name:'formStatus', width:150, align:"center", formatter: function(val, obj, row, act){
+					return js.getDictLabel(${@DictUtils.getDictListJson('form_status')}, val, '${text("---")}', true);
+				}},
+			{header:'${text("维修网点")}', name:'office.officeName', width:150, align:"center"},
+			{header:'${text("更新时间")}', name:'updateDate', width:150, align:"left"},
+
+
+		],
+		sortableColumn: false,
+		// 加载成功后执行事件
+		ajaxSuccess: function(data){
+
+		}
+	});
+</script>

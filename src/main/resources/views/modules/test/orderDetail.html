@@ -1,0 +1,23 @@
+<h1>这是一个测试，看你是否能引入我呢？</h1>
+<div id="testDiv">
+<%
+#ajax orderDetail: {
+%>
+    <h2>${policyInfo!}</h2>
+    <h2>${orderInfo!}</h2>
+    <h2>历史流转1：${h1.name!}</h2>
+    <h2>历史流转2：${h2.id!}</h2>
+    
+<% }%>
+</div>
+
+<script src="${ctxStatic}/common/common.js?${_version}" ></script>
+<script>
+    $(function () {
+        $.get("${ctx}/demo/getOrderDetail?id=${id}",function (data) {
+            console.log(data);
+            $("#testDiv").html(data);
+        });
+    })
+</script>
+

@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.forminfo.dao.HtFormInfoDao">
+
+    <!-- 查询数据
+    <select id="findList" resultType="HtFormInfo">
+        SELECT ${sqlMap.column.toSql()}
+        FROM ${sqlMap.table.toSql()}
+        <where>
+            ${sqlMap.where.toSql()}
+        </where>
+        ORDER BY ${sqlMap.order.toSql()}
+    </select> -->
+
+    <select id="findFormAmount" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM ht_form_info where policy_id=#{policyId}
+    </select>
+    <select id="findMainPointCondition" resultType="java.util.Map">
+       select * from ((SELECT
+           '1' AS 'whetherOrder',
+            p.channel_id AS 'channelId',
+            p.str_phone_brand AS 'phoneBrand',
+            area.province_code AS 'provinceCode',
+            area.city_code AS 'cityCode'
+        FROM
+            ht_form_info f
+        INNER JOIN ht_policy_info p ON f.policy_id = p.id
+        LEFT JOIN ht_user_apply_info ua ON f.id = ua.form_id
+        LEFT JOIN ht_user_apply_area area ON ua.area_id = area.id
+        LEFT JOIN ht_product_info po ON p.channel_product_id = po.id
+        WHERE
+            f.id = #{formId})aa,
+
+						(select  c.maintain_standard AS 'maintainStandard'
+						from ht_policy_detail a inner join  ht_group_product_child b on a.child_id =b.id
+						inner join ht_product_info c on c.id = b.product_id
+						where a.id= #{childId})bb)
+    </select>
+    <select id="findFormCount" resultType="java.lang.Integer">
+        <![CDATA[
+
+            SELECT COUNT(1) FROM ht_form_info
+            WHERE form_status <> '1023' AND form_status <> '1014'
+            and office_id = #{officeId}
+
+        ]]>
+    </select>
+    <select id="findOrderSum" resultType="java.lang.Integer">
+        <![CDATA[
+
+            SELECT COUNT(1) FROM ht_form_info
+            WHERE office_id = #{officeId}
+
+        ]]>
+    </select>
+    <select id="findListByPolicyId" resultType="com.jeesite.modules.forminfo.entity.HtFormInfo">
+        select * from ht_form_info where policy_id=#{policyId}
+    </select>
+    <select id="findPageByPolicyId" resultType="com.jeesite.modules.forminfo.entity.HtFormInfo">
+         select * from ht_form_info where policy_id = #{formInfo.policyInfo.id}
+
+    </select>
+    <select id="getBypolicyId" resultType="java.lang.String">
+        select id from ht_form_info where policy_id = #{policyId} order by create_date desc limit 1
+    </select>
+    <select id="getPointSumPrice" resultType="java.lang.Double">
+        <![CDATA[
+        SELECT convert(SUM(r.sum_price)/100,decimal(12,2)) FROM ht_form_info f
+        INNER JOIN ht_repair_client_form r ON f.id = r.form_id
+        WHERE form_status <> '1023' AND office_id = #{organizationId}; ]]>
+    </select>
+    <select id="findTotalFromInOffice" resultType="HtFormInfo">
+        SELECT * FROM ht_form_info f
+            WHERE  office_id = #{organizationId};
+    </select>
+    <select id="findFormOffice" resultType="java.util.Map">
+        SELECT office_id,IF(o.office_name is null,'暂无',o.office_name) as 'office_name'
+        FROM ht_form_info f
+        LEFT JOIN js_sys_office o
+        ON f.office_id = o.office_code
+        GROUP BY office_id
+        ORDER BY office_id
+    </select>
+    <select id="findDateSales" resultType="java.lang.Integer">
+
+        SELECT COUNT(1) FROM ht_form_info
+            <where>
+                <if test="dates !='' and dates=='day' ">
+                    and  TO_DAYS(create_date) = TO_DAYS(NOW())
+                </if>
+                <if test="dates !='' and dates=='yesterday' ">
+                    and <![CDATA[ TO_DAYS(NOW()) - TO_DAYS(create_date) <= 1 ]]>
+                </if>
+                <if test="dates !='' and dates=='month' ">
+                    and DATE_FORMAT( create_date, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' )
+                </if>
+                AND office_id = #{officeId}
+            </where>
+    </select>
+    <select id="findPageByPolicyId" resultType="com.jeesite.modules.forminfo.entity.HtFormInfo">
+         select * from ht_form_info where policy_id = #{formInfo.policyInfo.id}
+        <if test="formInfo.page != null and formInfo.page.orderBy != null and formInfo.page.orderBy != ''">
+            ORDER BY ${formInfo.page.orderBy}
+        </if>
+
+    </select>
+    <select id="getBypolicyId" resultType="java.lang.String">
+        select id from ht_form_info where policy_id = #{policyId}
+    </select>
+    <select id="findPutUpForm" resultType="java.lang.String">
+        SELECT a.form_id FROM `test_ht.bh_form_info`  a inner join  `insure.order_info` b on b.policy_id = a.order_id where b.status ='order_break'
+    </select>
+    <select id="findputUpPage" resultType="com.jeesite.modules.forminfo.entity.HtFormInfo">
+SELECT
+	a.`id` AS "id",
+	a.`policy_id` AS "policyInfo.id",
+	a.`manage_status` AS "manageStatus",
+	a.`form_status` AS "formStatus",
+	a.`form_type` AS "formType",
+	a.`office_id` AS "office.id",
+	a.`is_run` AS "isRun",
+	a.`product_child_id` AS "productChildId",
+	a.`bh_id` AS "bhId",
+	a.`bh_flag` AS "bhFlag",
+	a.`user_id` AS "userId",
+	a.`put_up` AS "putUp",
+	a.`status` AS "status",
+	a.`create_by` AS "createBy",
+	a.`create_date` AS "createDate",
+	a.`update_by` AS "updateBy",
+	a.`update_date` AS "updateDate",
+	a.`remarks` AS "remarks",
+	a.`is_automatic` AS "isAutomatic",
+	p.`unique_mark` AS "policyInfo.uniqueMark",
+	p.`str_name` AS "policyInfo.strName",
+	p.`str_contact_num` AS "policyInfo.strContactNum",
+	p.`str_type` AS "policyInfo.strType",
+	p.`str_wechat` AS "policyInfo.strWechat",
+	p.`str_card_id` AS "policyInfo.strCardId",
+	p.`date_birthday` AS "policyInfo.dateBirthday",
+	p.`str_sex` AS "policyInfo.strSex",
+	p.`str_filiale` AS "policyInfo.strFiliale",
+	p.`str_channel_name` AS "policyInfo.strChannelName",
+	p.`channel_product_name` AS "policyInfo.channelProductName",
+	p.`int_product_price` AS "policyInfo.intProductPrice",
+	p.`int_sell_price` AS "policyInfo.intSellPrice",
+	p.`date_cost_time` AS "policyInfo.dateCostTime",
+	p.`str_province` AS "policyInfo.strProvince",
+	p.`str_card_number` AS "policyInfo.strCardNumber",
+	p.`date_buy_card` AS "policyInfo.dateBuyCard",
+	p.`date_effective_date` AS "policyInfo.dateEffectiveDate",
+	p.`str_buy_pattern` AS "policyInfo.strBuyPattern",
+	p.`date_end_date` AS "policyInfo.dateEndDate",
+	p.`str_sys` AS "policyInfo.strSys",
+	p.`str_phone_brand` AS "policyInfo.strPhoneBrand",
+	p.`str_color` AS "policyInfo.strColor",
+	p.`str_phone_model` AS "policyInfo.strPhoneModel",
+	p.`str_city` AS "policyInfo.strCity",
+	p.`int_internal` AS "policyInfo.intInternal",
+	p.`str_store` AS "policyInfo.strStore",
+	p.`str_imei_num` AS "policyInfo.strImeiNum",
+	p.`str_salesman` AS "policyInfo.strSalesman",
+	p.`policy_status` AS "policyInfo.policyStatus",
+	p.`int_loan_amount` AS "policyInfo.intLoanAmount",
+	p.`int_batch_num` AS "policyInfo.intBatchNum",
+	p.`int_status` AS "policyInfo.intStatus",
+	p.`str_card_type` AS "policyInfo.strCardType",
+	p.`channel_id` AS "policyInfo.channelId",
+	p.`channel_product_id` AS "policyInfo.channelProductId",
+	p.`policy_submission_date` AS "policyInfo.policySubmissionDate",
+	p.`status` AS "policyInfo.status",
+	p.`create_by` AS "policyInfo.createBy",
+	p.`create_date` AS "policyInfo.createDate",
+	p.`update_by` AS "policyInfo.updateBy",
+	p.`update_date` AS "policyInfo.updateDate",
+	p.`remarks` AS "policyInfo.remarks",
+	p.`delflag` AS "policyInfo.delflag",
+	p.`surplus_coverage` AS "policyInfo.surplusCoverage",
+	p.`invite` AS "policyInfo.invite",
+	p.`inviteflag` AS "policyInfo.inviteflag",
+	p.`fromtype` AS "policyInfo.fromtype",
+	p.`bhstauts` AS "policyInfo.bhstauts",
+	p.`callguke` AS "policyInfo.callguke",
+	p.`openid` AS "policyInfo.openid",
+	p.`external_identifier` AS "policyInfo.externalIdentifier",
+	p.`bh_flag` AS "policyInfo.bhFlag",
+	p.`insurance_periods` AS "policyInfo.insurancePeriods",
+	p.`is_create_form` AS "policyInfo.isCreateForm",
+	p.`is_old` AS "policyInfo.isOld",
+	p.`is_error` AS "policyInfo.isError",
+	p.`jx_policy_id` AS "policyInfo.jxPolicyId",
+	p.`other_policy_id` AS "policyInfo.otherPolicyId",
+	ua.`id` AS "htUserApplyInfo.id",
+	ua.`policy_id` AS "htUserApplyInfo.policyId",
+	ua.`facility_brand_id` AS "htUserApplyInfo.facilityBrandId",
+	ua.`form_id` AS "htUserApplyInfo.formId",
+	ua.`facility_model_id` AS "htUserApplyInfo.facilityModelId",
+	ua.`facility_color` AS "htUserApplyInfo.facilityColor",
+	ua.`area_id` AS "htUserApplyInfo.areaId",
+	ua.`malfunction_date` AS "htUserApplyInfo.malfunctionDate",
+	ua.`malfunction_id` AS "htUserApplyInfo.malfunctionId",
+	ua.`card_name` AS "htUserApplyInfo.cardName",
+	ua.`card_id` AS "htUserApplyInfo.cardId",
+	ua.`card_start_date` AS "htUserApplyInfo.cardStartDate",
+	ua.`card_end_date` AS "htUserApplyInfo.cardEndDate",
+	ua.`bad_part_img` AS "htUserApplyInfo.badPartImg",
+	ua.`card_img` AS "htUserApplyInfo.cardImg",
+	ua.`voucher_img` AS "htUserApplyInfo.voucherImg",
+	ua.`is_main` AS "htUserApplyInfo.isMain",
+	ua.`product_name` AS "htUserApplyInfo.productName",
+	ua.`user_phone` AS "htUserApplyInfo.userPhone",
+	ua.`bad_side_wimg` AS "htUserApplyInfo.badSideWimg",
+	ua.`bad_side_oimg` AS "htUserApplyInfo.badSideOimg",
+	ua.`bad_reverse_img` AS "htUserApplyInfo.badReverseImg",
+	ua.`bad_front_img` AS "htUserApplyInfo.badFrontImg",
+	ua.`card_reverse_img` AS "htUserApplyInfo.cardReverseImg",
+	ua.`card_front_img` AS "htUserApplyInfo.cardFrontImg",
+	ua.`card_hand_img` AS "htUserApplyInfo.cardHandImg",
+	ua.`user_id` AS "htUserApplyInfo.userId",
+	ua.`create_date` AS "htUserApplyInfo.createDate",
+	ua.`update_date` AS "htUserApplyInfo.updateDate",
+	o.`corp_code` AS "office.corpCode",
+	o.`corp_name` AS "office.corpName",
+	o.`status` AS "office.status",
+	o.`create_by` AS "office.createBy",
+	o.`create_date` AS "office.createDate",
+	o.`update_by` AS "office.updateBy",
+	o.`update_date` AS "office.updateDate",
+	o.`remarks` AS "office.remarks",
+	o.`parent_code` AS "office.parentCode",
+	o.`parent_codes` AS "office.parentCodes",
+	o.`tree_sort` AS "office.treeSort",
+	o.`tree_sorts` AS "office.treeSorts",
+	o.`tree_leaf` AS "office.treeLeaf",
+	o.`tree_level` AS "office.treeLevel",
+	o.`tree_names` AS "office.treeNames",
+	o.`office_code` AS "office.officeCode",
+	o.`view_code` AS "office.viewCode",
+	o.`office_name` AS "office.officeName",
+	o.`full_name` AS "office.fullName",
+	o.`office_type` AS "office.officeType",
+	o.`leader` AS "office.leader",
+	o.`phone` AS "office.phone",
+	o.`address` AS "office.address",
+	o.`zip_code` AS "office.zipCode",
+	o.`email` AS "office.email",
+	o.`extend_s1` AS "office.extend.extendS1",
+	o.`extend_s2` AS "office.extend.extendS2",
+	o.`extend_s3` AS "office.extend.extendS3",
+	o.`extend_s4` AS "office.extend.extendS4",
+	o.`extend_s5` AS "office.extend.extendS5",
+	o.`extend_s6` AS "office.extend.extendS6",
+	o.`extend_s7` AS "office.extend.extendS7",
+	o.`extend_s8` AS "office.extend.extendS8",
+	o.`extend_i1` AS "office.extend.extendI1",
+	o.`extend_i2` AS "office.extend.extendI2",
+	o.`extend_i3` AS "office.extend.extendI3",
+	o.`extend_i4` AS "office.extend.extendI4",
+	o.`extend_f1` AS "office.extend.extendF1",
+	o.`extend_f2` AS "office.extend.extendF2",
+	o.`extend_f3` AS "office.extend.extendF3",
+	o.`extend_f4` AS "office.extend.extendF4",
+	o.`extend_d1` AS "office.extend.extendD1",
+	o.`extend_d2` AS "office.extend.extendD2",
+	o.`extend_d3` AS "office.extend.extendD3",
+	o.`extend_d4` AS "office.extend.extendD4"
+FROM
+	`ht_form_info` a
+	LEFT JOIN `ht_policy_info` p ON p.id = a.policy_id
+	LEFT JOIN `ht_user_apply_info` ua ON ua.form_id = a.id
+	LEFT JOIN `js_sys_office` o ON o.office_code = a.office_id
+<where>
+	a.put_up ='1'
+	<if test="id !=null and id!='' ">
+		and a.id = #{htFormInfo.id}
+	</if>
+	<if test="manageStatus !=null and manageStatus!='' ">
+		and a.manage_status = #{manageStatus}
+	</if>
+	<if test="formStatus !=null and formStatus!='' ">
+	   and a.form_status = #{formStatus}
+	</if>
+</where>
+ORDER BY
+	a.update_date DESC
+		<if test="pageNo!=null and pageSize!=null ">
+			limit #{pageNo} , #{pageSize}
+		</if>
+    </select>
+	<select id="findOldFormByPolicyId" resultType="com.jeesite.modules.forminfo.entity.HtFormInfo">
+		select
+		id as id,
+		order_type as formType,
+		order_from as formStatus,
+		reply_phone as manageStatus
+		from order_info where policy_id = #{formInfo.policyInfo.id}
+	</select>
+
+</mapper>

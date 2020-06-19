@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.advisory.dao.HtAdvisoryInfoDao">
+	
+	<!-- 查询数据
+	<select id="findList" resultType="HtAdvisoryInfo">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+	</select> -->
+
+    <select id="findFormLsit" resultType="com.jeesite.modules.forminfo.entity.HtFormInfo">
+        SELECT
+        a.`id` AS "id",
+        a.`policy_id` AS "policyInfo.id",
+        a.`manage_status` AS "manageStatus",
+        a.`form_status` AS "formStatus",
+        a.`form_type` AS "formType",
+        a.`office_id` AS "office.id",
+        a.`is_run` AS "isRun",
+        a.`status` AS "status",
+        a.`create_by` AS "createBy",
+        a.`create_date` AS "createDate",
+        a.`update_by` AS "updateBy",
+        a.`update_date` AS "updateDate",
+        a.`remarks` AS "remarks",
+        a.`is_automatic` AS "isAutomatic",
+        p.`unique_mark` AS "policyInfo.uniqueMark",
+        p.`str_name` AS "policyInfo.strName",
+        p.`str_contact_num` AS "policyInfo.strContactNum",
+        p.`str_type` AS "policyInfo.strType",
+        p.`str_wechat` AS "policyInfo.strWechat",
+        p.`str_card_id` AS "policyInfo.strCardId",
+        p.`date_birthday` AS "policyInfo.dateBirthday",
+        p.`str_sex` AS "policyInfo.strSex",
+        p.`policy_status` AS "policyInfo.policyStatus",
+        p.`str_filiale` AS "policyInfo.strFiliale",
+        p.`str_channel_name` AS "policyInfo.strChannelName",
+        p.`channel_product_name` AS "policyInfo.channelProductName",
+        p.`int_product_price` AS "policyInfo.intProductPrice",
+        p.`int_sell_price` AS "policyInfo.intSellPrice",
+        p.`date_cost_time` AS "policyInfo.dateCostTime",
+        p.`str_province` AS "policyInfo.strProvince",
+        p.`str_card_number` AS "policyInfo.strCardNumber",
+        p.`date_buy_card` AS "policyInfo.dateBuyCard",
+        p.`date_effective_date` AS "policyInfo.dateEffectiveDate",
+        p.`str_buy_pattern` AS "policyInfo.strBuyPattern",
+        p.`date_end_date` AS "policyInfo.dateEndDate",
+        p.`str_sys` AS "policyInfo.strSys",
+        p.`str_phone_brand` AS "policyInfo.strPhoneBrand",
+        p.`str_color` AS "policyInfo.strColor",
+        p.`str_phone_model` AS "policyInfo.strPhoneModel",
+        p.`str_city` AS "policyInfo.strCity",
+        p.`int_internal` AS "policyInfo.intInternal",
+        p.`str_store` AS "policyInfo.strStore",
+        p.`str_imei_num` AS "policyInfo.strImeiNum",
+        p.`str_salesman` AS "policyInfo.strSalesman",
+        p.`coverage` AS "policyInfo.coverage",
+        p.`int_loan_amount` AS "policyInfo.intLoanAmount",
+        p.`int_batch_num` AS "policyInfo.intBatchNum",
+        p.`int_status` AS "policyInfo.intStatus",
+        p.`str_card_type` AS "policyInfo.strCardType",
+        p.`channel_id` AS "policyInfo.channelId",
+        p.`channel_product_id` AS "policyInfo.channelProductId",
+        p.`policy_submission_date` AS "policyInfo.policySubmissionDate",
+        p.`status` AS "policyInfo.status",
+        p.`create_by` AS "policyInfo.createBy",
+        p.`create_date` AS "policyInfo.createDate",
+        p.`update_by` AS "policyInfo.updateBy",
+        p.`update_date` AS "policyInfo.updateDate",
+        p.`remarks` AS "policyInfo.remarks",
+        p.`delflag` AS "policyInfo.delflag",
+        p.`surplus_coverage` AS "policyInfo.surplusCoverage",
+        p.`invite` AS "policyInfo.invite",
+        p.`inviteflag` AS "policyInfo.inviteflag",
+        p.`fromtype` AS "policyInfo.fromtype",
+        p.`bhstauts` AS "policyInfo.bhstauts",
+        p.`callguke` AS "policyInfo.callguke",
+        p.`openid` AS "policyInfo.openid",
+        p.`external_identifier` AS "policyInfo.externalIdentifier",
+        p.`bh_flag` AS "policyInfo.bhFlag",
+        p.`insurance_periods` AS "policyInfo.insurancePeriods"
+        FROM
+        `ht_form_info` a
+        LEFT JOIN `ht_policy_info` p ON p.id = a.policy_id
+        <where>
+            a.form_type != '4'
+            <if test="htFormInfo.policyInfo !=null">
+            <if test="htFormInfo.policyInfo.strContactNum !=null and htFormInfo.policyInfo.strContactNum!='' " >
+                AND p.`str_contact_num` =#{htFormInfo.policyInfo.strContactNum}
+            </if>
+            <if test="htFormInfo.policyInfo.strName !=null and htFormInfo.policyInfo.strName!='' ">
+                AND p.`str_name` like CONCAT('%',#{htFormInfo.policyInfo.strName},'%')
+            </if>
+            <if test="htFormInfo.policyInfo.id !=null and htFormInfo.policyInfo.id!='' ">
+                AND p.`id` = #{htFormInfo.policyInfo.id}
+            </if>
+            </if>
+            <if test="htFormInfo.id !=null and htFormInfo.id!='' ">
+                AND a.`id` = #{htFormInfo.id}
+            </if>
+        </where>
+        ORDER BY
+        a.update_date DESC
+        LIMIT  #{pageNo},#{pageSize}
+    </select>
+    <select id="findByFormId" resultType="com.jeesite.modules.advisory.entity.HtAdvisoryInfo">
+        select * from ht_advisory_info where form_id=#{id}
+    </select>
+    <select id="findByTaskId" resultType="com.jeesite.modules.advisory.entity.HtAdvisoryInfo">
+          select * from ht_advisory_info where task_id=#{taskId}
+    </select>
+    <select id="findCountInOffice" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM ht_advisory_info WHERE msg_type = #{type} AND office_id = #{officeId}
+    </select>
+</mapper>

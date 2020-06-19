@@ -1,0 +1,244 @@
+<% layout('/layouts/default.html', {title: '测试表单', libs: ['validate','fileupload','dataGrid']}){ %>
+<div class="main-content">
+    <% include('/modules/common/policyDetail.html', {commonFromId:commonFromId}){} %>
+<hr/>
+    <#form:form id="inputForm" model="${htRepairClientForm}" action="${ctx}/repair/htRepairClientForm/save" method="post" class="form-horizontal">
+    <div class="box-body">
+        <div class="form-unit">${text('核实用户实际信息')}</div>
+        <#form:hidden path="id"/>
+
+        <div class="row">
+            <div class="col-xs-3">
+                <div class="form-group">
+                    <label class="control-label col-sm-4" title="">
+                        <span class="required hide">*</span> ${text('客户姓名')}：<i class="fa icon-question hide"></i></label>
+                    <div class="col-sm-8">
+                        <#form:input path="" maxlength="64" class="form-control"/>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-3">
+                <div class="form-group">
+                    <label class="control-label col-sm-4" title="">
+                        <span class="required hide">*</span> ${text('联系电话')}：<i class="fa icon-question hide"></i></label>
+                    <div class="col-sm-8">
+                        <#form:input path="" maxlength="10" class="form-control"/>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-3">
+                <div class="form-group">
+                    <label class="control-label col-sm-4" title="">
+                        <span class="required hide">*</span> ${text('手机品牌')}：<i class="fa icon-question hide"></i></label>
+                    <div class="col-sm-8">
+                        <#form:input path="" maxlength="10" class="form-control"/>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-3">
+                <div class="form-group">
+                    <label class="control-label col-sm-4" title="">
+                        <span class="required hide">*</span> ${text('手机型号')}：<i class="fa icon-question hide"></i></label>
+                    <div class="col-sm-8">
+                        <#form:input path="" maxlength="10" class="form-control"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-3">
+                <div class="form-group">
+                    <label class="control-label col-sm-4" title="">
+                        <span class="required">*</span> ${text('联系情况')}：<i class="fa icon-question hide"></i></label>
+                    <div class="col-sm-8">
+                        <#form:radio path="contactStatus" dictType="contact_status" class="form-control" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-xs-3">
+                <div class="form-group">
+                    <label class="control-label col-sm-4" title="">
+                        <span class="required hide">*</span> ${text('再次沟通的时间')}：<i class="fa icon-question hide"></i></label>
+                    <div class="col-sm-8">
+                        <#form:input path="againDate" readonly="true" maxlength="20" class="form-control Wdate"
+                        dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:true});"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3">
+                <div class="form-group">
+                    <label class="control-label col-sm-4" title="">
+                        <span class="required">*</span> ${text('理赔资料状态')}：<i class="fa icon-question hide"></i></label>
+                    <div class="col-sm-8">
+                        <#form:radio path="claimStatus" dictType="claim_status" blankOption="true" class="form-control"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3">
+                <div class="form-group">
+                    <label class="control-label col-sm-4" title="">
+                        <span class="required">*</span> ${text('核实理赔资料')}：<i class="fa icon-question hide"></i></label>
+                    <div class="col-sm-8">
+                        <#form:checkbox path="claimData" dictType="claim_data" blankOption="true" class="form-control"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-xs-3">
+                <div class="form-group">
+                    <label class="control-label col-sm-4" title="">
+                        <span class="required hide">*</span> ${text('预期邮寄时间')}：<i class="fa icon-question hide"></i></label>
+                    <div class="col-sm-8">
+                        <#form:input path="mailDate" readonly="true" maxlength="20" class="form-control Wdate"
+                        dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:true});"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3">
+                <div class="form-group">
+                    <label class="control-label col-sm-4" title="">
+                        <span class="required hide">*</span> ${text('快递公司')}：<i class="fa icon-question hide"></i></label>
+                    <div class="col-sm-8">
+                        <#form:select path="expressCompany" dictType="sys_menu_type" blankOption="true" class="form-control" />
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-3">
+                <div class="form-group">
+                    <label class="control-label col-sm-4" title="">
+                        <span class="required hide">*</span> ${text('快递单号')}：<i class="fa icon-question hide"></i></label>
+                    <div class="col-sm-8">
+                        <#form:input path="expressNo" maxlength="64" class="form-control"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3">
+                <div class="form-group">
+                    <label class="control-label col-sm-4" title="">
+                        <span class="required hide">*</span> ${text('手机品牌')}：<i class="fa icon-question hide"></i></label>
+                    <div class="col-sm-8">
+                        <#form:input path="phoneBrand" maxlength="64" class="form-control"/>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-3">
+                <div class="form-group">
+                    <label class="control-label col-sm-4" title="">
+                        <span class="required hide">*</span> ${text('手机型号')}：<i class="fa icon-question hide"></i></label>
+                    <div class="col-sm-8">
+                        <#form:input path="phoneType" maxlength="64" class="form-control"/>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-3">
+                <div class="form-group">
+                    <label class="control-label col-sm-4" title="">
+                        <span class="required hide">*</span> ${text('手机颜色')}：<i class="fa icon-question hide"></i></label>
+                    <div class="col-sm-8">
+                        <#form:input path="phoneColor" maxlength="64" class="form-control"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3">
+                <div class="form-group">
+                    <label class="control-label col-sm-4" title="">
+                        <span class="required">*</span> ${text('理赔是否合格')}：<i class="fa icon-question hide"></i></label>
+                    <div class="col-sm-8">
+                        <#form:radio path="isQualified" dictType="is_qualified" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-xs-4">
+                <div class="form-group">
+                    <label class="control-label col-sm-12" title="">
+                        <span class="required">*</span> ${text('上传快递单、设备及相关理赔资料照片(.jpg/.png/.jpeg)')}：<i class="fa icon-question hide"></i></label>
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="control-label col-sm-12" title="">
+                        <div class="col-sm-8">
+                            <#form:fileupload id="image" bizKey="123" bizType="clientData_image"
+                            uploadType="image" class="" readonly="false"/>
+                        </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-3">
+                <div class="form-group">
+                    <label class="control-label col-sm-2" title="">
+                        <span class="required hide">*</span> ${text('备注')}：<i class="fa icon-question hide"></i></label>
+                    <div class="col-sm-10">
+                        <#form:textarea path="remarks" rows="4" maxlength="500" class="form-control"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="box-footer">
+        <div class="row">
+            <div class="col-sm-offset-2 col-sm-10">
+                <% if (hasPermi('repair:htRepairClientForm:edit')){ %>
+                <button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+                <% } %>
+                <button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+            </div>
+        </div>
+    </div>
+</#form:form>
+</div>
+<% } %>
+<script>
+    $(function () {
+
+
+        var f="yyyy-MM-dd HH:mm:ss";
+        console.log(js.formatDate(new Date($("#inputCreateDate").val()),f));
+        console.log(js.formatDate(new Date($("#inputBirthday").val()),f));
+        console.log(js.formatDate(new Date($("#inputEffectTime").val()),f));
+        console.log(js.formatDate(new Date($("#inputCostTime").val()),f));
+        console.log(js.formatDate(new Date($("#inputBuyCard").val()),f));
+        console.log($("#inputIdType").val());
+        console.log($("#inputSex").val());
+
+
+
+
+
+
+        // $("#createDate").html(js.formatDate(new Date($("#inputCreateDate").val()),f));
+        $("#birthday").html(js.formatDate(new Date($("#inputBirthday").val()),f));
+        // $("#effectTime").html(js.formatDate(new Date($("#inputEffectTime").val()),f));
+        //  $("#costTime").html(js.formatDate(new Date($("#inputCostTime").val()),f));
+        // $("#buyCard").html(js.formatDate(new Date($("#inputBuyCard").val()),f));
+        if ($("#inputIdType").val()=="1"){$("#idType").html("身份证");}
+        if ($("#inputSex").val()=="1"){$("#sex").html("男");}else if ($("#inputSex").val()=="2") {$("#sex").html("女");}
+    })
+</script>

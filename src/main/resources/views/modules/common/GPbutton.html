@@ -1,0 +1,36 @@
+<div id="commonButtonGP" style="display: inline-block;">
+    <%
+    #ajax commonButtonGP: {
+    %>
+<button type="button" data-layer="true" data-layer-width="725" data-layer-height="420"  class="btn btn-sm btn-default"  myButton="GP" onclick="butt(this,${id!});"  ><i class="fa icon-share-alt"></i> ${text('申请改派')}</button>
+    <%}%>
+
+</div>
+<script src="${ctxStatic}/common/common.js?${_version}" ></script>
+<script>
+
+    $(function () {
+        $.get("${ctx}/forminfo/htFormOperation/GPbutton?commonFromId=${commonFromId}",function (data) {
+            console.log(data);
+                $("#commonButtonGP").html(data);
+        });
+    });
+
+    function butt(b,formId) {
+        //获取工单ID
+
+        var $bt=$(b);
+        console.log($bt.attr("myButton"));
+        if ($bt.attr("myButton")=="GP"){
+
+            js.addTabPage($bt,"","${ctx}/forminfo/htFormOperation/reassignment?formId="+formId);
+        }
+        if ($bt.attr("myButton")=="GB"){
+            js.addTabPage($bt,"","${ctx}/forminfo/htFormOperation/close?formId="+formId);
+        }
+        if ($bt.attr("myButton")=="KQ"){
+            js.addTabPage($bt,"","${ctx}/forminfo/htFormOperation/reopen?formId="+formId);
+        }
+    }
+</script>
+</html>

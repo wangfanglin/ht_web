@@ -1,0 +1,66 @@
+<% layout('/layouts/default.html', {title: '映射失败保单管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa icon-notebook"></i> ${text('映射失败保单管理')}
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${htFailPolicy}" action="${ctx}/policy/htFailPolicy/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+			<div class="form-group">
+				<label class="control-label">${text('原始渠道名称')}：</label>
+				<div class="control-inline">
+					<#form:input path="originalChannel" maxlength="255" class="form-control width-120"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label">${text('原始产品名称')}：</label>
+				<div class="control-inline width-120">
+					<#form:input path="originalChannelProduct" maxlength="255"  class="form-control width-120"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label">${text('原始手机品牌')}：</label>
+				<div class="control-inline width-120">
+					<#form:input path="originalBrand"  class="form-control width-120"/>
+				</div>
+			</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="reset" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+        {header:'${text("原始保单")}', name:'policyId', index:'p.str_channel_name', width:150, align:"center", formatter: function(val, obj, row, act){
+                return '<a href="${ctx}/policy/htFailPolicy/form?id='+row.id+'" class="btnList" data-title="${text("编辑映射失败保单")}">'+(val||row.id)+'</a>';
+            }},
+        {header:'${text("原始品牌")}', name:'originalBrand', index:'a.original_brand', width:170, align:"left"},
+        {header:'${text("原始机型")}', name:'originalModel', index:'a.original_model', width:170, align:"left"},
+        {header:'${text("原始渠道")}', name:'originalChannel', index:'a.original_channel', width:150, align:"left"},
+        {header:'${text("原始产品")}', name:'originalChannelProduct', index:'a.original_channel_product', width:150, align:"left"},
+        {header:'${text("创建时间")}', name:'createDate', index:'a.create_date', width:150, align:"center"},
+		{header:'${text("处理状态")}', name:'status', index:'a.status', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('fail_policy_status')}, val, '${text("未知")}', true);
+		}}
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.htdutyroster.dao.HtDutyRosterDao">
+	
+	<!-- 查询数据
+	<select id="findList" resultType="HtDutyRoster">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+	</select> -->
+	<select id="getOfficeInfoByNo" resultType="java.util.Map">
+		SELECT e.office_code,u.user_code FROM js_sys_employee e INNER JOIN js_sys_user u ON e.emp_code = u.ref_code
+		 WHERE emp_no = #{organizationNo}
+	</select>
+	<select id="getStaffWhether" resultType="String">
+		SELECT id FROM ht_duty_roster WHERE staff_user_id = #{staffUserId} AND
+		 TO_DAYS(start_time) = TO_DAYS(#{startTime}) AND TO_DAYS(end_time) = TO_DAYS(#{endTime}) AND `status` = '0' LIMIT 1
+	</select>
+	<select id="getDutyRosterStaffUserId" resultType="String">
+		<![CDATA[
+			SELECT dr.staff_user_id FROM js_sys_office of
+			LEFT JOIN js_sys_employee em ON of.office_code = em.office_code
+			LEFT JOIN js_sys_user users ON users.ref_code = em.emp_code
+			INNER JOIN ht_duty_roster dr ON users.user_code = dr.staff_user_id
+			LEFT JOIN (SELECT l.user_id,COUNT(user_id) AS "counts" FROM ht_duty_roster_log l where TO_DAYS(NOW()) = TO_DAYS(create_date) GROUP BY l.user_id) lo ON users.user_code = lo.user_id
+			WHERE (of.office_code = #{officeId} OR of.parent_codes LIKE  CONCAT('%',#{officeId},',%')) AND  NOW() BETWEEN dr.start_time AND dr.end_time
+			ORDER BY lo.counts LIMIT 1;
+			]]>
+	</select>
+
+
+	<select id="getDutyRosterStaffUserIdByRole" resultType="String">
+		<![CDATA[
+			SELECT dr.staff_user_id FROM js_sys_user_role of
+			LEFT JOIN js_sys_user users ON users.ref_code = of.user_code
+			INNER JOIN ht_duty_roster dr ON users.user_code = dr.staff_user_id
+			LEFT JOIN (SELECT l.user_id,COUNT(user_id) AS "counts" FROM ht_duty_roster_log l where TO_DAYS(NOW()) = TO_DAYS(create_date) GROUP BY l.user_id) lo ON users.user_code = lo.user_id
+			WHERE of.role_code = #{roleId}  AND  NOW() BETWEEN dr.start_time AND dr.end_time
+			ORDER BY lo.counts LIMIT 1;
+			]]>
+	</select>
+
+	<insert id="saveRosterLog" parameterType="java.lang.String">
+		insert into ht_duty_roster_log(id,user_id,use_date,create_date) values (UUID(),#{userId},NOW(),NOW())
+	</insert>
+	<select id="findWhetherBeOnDuty" parameterType="java.lang.Integer">
+		SELECT COUNT(1) FROM ht_duty_roster WHERE `status`= '0' AND staff_user_id = #{userCode}
+									AND NOW() BETWEEN start_time AND end_time  ORDER BY `status` DESC
+	</select>
+</mapper>

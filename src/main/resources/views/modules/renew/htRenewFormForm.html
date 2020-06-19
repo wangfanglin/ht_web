@@ -1,0 +1,451 @@
+<% layout('/layouts/default.html', {title: '换新工单-待联系客户', libs: ['validate','fileupload']}){ %>
+<div class="main-content">
+	<% include('/modules/common/policyDetail.html', {commonFromId:commonFromId}){} %>
+
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${htRenewForm}" action="${ctx}/renew/htRenewForm/save" method="post" class="form-horizontal">
+			<div class="box-body">
+				<div class="form-unit">${text('核实用户实际信息')}</div>
+				<#form:hidden path="id"/>
+				<#form:hidden path="lackClaimData"/>
+				<#form:hidden path="callId" class="call"/>
+
+
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('客户姓名')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="htClaimSettlementForm.userName" readonly="true" maxlength="64" class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('联系电话')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="htClaimSettlementForm.phone" readonly="true" class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('手机品牌')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="htClaimSettlementForm.phoneBrand" disabled="true" items="${brandList}" blankOption="true" blankOptionLabel="请选择" itemLabel="name" itemValue="id" class="form-control required" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('手机型号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="htClaimSettlementForm.phoneModel" disabled="true" items="${typeList}" blankOption="true" blankOptionLabel="请选择"  itemLabel="model" itemValue="id" class="form-control required" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-1" title="">
+								<span class="required">*</span> ${text('联系情况')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-9">
+								<#form:radio path="contactStatus" dictType="contact_status" class="form-control required" />
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row" >
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('再次沟通的时间')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="againDate" readonly="true" maxlength="20" class="form-control Wdate"
+								dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:true});"/>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+				<div class="claimStatus row hide" >
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-1" title="">
+								<span class="required" >*</span> ${text('理赔资料')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:radio path="claimStatus" dictType="claim_status" blankOption="true" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="claim row hide">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-1" title="">
+								<span class="required">*</span> ${text('核实理赔资料')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:checkbox path="claimData" items="${claimDataList}" itemLabel="data_name" itemValue="id" class="form-control required" />
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="expressDate row hide">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('预期邮寄时间')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="mailDate" readonly="true" maxlength="20" class="form-control Wdate"
+								dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:true});"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="express row hide" >
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required">*</span> ${text('快递公司')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="expressCompany" blankOption="true" blankOptionLabel="请选择"  items="${exList}" itemLabel="exprname" itemValue="id" class="form-control required" />
+
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required">*</span> ${text('快递单号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="expressNo" maxlength="64" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="claim row hide">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required">*</span> ${text('手机品牌')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="phoneBrand" onchange="findPhoneModel()" items="${brandList}" blankOption="true" blankOptionLabel="请选择" itemLabel="name" itemValue="id" class="form-control required" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required">*</span> ${text('手机型号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="phoneType" items="${typeList}" blankOption="true" blankOptionLabel="请选择"  itemLabel="model" itemValue="id" class="form-control required" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required">*</span> ${text('手机颜色')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="phoneColor" dictType="phone_color" blankOption="true" blankOptionLabel="请选择"  class="form-control required" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="claim row hide">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required">*</span> ${text('理赔是否合格')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:radio path="isQualified" dictType="is_qualified" class="form-control required" />
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="claim row hide">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-1" title="">
+								<span class="required">*</span> 上传快递单、设备及相关理赔资料照片(.jpg/.png/.jpeg)：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:fileupload id="imageId" returnPath="true"
+								filePathInputId="image"
+								bizKey="${htRenewForm.id}" bizType="clientRenew_image"
+								uploadType="image" class="required" readonly="false" />
+
+								<#form:hidden name="image" class="form-control"/>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="claim row hide">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-1" title="">
+								<span class="required">*</span> ${text('短信模板')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:textarea path="smsModel" rows="4" maxlength="500" class="form-control required"/>
+								<span>
+									<input type="button" value="生成短信模板" onclick="getSmsMess();">
+								</span>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('备注')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:textarea path="remarks" rows="4" maxlength="500" class="form-control"/>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+				<div class="box-footer">
+					<div class="row">
+						<div class="col-sm-offset-2 col-sm-10">
+							<% if (hasPermi('renew:htRenewForm:edit')){ %>
+							<#form:hidden id="formInfoStatus" path="htFormInfo.status"/>
+							<#form:hidden path="htFormInfo.id"/>
+							<#form:hidden path="operationType" value="0"/>
+
+							<% if (htRenewForm.bpm.activityId == 'renew_info' && !htRenewForm.bpm.isView){ %>
+							<button type="button" data-layer="true" data-layer-width="725" data-layer-height="420" onclick="gbButton(this);" class="btn btn-sm btn-info mr3"><i class="fa icon-minus"></i> ${text('申请关闭')}</button>
+							<% } %>
+
+
+							<#bpm:button bpmEntity="${htRenewForm}" formKey="hd_form_claim" completeText="${text('提 交')}"/>
+							<% } %>
+							<script>
+
+								function gbButton(b) {
+									var $bt=$(b);
+
+									let formId = "${htRenewForm.htFormInfo.id}";
+									let procInsId = "${htRenewForm.bpm.procInsId}";
+									let activityId = "${htRenewForm.bpm.activityId}";
+									let taskId = "${htRenewForm.bpm.taskId}";
+									js.addTabPage($bt,"","${ctx}/forminfo/htFormOperation/close?id=${htRenewForm.id}&formId="+formId+"&activityId="+activityId+"&procInsId="+procInsId+"&taskId="+taskId);
+
+								}
+
+								// 流程按钮提交事件
+								BpmButton = window.BpmButton || {};
+								BpmButton.complete = function($this, task){
+									$('#formInfoStatus').val(Global.STATUS_AUDIT);
+								};
+							</script>
+							<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+						</div>
+					</div>
+				</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+
+		let claimData = "";
+		$("input[name='claimData']:not(:checked)").each(function() {
+			let str = $(this).parent().parent().text().trim()+",";
+			claimData += str;
+		});
+		claimData=claimData.slice(0, -1);
+		$("#lackClaimData").val(claimData);
+
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+
+
+$(function(){
+	changeContact();
+	changeClaim();
+});
+
+$("input:radio[name='claimStatus']").on('ifChecked', function(event){
+	changeClaim();
+});
+
+$("input:radio[name='contactStatus']").on('ifChecked', function(event){
+	changeContact();
+});
+
+//联系状态
+function changeContact() {
+	let contactStatus = $("input[name='contactStatus']:checked").val();
+
+	if(contactStatus == '1'){
+		$(".claimStatus").removeClass("hide");
+		changeClaim();
+		$("#claimStatus").iCheck('enable');
+
+	}else{
+		$(".claimStatus").addClass("hide");
+		$(".expressDate").addClass("hide");
+		$(".express").addClass("hide");
+		$(".claim").addClass("hide");
+
+		$("#claimStatus").iCheck('disable');
+		$('#claimData').iCheck('disable');
+		$("#phoneBrand").attr("disabled",true);
+		$("#phoneType").attr("disabled",true);
+		$("#phoneColor").attr("disabled",true);
+		$("#isQualified").iCheck("disabled");
+		$("#imageId").attr("disabled",true);
+
+		$("#smsModel").attr("disabled",true);
+
+
+		$("#expressCompany").attr("disabled",true)
+		$("#expressNo").attr("disabled",true);
+	}
+}
+
+
+
+//理赔资料
+function changeClaim() {
+	let claimStatus = $("input[name='claimStatus']:checked").val();
+	//1已邮寄
+	if(claimStatus == '1'){
+		$(".claim").addClass("hide");
+
+		$(".express").removeClass("hide");
+		$('#claimData').iCheck('disable');
+		$("#phoneBrand").attr("disabled",true);
+		$("#phoneType").attr("disabled",true);
+		$("#phoneColor").attr("disabled",true);
+		$("#isQualified").iCheck("disable");
+		$("#imageId").attr("disabled",true);
+
+		$("#smsModel").attr("disabled",true);
+
+		$("#expressNo").removeAttr("disabled");
+		$("#expressCompany").removeAttr("disabled");
+
+
+
+
+	}
+	//3已签收
+	if(claimStatus == '3'){
+		$(".expressDate").addClass("hide");
+		$(".express").addClass("hide");
+		$(".claim").removeClass("hide");
+
+		$("#claimData").iCheck('enable');
+		$("#phoneBrand").removeAttr("disabled");
+		$("#phoneType").removeAttr("disabled");
+		$("#phoneColor").removeAttr("disabled");
+		$("#isQualified").iCheck('enable');
+		$("#imageId").removeAttr("disabled");
+
+		$("#smsModel").removeAttr("disabled");
+
+
+
+		$("#expressNo").attr("disabled",true);
+		$("#expressCompany").attr("disabled",true);
+
+		if (typeof window.webuploaderRefresh == 'function'){
+			window.webuploaderRefresh();
+		}
+
+	}
+	if(claimStatus != '1' && claimStatus != '3'){
+		$(".expressDate").addClass("hide");
+		$(".claim").addClass("hide");
+
+		$(".express").addClass("hide");
+		$('#claimData').iCheck('disable');
+		$("#phoneBrand").attr("disabled",true);
+		$("#phoneType").attr("disabled",true);
+		$("#phoneColor").attr("disabled",true);
+		$('#isQualified').iCheck('disable');
+		$("#imageId").attr("disabled",true);
+
+		$("#smsModel").attr("disabled",true);
+
+		$("#expressNo").attr("disabled",true);
+		$("#expressCompany").attr("disabled",true);
+
+	}
+}
+
+
+
+function findPhoneModel() {
+	var option=$('#phoneBrand option:selected').val(); //获取选中的项
+	console.log(option);
+	$.ajax({
+		type:"get",
+		url:"${ctx}/phonemodelinfo/htPhoneModelInfo/findByPhoneModel?brandId="+option,
+		success: function(data) {
+			var options = [];
+			$.each(data, function (index, value) {
+				options.push("<option value='" + value.id + "'> " + value.model + "</option>");
+			});
+			$("#phoneType option").remove();
+			$("#phoneType").append(options.join(''));
+			$('#phoneType').attr("disabled",false);
+		}
+	});
+}
+
+function getSmsMess(){
+	let claimData = "";
+
+	$("input[name='claimData']:not(:checked)").each(function() {
+		let str = $(this).parent().parent().text().trim()+",";
+		claimData += str;
+	});
+	claimData=claimData.slice(0, -1);
+
+	let isQualified = $("input[name='isQualified']:checked").val();
+	let formId = "${commonFromId}";
+
+
+	$.ajax({url:'${ctx}/renew/htRenewForm/getSmsString',
+		data:{"isQualified":isQualified,"formId":formId,"lackClaimData":claimData},
+		type:"POST",
+		traditional:true,
+		success:function(data){
+			$("#smsModel").val(data)
+		}
+	});
+
+}
+</script>

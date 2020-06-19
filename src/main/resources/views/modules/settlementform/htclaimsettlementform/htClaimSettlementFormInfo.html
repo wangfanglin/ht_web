@@ -1,0 +1,40 @@
+<% layout('/layouts/default.html', {title: '在线理赔信息', libs: ['validate','fileupload']}){ %>
+
+
+<% include('/modules/common/policyDetail.html', {commonFromId:htFormInfo.id}){} %>
+
+<% } %>
+
+<div class="box-footer">
+    <div class="row">
+        <div class="col-sm-offset-2 col-sm-10">
+
+            <% if ('0' == htFormInfo.isRun!){ %>
+            <button type="button" data-layer="true" data-layer-width="725" data-layer-height="420" onclick="gpButton(this);" class="btn btn-sm btn-default"><i class="fa icon-minus"></i> ${text('改派')}</button>
+            <% } %>
+
+            <% if ('1' == htFormInfo.isRun!){ %>
+            <button type="button" data-layer="true" data-layer-width="725" data-layer-height="420" onclick="openTabCQ(this)"  class="btn btn-sm btn-info mr3"><i class="fa   icon-clock"></i> 重新开启</button>
+            <% } %>
+            <button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+            <script>
+
+                function openTabCQ(b) {
+                    var $bt=$(b);
+                    let formId = "${htFormInfo.id!}";
+                    js.addTabPage($bt,"","${ctx}/forminfo/htFormOperation/reopen?formId="+formId);
+                }
+                function gpButton(b) {
+                    var $bt=$(b);
+                    let formId = "${commonApplyId!}";
+                    js.addTabPage($bt,"","${ctx}/htclaimsettlementform/htClaimSettlementForm/redeploy?type=claim_info&formId="+formId);
+
+                }
+
+            </script>
+        </div>
+    </div>
+</div>
+<script>
+
+</script>

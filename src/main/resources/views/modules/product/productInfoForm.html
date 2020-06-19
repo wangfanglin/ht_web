@@ -1,0 +1,614 @@
+<% layout('/layouts/default.html', {title: '产品表管理', libs: ['validate']}){ %>
+<script>
+    $(function () {
+        // 正数
+        jQuery.validator.addMethod("zheng", function(value, element) {
+            var tel = /^(\+)?\d+(\.\d+)?$/;
+            return this.optional(element) || (tel.test(value));
+        }, '请输入一个正数');
+
+        var option=$('#productType option:selected').val(); //获取选中的项
+        if (option=="0"){//维修
+            $("#weixiu *").attr("disabled",false);
+            $("#huanji *").attr("disabled",true);
+            $("#shujubao *").attr("disabled",true);
+          //  $("#weixiuesc *").attr("disabled",false);
+          //  $("#huanxinesc *").attr("disabled",true);
+         //   $("#yanbaoesc *").attr("disabled",true);
+           // $("#shujubaoesc *").attr("disabled",true);
+
+            document.getElementById("weixiu").style.display ="";
+            document.getElementById("huanji").style.display ="none";
+            document.getElementById("shujubao").style.display ="none";
+          //  document.getElementById("weixiuesc").style.display ="";
+          //  document.getElementById("huanxinesc").style.display ="none";
+          //  document.getElementById("yanbaoesc").style.display ="none";
+          //  document.getElementById("shujubaoesc").style.display ="none";
+        }
+        if (option=="1"){//换机
+            $("#weixiu *").attr("disabled",true);
+            $("#huanji *").attr("disabled",false);
+            $("#shujubao *").attr("disabled",true);
+          //  $("#weixiuesc *").attr("disabled",true);
+          //  $("#huanxinesc *").attr("disabled",false);
+           // $("#yanbaoesc *").attr("disabled",true);
+          //  $("#shujubaoesc *").attr("disabled",true);
+
+            document.getElementById("weixiu").style.display ="none";
+            document.getElementById("huanji").style.display ="";
+            document.getElementById("shujubao").style.display ="none";
+           // document.getElementById("weixiuesc").style.display ="none";
+           // document.getElementById("huanxinesc").style.display ="";
+          //  document.getElementById("yanbaoesc").style.display ="none";
+          //  document.getElementById("shujubaoesc").style.display ="none";
+        }
+        if (option=="2"){//延保
+            $("#weixiu *").attr("disabled",false);
+            $("#huanji *").attr("disabled",true);
+            $("#shujubao *").attr("disabled",true);
+            //$("#weixiuesc *").attr("disabled",true);
+           // $("#huanxinesc *").attr("disabled",true);
+           // $("#yanbaoesc *").attr("disabled",false);
+           // $("#shujubaoesc *").attr("disabled",true);
+
+            document.getElementById("weixiu").style.display ="";
+            document.getElementById("huanji").style.display ="none";
+            document.getElementById("shujubao").style.display ="none";
+          //  document.getElementById("weixiuesc").style.display ="none";
+            //document.getElementById("huanxinesc").style.display ="none";
+           // document.getElementById("yanbaoesc").style.display ="";
+           // document.getElementById("shujubaoesc").style.display ="none";
+        }
+        if (option=="3"){//数据保
+            $("#weixiu *").attr("disabled",true);
+            $("#huanji *").attr("disabled",true);
+            $("#shujubao *").attr("disabled",false);
+           // $("#weixiuesc *").attr("disabled",true);
+           // $("#huanxinesc *").attr("disabled",true);
+           // $("#yanbaoesc *").attr("disabled",true);
+          //  $("#shujubaoesc *").attr("disabled",false);
+
+            document.getElementById("weixiu").style.display ="none";
+            document.getElementById("huanji").style.display ="none";
+            document.getElementById("shujubao").style.display ="";
+            //document.getElementById("weixiuesc").style.display ="none";
+           // document.getElementById("huanxinesc").style.display ="none";
+          //  document.getElementById("yanbaoesc").style.display ="none";
+           // document.getElementById("shujubaoesc").style.display ="";
+        }
+    })
+</script>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-title">
+				<i class="fa icon-note"></i> ${text(productInfo.isNewRecord ? '新增产品表' : '编辑产品表')}
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+
+		<#form:form id="inputForm" model="${productInfo}" action="${ctx}/product/productInfo/save" method="post" class="form-horizontal">
+		<div class="box-body">
+			<div class="form-unit">${text('产品基本信息')}</div>
+			<#form:hidden path="id"/>
+			<div class="row">
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required ">*</span> ${text('产品名称:')}<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="proName" maxlength="255" class="form-control required"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required ">*</span> ${text('产品编码:')}<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="proCode" maxlength="255" class="form-control required"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required ">*</span> ${text('服务标的/类目:')}<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="category" dictType="category"  blankOption="true" blankOptionLabel="请选择" class="form-control required"  onchange="findAssByCategory()"/>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required ">*</span> ${text('系统类型:')}<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="systemType" dictType="system_type" blankOption="true" blankOptionLabel="请选择" class="form-control required" />
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required ">*</span> ${text('产品类别:')}<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="productType" dictType="product_type" blankOption="true" blankOptionLabel="请选择" class="form-control required" onchange="changeType()"/>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required ">*</span> ${text('维修品质:')}<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="maintainStandard" dictType="maintain_standard" blankOption="true" blankOptionLabel="请选择"  class="form-control required"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('权益简介:')}<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="equityIntro" class="form-control"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required ">*</span> ${text('权益地址:')}<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="equityUrl" maxlength="255" class="form-control required"/>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required ">*</span> ${text('上市时间:')}<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="intoMarketDate" readonly="true" maxlength="20" class="form-control Wdate required"
+							dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:false});"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required ">*</span> ${text('退市时间:')}<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="exitMarketDate" readonly="true" maxlength="20" class="form-control Wdate required"
+							dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:true});"/>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+		<!---------------------------------------------------------------------------------------->
+		<div id="weixiu">
+			<div class="form-unit">${text('维修条件配置:')}</div>
+			<div class="row">
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required ">*</span> ${text('维修部件:')}<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="assemblyId" items="${assemblyUnitList}"  itemLabel="name"  itemValue="id"  multiple="true"  blankOption="true"  blankOptionLabel="请选择"   class="form-control required" />
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('维修次数')}：<i class="required "></i></label>
+						<div class="col-sm-8">
+							<#form:select path="maintenanceFrequency" dictType="frequency" blankOption="true" blankOptionLabel="请选择" class="form-control"/>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-6" title="">
+							<span class="required ">*</span> ${text('维修限额是否有限制')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-6">
+							<p><label><#form:radio path="isRestrict" dictType="is_restrict" class="form-control required" /></label><label><#form:input path="restrictPrice" maxlength="7" class="form-control required zheng" style="width: 50px" /></label></p>
+
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-6" title="">
+							<span class="required hide">*</span> ${text('保险公司维修限额')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-6">
+							<#form:input path="insuranceRestrictPrice" maxlength="7"   class="form-control zheng"/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="huanji" disabled="disabled" style="display: none">
+			<div class="form-unit">${text('换机条件配置:')}</div>
+			<div class="row">
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required ">*</span> ${text('换机次数')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="changeFrequency" dictType="frequency" blankOption="true" blankOptionLabel="请选择"  class="form-control required" />
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('换机条件')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="changeCondition" maxlength="255" class="form-control"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required ">*</span> ${text('换机自付额')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="changePayment" maxlength="7"   class="form-control zheng required"/>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('基础折旧率')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="basisDepreciation" maxlength="7"  class="form-control required zheng"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('每月折旧率')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="monthlyDepreciation" maxlength="7"  class="form-control required  zheng"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-8" title="" style="color: red">
+							<span class="required">*</span> ${text('折旧率输入的值为百分比类型！')}<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-2">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div id="shujubao" disabled="disabled" style="display: none">
+			<div class="form-unit">${text('数据恢复配置:')}</div>
+			<div class="row">
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required ">*</span> ${text('维修次数')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="maintenanceFrequency" dictType="frequency" blankOption="true" blankOptionLabel="请选择" class="form-control required digits" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="form-unit">${text('供应链/财务')}</div>
+		<div class="row">
+			<div class="col-xs-4">
+				<div class="form-group">
+					<label class="control-label col-sm-4" title="">
+						<span class="required hide">*</span> ${text('服务成本')}：<i class="fa icon-question hide"></i></label>
+					<div class="col-sm-8">
+						<#form:input path="serveCostPrice" maxlength="7"  class="form-control zheng"/>
+					</div>
+				</div>
+			</div>
+			<div class="col-xs-4">
+				<div class="form-group">
+					<label class="control-label col-sm-4" title="">
+						<span class="required hide">*</span> ${text('费率')}：<i class="fa icon-question hide"></i></label>
+					<div class="col-sm-8">
+						<#form:input path="rate" maxlength="7"  class="form-control zheng"/>
+					</div>
+				</div>
+			</div>
+			<div class="col-xs-4">
+				<div class="form-group">
+					<label class="control-label col-sm-4" title="">
+						<span class="required hide">*</span> ${text('保费')}：<i class="fa icon-question hide"></i></label>
+					<div class="col-sm-8">
+						<#form:input path="premium" maxlength="7"  class="form-control zheng"/>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-4">
+				<div class="form-group">
+					<label class="control-label col-sm-4" title="">
+						<span class="required hide">*</span> ${text('建议零售价')}：<i class="fa icon-question hide"></i></label>
+					<div class="col-sm-8">
+						<#form:input path="suggestedRetailPrice" maxlength="7"  class="form-control zheng"/>
+					</div>
+				</div>
+			</div>
+			<div class="col-xs-4">
+				<div class="form-group">
+					<label class="control-label col-sm-4" title="">
+						<span class="required">*</span> ${text('保险供应商')}：<i class="fa icon-question hide"></i></label>
+					<div class="col-sm-8">
+						<#form:select path="insuranceProviderId" items="${insuranceProviderList}"  itemLabel="suppliername"  itemValue="id" blankOption="true" blankOptionLabel="请选择" class="form-control required" />
+					</div>
+				</div>
+			</div>
+			<div class="col-xs-4">
+				<div class="form-group">
+					<label class="control-label col-sm-4" title="">
+						<span class="required">*</span> ${text('中介服务商')}：<i class="fa icon-question hide"></i></label>
+					<div class="col-sm-8">
+						<#form:select path="intermediaryServiceId" items="${intermediaryServerList}"  itemLabel="name"  itemValue="id" blankOption="true" blankOptionLabel="请选择" class="form-control required" />
+					</div>
+				</div>
+			</div>
+			<#form:hidden path="excessRate"/>
+			<#form:hidden path="fixExcessRate"/>
+			<#form:hidden path="insureLimit"/>
+			<#form:hidden path="guaLimt"/>
+		</div>
+
+
+
+
+		<% if (productInfo.isNewRecord){ %>
+
+		<div class="row">
+			<div class="col-xs-6">
+				<div class="form-group">
+					<label class="control-label col-sm-4" title="">
+						<span class="required ">*</span> ${text('是否立即启用')}：<i class="fa icon-question hide"></i></label>
+					<div class="col-sm-8">
+						<#form:radio path="isStart" dictType="is_start" class="form-control required" />
+					</div>
+				</div>
+			</div>
+
+		</div>
+		<% } %>
+		<#form:hidden path="remark"/>
+	</div>
+
+	<div class="box-footer">
+		<div class="row">
+			<div class="col-sm-offset-2 col-sm-10">
+				<% if (hasPermi('product:productInfo:edit')){ %>
+				<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+				<% } %>
+				<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+			</div>
+		</div>
+	</div>
+
+</#form:form>
+</div>
+</div>
+<% } %>
+
+<script>
+    $("#inputForm").validate({
+        submitHandler: function(form){
+            js.ajaxSubmitForm($(form), function(data){
+                js.showMessage(data.message);
+                if(data.result == Global.TRUE){
+                    js.closeCurrentTabPage(function(contentWindow){
+                        contentWindow.page();
+                    });
+                }
+            }, "json");
+        }
+    });
+
+
+
+
+
+    function changeType() {
+        var option=$('#productType option:selected').val(); //获取选中的项
+        if (option=="0"){//维修
+            $("#weixiu *").attr("disabled",false);
+            $("#huanji *").attr("disabled",true);
+            $("#shujubao *").attr("disabled",true);
+         //   $("#weixiuesc *").attr("disabled",false);
+          //  $("#huanxinesc *").attr("disabled",true);
+           // $("#yanbaoesc *").attr("disabled",true);
+          //  $("#shujubaoesc *").attr("disabled",true);
+
+            document.getElementById("weixiu").style.display ="";
+            document.getElementById("huanji").style.display ="none";
+            document.getElementById("shujubao").style.display ="none";
+         //   document.getElementById("weixiuesc").style.display ="";
+           // document.getElementById("huanxinesc").style.display ="none";
+          //  document.getElementById("yanbaoesc").style.display ="none";
+          //  document.getElementById("shujubaoesc").style.display ="none";
+        }
+        if (option=="1"){//换机
+            $("#weixiu *").attr("disabled",true);
+            $("#huanji *").attr("disabled",false);
+            $("#shujubao *").attr("disabled",true);
+          //  $("#weixiuesc *").attr("disabled",true);
+          //  $("#huanxinesc *").attr("disabled",false);
+          //  $("#yanbaoesc *").attr("disabled",true);
+          //  $("#shujubaoesc *").attr("disabled",true);
+
+            document.getElementById("weixiu").style.display ="none";
+            document.getElementById("huanji").style.display ="";
+            document.getElementById("shujubao").style.display ="none";
+          //  document.getElementById("weixiuesc").style.display ="none";
+          //  document.getElementById("huanxinesc").style.display ="";
+           // document.getElementById("yanbaoesc").style.display ="none";
+          //  document.getElementById("shujubaoesc").style.display ="none";
+        }
+        if (option=="2"){//延保
+            $("#weixiu *").attr("disabled",false);
+            $("#huanji *").attr("disabled",true);
+            $("#shujubao *").attr("disabled",true);
+        //    $("#weixiuesc *").attr("disabled",true);
+          //  $("#huanxinesc *").attr("disabled",true);
+           // $("#yanbaoesc *").attr("disabled",false);
+           // $("#shujubaoesc *").attr("disabled",true);
+
+            document.getElementById("weixiu").style.display ="";
+            document.getElementById("huanji").style.display ="none";
+            document.getElementById("shujubao").style.display ="none";
+          //  document.getElementById("weixiuesc").style.display ="none";
+          //  document.getElementById("huanxinesc").style.display ="none";
+           // document.getElementById("yanbaoesc").style.display ="";
+           // document.getElementById("shujubaoesc").style.display ="none";
+        }
+        if (option=="3"){//数据保
+            $("#weixiu *").attr("disabled",true);
+            $("#huanji *").attr("disabled",true);
+            $("#shujubao *").attr("disabled",false);
+           // $("#weixiuesc *").attr("disabled",true);
+          //  $("#huanxinesc *").attr("disabled",true);
+           // $("#yanbaoesc *").attr("disabled",true);
+           // $("#shujubaoesc *").attr("disabled",false);
+
+
+            document.getElementById("weixiu").style.display ="none";
+            document.getElementById("huanji").style.display ="none";
+            document.getElementById("shujubao").style.display ="";
+           // document.getElementById("weixiuesc").style.display ="none";
+         //   document.getElementById("huanxinesc").style.display ="none";
+           // document.getElementById("yanbaoesc").style.display ="none";
+          //  document.getElementById("shujubaoesc").style.display ="";
+        }
+    }
+
+    $("input:radio[name='priceFlag']").on('ifChecked', function(){
+        let flag = $(this).val();
+        //保额是否为主商品金额   1：是0：否
+        if(flag == '1'){
+            $('#coverage').attr("disabled",true)
+        }
+        if(flag == '0'){
+            $('#coverage').attr("disabled",false)
+        }
+
+    });
+    $("input:radio[name='priceFlag']").on('ifChecked', function(){
+        let flag = $(this).val();
+        //保额是否为主商品金额   1：是0：否
+        if(flag == '1'){
+            $('#coverage').attr("disabled",true)
+        }
+        if(flag == '0'){
+            $('#coverage').attr("disabled",false)
+        }
+
+    });
+    $("input:radio[name='isRestrict']").on('ifChecked', function(){
+        let flag = $(this).val();
+        //  1：是0：否
+        if(flag == '1'){
+            $('#restrictPrice').attr("disabled",false)
+        }
+        if(flag == '0'){
+            $('#restrictPrice').attr("disabled",true)
+        }
+
+    });
+    $("#WXSX1,#WXSX2").on('ifChecked', function(){
+
+        let flag = $(this).val();
+        // 是否立即生效 1：是0：否
+        if(flag == '1'){
+            $('#WXDAY').attr("disabled",true)
+        }
+        if(flag == '0'){
+            $('#WXDAY').attr("disabled",false)
+        }
+
+    });
+
+
+
+    $("#HXSX1,#HXSX2").on('ifChecked', function(){
+        let flag = $(this).val();
+        // 是否立即生效 1：是0：否
+        if(flag == '1'){
+            $('#HXDAY').attr("disabled",true)
+        }
+        if(flag == '0'){
+            $('#HXDAY').attr("disabled",false)
+        }
+
+    });
+
+    $("#YBSX1,#YBSX2").on('ifChecked', function(){
+        let flag = $(this).val();
+        console.log(flag);
+        // 是否立即生效 1：是0：否
+        if(flag == '1'){
+            $('#YXDAY').attr("disabled",true)
+        }
+        if(flag == '0'){
+            $('#YXDAY').attr("disabled",false)
+        }
+
+    });
+
+    $("#SJBSX1,#SJBSX2").on('ifChecked', function(){
+        let flag = $(this).val();
+        console.log(flag);
+        // 是否立即生效 1：是0：否
+        if(flag == '1'){
+            $('#SJBDAY').attr("disabled",true)
+        }
+        if(flag == '0'){
+            $('#SJBDAY').attr("disabled",false)
+        }
+
+    });
+    function findAssByCategory() {
+        var option=$('#category option:selected').val(); //获取选中的项
+        $.ajax({
+            type:"get",
+            url:"${ctx}/htassemblyunit/htAssemblyUnit/findAssemblyByCategory?category="+option,
+            success: function(data) {
+                var options = [];
+                $.each(data, function (index, value) {
+                    options.push("<option value='" + value.id + "'> " + value.name + "</option>");
+                });
+                $("#assemblyId option").remove();
+                $("#assemblyId").append(options.join(''));
+                console.log(data);
+            }
+        });
+    }
+</script>

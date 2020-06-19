@@ -1,0 +1,308 @@
+<% layout('/layouts/default.html', {title: '维修工单-待联系客户管理', libs: ['validate','fileupload']}){ %>
+<link rel="stylesheet" href="${ctxStatic}/common/css/index.css">
+<script src="${ctxStatic}/common/js/index.js"></script>
+<script src="${ctxStatic}/common/js/jquery.rotate.min.js"></script>
+<div class="main-content">
+	<% include('/modules/common/policyDetail.html', {commonFromId:commonFromId}){} %>
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${htRepairClientForm}" action="${ctx}/repair/htRepairClientForm/save" method="post" class="form-horizontal">
+			<div class="box-body">
+				<div class="form-unit">${text('核实用户实际信息')}</div>
+				<#form:hidden path="id"/>
+
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('客户姓名')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="htClaimSettlementForm.userName" readonly="true" maxlength="64" class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('联系电话')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="htClaimSettlementForm.phone" readonly="true" class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('手机品牌')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="htClaimSettlementForm.phoneBrand" disabled="true" items="${brandList}" blankOption="true" blankOptionLabel="请选择" itemLabel="name" itemValue="id" class="form-control required" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('手机型号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="htClaimSettlementForm.phoneModel" disabled="true" items="${typeList}" blankOption="true" blankOptionLabel="请选择"  itemLabel="model" itemValue="id" class="form-control required" />
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-1" title="">
+								<span class="required">*</span> ${text('联系情况')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-9">
+								<#form:radio path="contactStatus" disabled="true"  dictType="contact_status" class="form-control required" />
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+				<div class="row" >
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('再次沟通的时间')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="againDate" disabled="true"  readonly="true" maxlength="20" class="form-control Wdate"
+									dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:true});"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="claimStatus row hide" >
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-1" title="">
+								<span class="required" >*</span> ${text('理赔资料')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:radio path="claimStatus" disabled="true"  dictType="claim_status" blankOption="true" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="claim row hide">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-1" title="">
+								<span class="required">*</span> ${text('核实理赔资料')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:checkbox path="claimData" disabled="true"  items="${claimDataList}" itemLabel="data_name" itemValue="id" class="form-control required" />
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="expressDate row hide">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('预期邮寄时间')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="mailDate" disabled="true"  readonly="true" maxlength="20" class="form-control Wdate"
+								dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:true});"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="express row hide" >
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required">*</span> ${text('快递公司')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="expressCompany" disabled="true"  blankOption="true" blankOptionLabel="请选择"  items="${exList}" itemLabel="exprname" itemValue="id" class="form-control required" />
+
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required">*</span> ${text('快递单号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="expressNo" readonly="true" maxlength="64" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="claim row hide">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required">*</span> ${text('手机品牌')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="phoneBrand" disabled="true"  items="${brandList}" blankOption="true" blankOptionLabel="请选择" itemLabel="name" itemValue="id" class="form-control required" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required">*</span> ${text('手机型号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="phoneType" disabled="true" items="${typeList}" blankOption="true" blankOptionLabel="请选择"  itemLabel="model" itemValue="id" class="form-control required" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required">*</span> ${text('手机颜色')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="phoneColor" disabled="true"  dictType="phone_color" blankOption="true" blankOptionLabel="请选择"  class="form-control required" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="claim row hide">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required">*</span> ${text('理赔是否合格')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:radio path="isQualified" disabled="true"  dictType="is_qualified" class="form-control required" />
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="claim row hide">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required hide">*</span> ${text('上传快递单、设备及相关理赔资料照片(.jpg/.png/.jpeg)')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-12">
+								<ul class="picView-magnify-list" style="padding: 0px">
+									<% for(imgs in imageList!){ %>
+									<li>
+										<a href="javascript:void(0)" data-magnify="gallery" data-group="g1" data-src="${imgs}" data-caption="">
+											<img src="${imgs}" width="100px" height="100px">
+										</a>
+									</li>
+									<% } %>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('备注')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:textarea path="remarks" disabled="true"  rows="4" maxlength="500" class="form-control"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="box-footer">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+
+
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+
+
+$(function(){
+	changeContact();
+	changeClaim();
+});
+
+$("input:radio[name='claimStatus']").on('ifChecked', function(event){
+	changeClaim();
+});
+
+$("input:radio[name='contactStatus']").on('ifChecked', function(event){
+	changeContact();
+});
+
+//联系状态
+function changeContact() {
+	let contactStatus = "${htRepairClientForm.contactStatus}";;
+
+	if(contactStatus == '1'){
+		$(".claimStatus").removeClass("hide");
+		changeClaim();
+
+	}else{
+		$(".claimStatus").addClass("hide");
+		$(".expressDate").addClass("hide");
+		$(".express").addClass("hide");
+		$(".claim").addClass("hide");
+
+	}
+}
+
+
+
+//理赔资料
+function changeClaim() {
+	let claimStatus = "${htRepairClientForm.claimStatus}";
+		//1已邮寄
+		if(claimStatus == '1'){
+			$(".claim").addClass("hide");
+
+			$(".express").removeClass("hide");
+
+			let activityId = "${htRepairClientForm.activityId}";
+			if(activityId == "repair_confirm_time"){
+				$(".expressDate").removeClass("hide");
+			}
+
+			if(activityId == "repair_sign_for"){
+				$(".expressDate").removeClass("hide");
+			}
+
+
+
+		}
+		//3已签收
+		if(claimStatus == '3'){
+			$(".expressDate").addClass("hide");
+			$(".express").addClass("hide");
+			$(".claim").removeClass("hide");
+
+		}
+		if(claimStatus != '1' && claimStatus != '3'){
+			$(".expressDate").addClass("hide");
+			$(".claim").addClass("hide");
+
+			$(".express").addClass("hide");
+
+		}
+}
+</script>

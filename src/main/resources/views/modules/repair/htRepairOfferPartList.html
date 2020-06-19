@@ -1,0 +1,122 @@
+<% layout('/layouts/default.html', {title: '维修工单-待报价-损害部位表管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa icon-notebook"></i> ${text('维修工单-待报价-损害部位表管理')}
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+				<% if(hasPermi('repair:htRepairOfferPart:edit')){ %>
+					<a href="${ctx}/repair/htRepairOfferPart/form" class="btn btn-default btnTool" title="${text('新增维修工单-待报价-损害部位表')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
+				<% } %>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${htRepairOfferPart}" action="${ctx}/repair/htRepairOfferPart/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="form-group">
+					<label class="control-label">${text('form_id')}：</label>
+					<div class="control-inline">
+						<#form:input path="formId" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('报价工单id')}：</label>
+					<div class="control-inline">
+						<#form:input path="offerId" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('损害部位id')}：</label>
+					<div class="control-inline">
+						<#form:input path="damageId" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('损害部位名称')}：</label>
+					<div class="control-inline">
+						<#form:input path="damageName" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('渤海方案id')}：</label>
+					<div class="control-inline">
+						<#form:input path="bhProjectId" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('和德方案id')}：</label>
+					<div class="control-inline">
+						<#form:input path="hdProjectId" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('配件报价')}：</label>
+					<div class="control-inline">
+						<#form:input path="damagePrice" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('是否有残值 0 否  1是')}：</label>
+					<div class="control-inline">
+						<#form:input path="isSalvage" maxlength="1" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('残值类型')}：</label>
+					<div class="control-inline">
+						<#form:input path="salvageType" maxlength="10" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('残值价格')}：</label>
+					<div class="control-inline">
+						<#form:input path="salvagePrice" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="reset" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'${text("form_id")}', name:'formId', index:'a.form_id', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			return '<a href="${ctx}/repair/htRepairOfferPart/form?id='+row.id+'" class="btnList" data-title="${text("编辑维修工单-待报价-损害部位表")}">'+(val||row.id)+'</a>';
+		}},
+		{header:'${text("报价工单id")}', name:'offerId', index:'a.offer_id', width:150, align:"left"},
+		{header:'${text("损害部位id")}', name:'damageId', index:'a.damage_id', width:150, align:"left"},
+		{header:'${text("损害部位名称")}', name:'damageName', index:'a.damage_name', width:150, align:"left"},
+		{header:'${text("渤海方案id")}', name:'bhProjectId', index:'a.bh_project_id', width:150, align:"left"},
+		{header:'${text("和德方案id")}', name:'hdProjectId', index:'a.hd_project_id', width:150, align:"left"},
+		{header:'${text("配件报价")}', name:'damagePrice', index:'a.damage_price', width:150, align:"right", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("是否有残值 0 否  1是")}', name:'isSalvage', index:'a.is_salvage', width:150, align:"left"},
+		{header:'${text("残值类型")}', name:'salvageType', index:'a.salvage_type', width:150, align:"left"},
+		{header:'${text("残值价格")}', name:'salvagePrice', index:'a.salvage_price', width:150, align:"center"},
+		{header:'${text("操作")}', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('repair:htRepairOfferPart:edit')){ %>
+				actions.push('<a href="${ctx}/repair/htRepairOfferPart/form?id='+row.id+'" class="btnList" title="${text("编辑维修工单-待报价-损害部位表")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+				actions.push('<a href="${ctx}/repair/htRepairOfferPart/delete?id='+row.id+'" class="btnList" title="${text("删除维修工单-待报价-损害部位表")}" data-confirm="${text("确认要删除该维修工单-待报价-损害部位表吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			<% } %>
+			return actions.join('');
+		}}
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>

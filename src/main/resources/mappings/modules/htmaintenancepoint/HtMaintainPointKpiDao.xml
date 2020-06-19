@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.htmaintenancepoint.dao.HtMaintainPointKpiDao">
+
+    <!-- 查询数据
+    <select id="findList" resultType="HtMaintainPointKpi">
+        SELECT ${sqlMap.column.toSql()}
+        FROM ${sqlMap.table.toSql()}
+        <where>
+            ${sqlMap.where.toSql()}
+        </where>
+        ORDER BY ${sqlMap.order.toSql()}
+    </select> -->
+    <delete id="truncateInfo">
+<![CDATA[
+
+		delete from ht_maintain_point_kpi
+        ]]>
+	</delete>
+
+    <select id="getMonth">
+		<![CDATA[
+        SELECT DISTINCT
+            date_format(
+            DATE_ADD(
+            '2020-01-20',
+            INTERVAL id MONTH
+            ),
+            '%Y-%m'
+            ) AS `TIME`
+            FROM
+            js_sys_number
+            WHERE
+            DATE_ADD(
+            '2020-01-20',
+            INTERVAL id MONTH
+            ) <= '2020-09-26';
+        ]]>
+	</select>
+
+    <select id="">
+        SELECT f.*,DATE_FORMAT(f.create_date,'%Y-%m') months from ht_form_info f
+            LEFT JOIN ht_time_efficiency t ON f.id = t.form_id
+            WHERE office_id is not NULL
+            GROUP BY months
+    </select>
+    <select id="">
+        SELECT IF(SUM(TIMESTAMPDIFF(DAY,t.start_date,t.end_date)) is NULL,0,SUM(TIMESTAMPDIFF(DAY,t.start_date,t.end_date))),of.office_name,office_id
+FROM ht_form_info f
+LEFT JOIN ht_time_efficiency t ON f.id = t.form_id
+LEFT JOIN js_sys_office of ON f.office_id = of.office_code
+WHERE DATE_FORMAT(f.create_date,'%Y-%m') in
+ (SELECT DATE_FORMAT(f.create_date,'%Y-%m') months from ht_form_info f
+LEFT JOIN ht_time_efficiency t ON f.id = t.form_id
+WHERE office_id is not NULL
+GROUP BY months) AND f.office_id is not NULL GROUP by f.office_id
+
+    </select>
+    <select id="getTableInfo" resultType="HtMaintainPointKpi">
+        select * from  ht_maintain_point_kpi where point_id = #{pointId}
+    </select>
+</mapper>

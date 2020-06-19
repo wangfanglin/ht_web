@@ -1,0 +1,77 @@
+<% layout('/layouts/default.html', {title: '拒单量表管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa icon-notebook"></i> ${text('拒单量表管理')}
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${htDateTable}"  onsubmit="return btn()" action="${ctx}/number/htDateTable/listData" method="post" class="form-inline hide"
+			data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+			<#form:hidden path="type" />
+			<div class="form-group">
+				<label class="control-label">${text('时间')}：</label>
+				<div class="control-inline">
+					<#form:input path="startTime" id="start" readonly="true"  maxlength="20" class="form-control Wdate-datetime"
+					dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});"/> 至
+					<#form:input path="endTime" id="end" readonly="true"  maxlength="20" class="form-control Wdate-datetime"
+					dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+			</div>
+		</#form:form>
+		<table id="dataGrid"></table>
+		<div id="dataGridPage"></div>
+	</div>
+</div>
+</div>
+<% } %>
+
+<script>
+	// 初始化DataGrid对象
+	$('#dataGrid').dataGrid({
+		searchForm: $("#searchForm"),
+		columnModel: [
+			{header:'${text("维修网点名称")}', name:'maintenancePointName', sortable:false,title:false,width:150, align:"left", frozen:true},
+			{header:'${text("时间")}', name:'numTime', sortable:false,dataindex:'a.time', width:150, align:"center"},
+			{header:'${text("结果数量")}', name:'resultNum', sortable:false,dataindex:'a.result_num', width:150, align:"center"}
+		],
+		// 加载成功后执行事件
+		ajaxSuccess: function(data){
+
+		}
+	});
+	function btn() {
+		var type = '${htDateTable.type}';
+			var str1 = document.getElementById('start').value;
+			var str2 = document.getElementById('end').value;
+			var str3 = str1.split("-");
+			var str4 = str2.split("-");
+			var start = str3[0];
+			var end = str4[0];
+			if(start == "" && end == ""){
+				alert("请选择查询时间");
+				return ;
+			}
+			if(start == ""){
+				alert("请选择起始时间");
+				return ;
+			}
+			if(end == ""){
+				alert("请选择结束时间");
+				return ;
+			}
+			if (start != end) {
+				alert("请选择同一年份的时间");
+				return false;
+			} else {
+				return true;
+			}
+	}
+</script>

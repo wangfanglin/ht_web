@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.htaccessoriesinfo.dao.HtAccessoriesPhoneModelDao">
+	
+	<!-- 查询数据
+	<select id="findList" resultType="HtAccessoriesPhoneModel">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+	</select> -->
+	<delete id="deleteBuAccessId">
+		delete from ht_accessories_phone_model where accessories_info_id=#{accessoriesInfoId}
+	</delete>
+	<select id="getModelStr" resultType="String">
+		select phone_model_id from ht_accessories_phone_model where accessories_info_id=#{accessoriesInfoId}
+	</select>
+</mapper>

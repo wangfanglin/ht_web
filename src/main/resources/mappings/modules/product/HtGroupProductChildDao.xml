@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.product.dao.HtGroupProductChildDao">
+    <delete id="deleteByProductId">
+            delete  from ht_group_product_child where product_id=#{productInfoId}
+    </delete>
+        <delete id="delGroupProduct">
+                DELETE from ht_group_product_info where id in(  select group_product_id from ht_product_child_middle where  group_product_child_id in(select id from ht_group_product_child where product_id=#{productInfoId}) )
+        </delete>
+    <delete id="delMiddel">
+        delete from ht_product_child_middle where id =#{middelid}
+
+    </delete>
+    <delete id="deleteById">
+       delete from ht_group_product_child where id =#{childId}
+    </delete>
+
+
+    <!-- 查询数据
+    <select id="findList" resultType="HtGroupProductChild">
+        SELECT ${sqlMap.column.toSql()}
+        FROM ${sqlMap.table.toSql()}
+        <where>
+            ${sqlMap.where.toSql()}
+        </where>
+        ORDER BY ${sqlMap.order.toSql()}
+    </select> -->
+
+    <select id="getByProductId" resultType="com.jeesite.modules.product.entity.HtGroupProductChild">
+            select
+            id as "id",
+            product_id as "productId",
+            is_immediately as"isImmediately",
+            take_day as "takeDay",
+            validity as "validity",
+            effect_time as"effectTime",
+            change_frequency as"changeFrequency",
+            remain_coverage as"remainCoverage",
+            serve_validity as"serveValidity",
+            maintenance_frequency as"maintenanceFrequency",
+            maintenance_amount as"maintenanceAmount",
+            recover_frequency as"recoverFrequency",
+            create_date as"createDate",
+            create_by as"createBy",
+            update_date as"updateDate",
+            update_by as"updateBy",
+            reamrk as"reamrk",
+            status as"status"
+            FROM ht_group_product_child where product_id=#{productInfoId} and status='0'
+    </select>
+
+    <select id="findChildByGroupId" resultType="com.jeesite.modules.product.entity.HtGroupProductChild">
+
+select
+c.id,
+c.product_id as "productInfo.id",
+c.is_immediately as "isImmediately",
+c.take_day as "takeDay",
+c.effect_time as "effectTime",
+c.validity as "validity",
+c.change_frequency as "changeFrequency",
+c.remain_coverage as "remainCoverage",
+c.serve_validity as "serveValidity",
+c.maintenance_frequency as "maintenanceFrequency",
+c.Maintenance_amount as "maintenanceAmount",
+c.recover_frequency as "recoverFrequency",
+c.create_date as "createDate",
+c.create_by  as "createBy",
+c.update_date as "updateDate",
+c.update_by as "updateBy",
+c.reamrk as "remark",
+d.product_type as "productType"
+from  ht_group_product_info a
+inner join ht_product_child_middle b on a.id=b.group_product_id
+inner join ht_group_product_child c on b.group_product_child_id=c.id
+inner join ht_product_info d on d.id = c.product_id
+where a.id = #{groupProductId}
+
+    </select>
+    <select id="findMiddel" resultType="java.util.Map">
+        SELECT * FROM `ht_product_child_middle` where  group_product_id =#{groupProductId}
+    </select>
+    <select id="listProduct" resultType="com.jeesite.modules.product.entity.ProductInfo">
+        select c.* from ht_product_child_middle a
+inner join ht_group_product_child b on a.group_product_child_id = b.id
+inner join ht_product_info c on c.id = b.product_id
+where a.group_product_id=#{groupProductId} and c.product_type=#{productType}
+    </select>
+    <select id="findPhoneMod" resultType="java.lang.String">
+      select   GROUP_CONCAT(phone_module_id)  from product_phone_middle where product_id = #{groupProductInfoId}
+    </select>
+
+</mapper>

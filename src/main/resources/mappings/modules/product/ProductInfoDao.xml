@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.product.dao.ProductInfoDao">
+	
+	<!-- 查询数据
+	<select id="findList" resultType="ProductInfo">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+	</select> -->
+
+    <insert id="insertProductPhoneModuleMiddle">
+        insert into product_phone_middle (
+        id,
+        product_id,
+        phone_module_id
+        )values
+        <foreach collection="phoneModuleIds" item="item" index="item" separator=",">
+        (
+        null,
+        #{productInfoId},
+        #{item}
+        )
+    </foreach>
+    </insert>
+    <delete id="deleteProductPhoneModuleMiddle">
+        delete from product_phone_middle where product_id=#{productInfoId}
+    </delete>
+</mapper>

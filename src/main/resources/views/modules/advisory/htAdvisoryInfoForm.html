@@ -1,0 +1,334 @@
+<% layout('/layouts/default.html', {title: '咨询工单管理', libs: ['validate']}){ %>
+
+
+<div class="main-content">
+	<div style="background: white">
+		<%if('1' == flag!){%>
+		<% include('/modules/common/policyDetail.html', {commonFromId:commonFromId}){} %>
+		<%}%>
+	</div>
+
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-title">
+				<i class="fa icon-note"></i> ${text(htAdvisoryInfo.isNewRecord ? '查看咨询工单' : '查看咨询工单')}
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${htAdvisoryInfo}" action="${ctx}/advisory/htAdvisoryInfo/save?flag=${flag}" method="post" class="form-horizontal">
+			<div class="box-body">
+				<%if('1' == flag!){%>
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('客户姓名')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${form.policyInfo.strName!}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('联系电话')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${form.policyInfo.strContactNum!}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('证件类型')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<%if("1"==form.policyInfo.strType!){%>身份证<%}%>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('证件号码')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${form.policyInfo.strCardId!}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('手机品牌')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${form.policyInfo.strPhoneBrand!}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('手机型号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${form.policyInfo.strPhoneModel!}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('来电号码')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${callPhone!}
+							</div>
+						</div>
+					</div>
+				</div>
+				<%}%>
+				<div class="form-unit">${text('基本信息')}</div>
+				<#form:hidden path="callPhone"/>
+				<#form:hidden path="callId"/>
+				<#form:hidden path="policyId"/>
+
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span id="userNameSpan" class="required hide">*</span> ${text('客户姓名')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="userName" maxlength="255" class="form-control  realName"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('来电号码')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+							${callPhone!}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('证件类型')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="idType" dictType="id_type" blankOption="true" blankOptionLabel="请选择"  class="form-control" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('证件号码')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="idNumber" maxlength="18" class="form-control idcard "/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('手机品牌')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="phoneBrand"  items="${brandList}" itemLabel="name" itemValue="id" blankOption="true"  blankOptionLabel="请选择" class="form-control "  onchange="findPhoneModel()"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('手机型号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="phoneType"   blankOption="true"  blankOptionLabel="请选择" class="form-control " disabled="disabled"/>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required">*</span> ${text('信息类型')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<%if('1' == flag!){%>
+								<#form:select id="hasPolicy"  path="msgType" dictType="policy_msg_type"  blankOption="true"  blankOptionLabel="请选择" class="form-control required" onchange="msgFun()"/>
+								<%}%>
+								<%if('1' != flag!){%>
+								<#form:select id="noPolicy"  path="msgType" dictType="msg_type"  blankOption="true"  blankOptionLabel="请选择" class="form-control required"/>
+								<%}%>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span id="departmentSpan" class="required hide">*</span> ${text('选择部门')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:treeselect id="testOffice" title="${text('选择部门')}"
+								path="officeId" labelPath="strChannelName"
+								url="${ctx}/product/channelProductInfo/treeData?parentCode=0_WXWD001" allowClear="true"
+								callbackFuncName="treeselectCallback()"  checkbox="false" class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span id="officeIdSpan" class="required hide">*</span> ${text('人员/网点id')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="departmentId"  blankOption="true"  blankOptionLabel="请选择" class="form-control" disabled="disabled"/>
+							</div>
+						</div>
+					</div>
+
+					<%if('1' == flag!){%>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span id="formIDspan" class="required hide">*</span> ${text('工单ID')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="originalFormId" items="${list}" itemLabel="id" itemValue="id" blankOption="true"  blankOptionLabel="请选择"  class="form-control "/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<%}%>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="" style="color: red">
+								<span class="required hide">*</span> ${text('工单电话')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="fromPhone" maxlength="11" class="form-control  mobile"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('备注')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:textarea  path="remark" maxlength="255" rows="3" class="form-control"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="box-footer">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('advisory:htAdvisoryInfo:edit')){ %>
+							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+						<button type="submit" class="btn btn-sm btn-primary" id="btnSub"><i class="fa fa-check"></i> ${text('返 修')}</button>&nbsp;
+						<% } %>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+
+
+
+
+$(function () {
+    var status = '${callPhone!}';
+    if (status == '110') {
+        js.showMessage("暂无用户咨询来电，无法创建工单！");
+        js.closeCurrentTabPage(function(contentWindow){
+            contentWindow.page();
+        })
+    }
+$("#btnSub").hide()
+    findPhoneModel()
+})
+
+function findPhoneModel() {
+    var option=$('#phoneBrand option:selected').val(); //获取选中的项
+    console.log(option);
+    if (option==null||option==undefined||option==""){
+        $("#phoneType option").remove();
+        $('#phoneType').attr("disabled",true)
+        return;
+    }
+    $.ajax({
+        type:"get",
+        url:"${ctx}/phonemodelinfo/htPhoneModelInfo/findByPhoneModel?brandId="+option,
+        success: function(data) {
+            var options = [];
+            $.each(data, function (index, value) {
+                options.push("<option value='" + value.id + "'> " + value.model + "</option>");
+            });
+            $("#phoneType option").remove();
+            $("#phoneType").append(options.join(''));
+            $('#phoneType').attr("disabled",false)
+
+
+
+
+            console.log(data);
+        }
+    });
+}
+
+function treeselectCallback(id, act, index, layero, nodes){
+    var dis= $('#testOfficeCode').val();
+    console.log(dis);
+    if (dis!=null||dis!=""|dis!=undefined){
+        $.ajax({
+            type:'post',
+            async: false,
+            url:'${ctx}/advisory/htAdvisoryInfo/findPersonByOffice?officeId='+dis,
+            dataType:'json',
+            success:function(data){
+                    console.log(data);
+                    //   $('#groupProductName').attr("items",data.data);
+                    var options = [];
+
+                    $.each(data, function (index, value) {
+                        options.push("<option value='" + value.empCode + "'> " + value.empName + "</option>");
+                    });
+                    $("#departmentId").append(options.join(''));
+
+                    $('#departmentId').removeAttr("disabled");
+                }
+        });
+    }
+}
+function msgFun() {
+   var type = $("#hasPolicy").val()
+	console.log(type)
+	if (type == '4'){
+       $("#btnSubmit").hide()
+		$("#btnSub").show()
+	}else{
+        $("#btnSubmit").show()
+        $("#btnSub").hide()
+	}
+}
+</script>

@@ -1,0 +1,113 @@
+<% layout('/layouts/default.html', {title: '渤海方案库管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa icon-notebook"></i> ${text('渤海方案库管理')}
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+				<% if(hasPermi('bh:bhFaultplandict:edit')){ %>
+					<a href="${ctx}/bh/bhFaultplandict/form" class="btn btn-default btnTool" title="${text('新增渤海方案库')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
+				<% } %>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${bhFaultplandict}" action="${ctx}/bh/bhFaultplandict/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="form-group">
+					<label class="control-label">${text('类别ID')}：</label>
+					<div class="control-inline">
+						<#form:input path="categoryid" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('类别名称')}：</label>
+					<div class="control-inline">
+						<#form:input path="categoryname" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('品牌id')}：</label>
+					<div class="control-inline">
+						<#form:input path="brandid" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('品牌名称')}：</label>
+					<div class="control-inline">
+						<#form:input path="brandname" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('型号id')}：</label>
+					<div class="control-inline">
+						<#form:input path="modelid" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('型号名称')}：</label>
+					<div class="control-inline">
+						<#form:input path="modelname" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('故障大类ID')}：</label>
+					<div class="control-inline">
+						<#form:input path="topid" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('故障大类名称')}：</label>
+					<div class="control-inline">
+						<#form:input path="topname" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('故障ID')}：</label>
+					<div class="control-inline">
+						<#form:input path="malfunctionid" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="reset" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'${text("类别ID")}', name:'categoryid', index:'a.categoryid', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			return '<a href="${ctx}/bh/bhFaultplandict/form?id='+row.id+'" class="btnList" data-title="${text("编辑渤海方案库")}">'+(val||row.id)+'</a>';
+		}},
+		{header:'${text("类别名称")}', name:'categoryname', index:'a.categoryname', width:150, align:"left"},
+		{header:'${text("品牌id")}', name:'brandid', index:'a.brandid', width:150, align:"left"},
+		{header:'${text("品牌名称")}', name:'brandname', index:'a.brandname', width:150, align:"left"},
+		{header:'${text("型号id")}', name:'modelid', index:'a.modelid', width:150, align:"left"},
+		{header:'${text("型号名称")}', name:'modelname', index:'a.modelname', width:150, align:"left"},
+		{header:'${text("故障大类ID")}', name:'topid', index:'a.topid', width:150, align:"left"},
+		{header:'${text("故障大类名称")}', name:'topname', index:'a.topname', width:150, align:"left"},
+		{header:'${text("故障ID")}', name:'malfunctionid', index:'a.malfunctionid', width:150, align:"left"},
+		{header:'${text("操作")}', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('bh:bhFaultplandict:edit')){ %>
+				actions.push('<a href="${ctx}/bh/bhFaultplandict/form?id='+row.id+'" class="btnList" title="${text("编辑渤海方案库")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+				actions.push('<a href="${ctx}/bh/bhFaultplandict/delete?id='+row.id+'" class="btnList" title="${text("删除渤海方案库")}" data-confirm="${text("确认要删除该渤海方案库吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			<% } %>
+			return actions.join('');
+		}}
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>

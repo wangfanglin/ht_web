@@ -1,0 +1,97 @@
+<% layout('/layouts/default.html', {title: '网点平均维修周期表管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa icon-notebook"></i> ${text('网点平均维修周期表管理')}
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+				<!--<% if(hasPermi('period:htMonthTable:edit')){ %>
+					<a href="${ctx}/period/htMonthTable/form" class="btn btn-default btnTool" title="${text('新增月份表')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
+				<% } %>-->
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${htMonthTable}" onsubmit="return btn()" action="${ctx}/period/htMonthTable/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+			<#form:hidden path="type" />
+			<label class="control-label">${text('查询的时间')}：</label>
+			<div id="time" class="control-inline">
+				<#form:input path="startTime" id="start" readonly="true"  maxlength="20" class="form-control Wdate-datetime"
+				dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});"/> 至
+				<#form:input path="endTime" id="end" readonly="true"  maxlength="20" class="form-control Wdate-datetime"
+				dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});"/>
+			</div>
+			<div class="form-group">
+				<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+				<!--<button type="reset" class="btn btn-default btn-sm">${text('重置')}</button>-->
+			</div>
+
+		</div>
+
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'${text("维修网点")}', name:'maintenancePointName',  sortable:false,width:150, align:"left", frozen:true},
+		{header:'${text("1月")}', name:'january',sortable:false,width:150, align:"left"},
+		{header:'${text("2月")}', name:'february',sortable:false, width:150, align:"left"},
+		{header:'${text("3月")}', name:'march', sortable:false,width:150, align:"left"},
+		{header:'${text("4月")}', name:'april', sortable:false, width:150, align:"left"},
+		{header:'${text("5月")}', name:'may', sortable:false,width:150, align:"left"},
+		{header:'${text("6月")}', name:'june', sortable:false,width:150, align:"left"},
+		{header:'${text("7月")}', name:'july', sortable:false,width:150, align:"left"},
+		{header:'${text("8月")}', name:'august',sortable:false, width:150, align:"left"},
+		{header:'${text("9月")}', name:'september',sortable:false, width:150, align:"left"},
+		{header:'${text("10月")}', name:'october', sortable:false, width:150, align:"left"},
+		{header:'${text("11月")}', name:'november',  sortable:false,width:150, align:"left"},
+		{header:'${text("12月")}', name:'december',sortable:false, width:150, align:"left"}
+
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+
+	}
+});
+function btn() {
+	var str1 = document.getElementById('start').value;
+	var str2 = document.getElementById('end').value;
+	var str3 = str1.split("-");
+	var str4 = str2.split("-");
+	var start = str3[0];
+	var end = str4[0];
+	if(start == "" && end == ""){
+		alert("请选择查询时间");
+		return ;
+
+	}
+	if(start == ""){
+	alert("请选择起始时间");
+		return ;
+
+	}
+	if(end == ""){
+		alert("请选择结束时间");
+		return ;
+
+	}
+
+	if (start != end) {
+		alert("请选择同一年份的时间");
+		return false;
+	} else {
+		return true;
+	}
+
+
+}
+</script>

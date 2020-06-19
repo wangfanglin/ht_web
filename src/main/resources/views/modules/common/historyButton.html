@@ -1,0 +1,34 @@
+<div id="commonDiv" style="background: white" align="center">
+    <%
+    #ajax button: {
+    %>
+            <a href="javascript:void(0)" data-layer="true" data-layer-width="725" data-layer-height="420" onclick="openTab(this)" > 查看工单历史流转记录</a>
+    <% }%>
+</div>
+
+
+
+
+<script src="${ctxStatic}/common/common.js?${_version}" ></script>
+<script>
+    $(function () {
+        $.ajax({
+            type:"get",
+            //公共参数  为了不重复 将工单ID 明明为commonButtonId
+            url:"${ctx}/common/historyButton?commonButtonId=${commonButtonId}",
+            beforSend:function (XMLHttpRequest) {
+                XMLHttpRequest.setRequestHeader("Content-Type","text/html;charset=UTF-8")
+            },
+            success: function(data) {
+                //console.log(data);
+                $("#commonDiv").html(data);
+
+            }
+        });
+    });
+    function openTab(b) {
+        var $bt=$(b);
+        js.addTabPage($bt,"","${ctx}/common/listOpen?workOrderId=${commonButtonId}");
+    }
+</script>
+

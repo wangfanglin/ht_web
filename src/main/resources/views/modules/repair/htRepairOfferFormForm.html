@@ -1,0 +1,627 @@
+<% layout('/layouts/default.html', {title: '维修工单-待报价管理', libs: ['validate','dataGrid','fileupload']}){ %>
+<link rel="stylesheet" href="${ctxStatic}/common/css/index.css">
+<script src="${ctxStatic}/common/js/index.js"></script>
+<script src="${ctxStatic}/common/js/jquery.rotate.min.js"></script>
+<div class="main-content">
+	<% include('/modules/common/policyDetail.html', {commonFromId:commonFromId}){} %>
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-title">
+				<i class="fa icon-note"></i> ${text(htRepairClientForm.isNewRecord ? '维修工单-待报价管理' : '维修工单-待报价管理')}
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${htRepairClientForm}" action="${ctx}/repair/htRepairClientForm/save" method="post" class="form-horizontal">
+		<div class="box-body">
+			<div class="form-unit">${text('核实用户实际信息')}</div>
+				<#form:hidden path="id"/>
+			<#form:hidden path="surplusPrice" />
+
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('客户姓名')}：<i
+								class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="htClaimSettlementForm.userName" readonly="true" maxlength="64"
+							class="form-control"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('联系电话')}：<i
+								class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="htClaimSettlementForm.phone" readonly="true"
+							class="form-control"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('手机品牌')}：<i
+								class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="htClaimSettlementForm.phoneBrand" disabled="true" items="${brandList}"
+							blankOption="true" blankOptionLabel="请选择" itemLabel="name" itemValue="id"
+							class="form-control" />
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('手机型号')}：<i
+								class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="htClaimSettlementForm.phoneModel" disabled="true" items="${typeList}"
+							blankOption="true" blankOptionLabel="请选择" itemLabel="model" itemValue="id"
+							class="form-control" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="shows row">
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-2" title="">
+							<span class="required hide">*</span> ${text('损坏部位')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-12">
+							<ul class="picView-magnify-list" style="padding: 0px" id="imgs">
+								<%for(imgs in damageImgsList!){ %>
+								<li>
+									<a href="javascript:void(0)" data-magnify="gallery" data-group="g1" data-src="${imgs}" data-caption="">
+										<img src="${imgs}" width="100px" height="100px">
+									</a>
+								</li>
+								<% } %>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-2" title="">
+							<span class="required hide">*</span> ${text('身份证')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-12">
+							<ul class="picView-magnify-list" style="padding: 30px" id="imgs1">
+								<%for(imgs in identityCardImgsList!){ %>
+
+								<li>
+									<a href="javascript:void(0)" data-magnify="gallery" data-group="g1" data-src="${imgs}" data-caption="测试图片一">
+										<img src="${imgs}"  width="100px" height="100px">
+									</a>
+								</li>
+
+								<% } %>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-2" title="">
+							<span class="required hide">*</span> ${text('购买凭证')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-12">
+							<ul class="picView-magnify-list" style="padding: 30px" id="imgs2">
+								<%for(imgs in purchaseImgsList!){ %>
+								<li>
+									<a href="javascript:void(0)" data-magnify="gallery" data-group="g1" data-src="${imgs}" data-caption="测试图片一">
+										<img src="${imgs}" width="100px" height="100px" >
+									</a>
+								</li>
+								<% } %>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('损坏主部位')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input value="${master_unit_str}" readonly="true"   class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('副部件')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input value="${vice_parts_str}" readonly="true"   class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('维修类型')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="htClaimSettlementForm.maintainId" disabled="true" items="${breakDownList}"
+								blankOption="true" blankOptionLabel="请选择" itemLabel="breakType" itemValue="id"
+								class="form-control" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-1" title="">
+								<span class="required">*</span> ${text('损害部件相关照片(.jpg/.png/.jpeg)')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+<!--								<#form:input path="damageImg" class="form-control number"/>-->
+								<#form:fileupload id="damageImgId" returnPath="true" filePathInputId="damageImg"
+								bizKey="${htRepairClientForm.id}" bizType="damageImg_image" maxUploadNum="6"
+								uploadType="image" class="required" readonly="false" />
+								<#form:hidden name="damageImg" class="form-control"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required">*</span> ${text('预期维修完成时间')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="repairEndDate" readonly="true" maxlength="20" class="form-control Wdate required"
+									dataFormat="datetime" onclick="WdatePicker({minDate: '%y-%M-%d',dateFmt:'yyyy-MM-dd HH:mm',isShowClear:true});"/>
+							</div>
+						</div>
+					</div>
+
+				</div>
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('其他收费')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input id="otherPrice" name="otherPrice" value="${@NumberUtils.formatNumber(htRepairClientForm.otherPrice/100,'0.00')}" min="0" onchange="changePrice()" defaultValue="0" class="form-control number"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('其他收费说明')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="otherRemarks" maxlength="255" class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('工时费')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input id="manHourPrice" name="manHourPrice" value="${@NumberUtils.formatNumber(htRepairClientForm.manHourPrice/100,'0.00')}" min="0" onchange="changePrice()" defaultValue="0" class="form-control number"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('本次自付款')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input id="selfPrice" name="selfPrice" value="${@NumberUtils.formatNumber(htRepairClientForm.selfPrice/100,'0.00')}"  min="0"  defaultValue="0" class="form-control number"/>
+							</div>
+						</div>
+					</div>
+
+				</div>
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('保单限额')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+
+								<#form:input id="surplusCoverage" value="${@NumberUtils.formatNumber(htFormInfo.policyInfo.surplusCoverage/100,'0.00')}" readonly="true" class="form-control number"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('本次总费')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input id="sumPrice" name="sumPrice" value="${@NumberUtils.formatNumber(htRepairClientForm.sumPrice/100,'0.00')}" min="0" defaultValue="0" readonly="true" class="form-control number"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required">*</span> ${text('收款方式')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="receiptType" dictType="receipt_type" blankOption="true" class="form-control required" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3 hide">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required">*</span> ${text('是否为全损')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:radio path="isAll" dictType="is_all" class="form-control" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('备注信息')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:textarea path="remarks" rows="4" maxlength="500" class="form-control"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<h4 class="form-unit">报价方案</h4>
+			<div class="ml10 mr10">
+				<table id="testDataChildDataGrid"></table>
+				<a href="#" id="testDataChildDataGridAddRowBtn" class="btn btn-primary btn-sm mt10 mb10"><i class="fa fa-plus"></i> 增行</a>
+			</div>
+			<div class="box-footer">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('repair:htRepairClientForm:edit')){ %>
+
+						<#form:hidden id="formInfoStatus" path="htFormInfo.status"/>
+						<#form:hidden path="htFormInfo.id"/>
+
+						<#bpm:button bpmEntity="${htRepairClientForm}" formKey="hd_form_claim" completeText="${text('提 交')}"/>
+						<% } %>
+
+						<script>
+							// 业务实现草稿按钮
+							$('#btnDraft').click(function(){
+								$('#formInfoStatus').val(Global.STATUS_DRAFT);
+							});
+							// 流程按钮提交事件
+							BpmButton = window.BpmButton || {};
+							BpmButton.complete = function($this, task){
+								$('#formInfoStatus').val(Global.STATUS_AUDIT);
+							};
+						</script>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+
+	</div>
+</div>
+<% } %>
+<script>
+	//初始化测试数据子表DataGrid对象
+	$("#testDataChildDataGrid").dataGrid({
+
+		data: ${toJson(offerPartList)},
+		datatype: "local", // 设置本地数据
+		autoGridHeight: function(){return 'auto'}, // 设置自动高度
+
+		// 设置数据表格列
+		columnModel: [
+			{header:'状态', name:'status', editable:true, hidden:true},
+			{header:'主键', name:'id', editable:true, hidden:true},
+			{header:'损坏部位', name:'damageId', width:100, align:"center",
+				editable:true, edittype:'select', editoptions:{'class':'form-control required',
+					items: $.merge([{name:'请选择',id:''}], ${toJson(assemblyUnitList)}),
+					itemLabel: 'name', itemValue: 'id', dataInit: function(element){
+						$(element).select2().on("change",function(){$(this).resetValid(),changeSelect(element)});
+					}
+				},
+				unformat: function(val, obj, cell){return $('#'+obj.rowId+'_'+obj.colModel.name, cell).val();
+				}
+			},
+			{header:'和德方案选择', name:'hdProjectId', align:"center", width:150,
+				formatter: function(val, obj, row, act){
+					return js.val(row, 'hdProjectId')+'|'+js.val(row, 'hdProjectName');
+				}, editable: true, edittype: "custom", editoptions: {
+					custom_element: function(val, editOptions) {
+						return js.template('listselectTpl', {
+							id: 'hdProjectId_'+editOptions.id, title: '和德方案选择',
+							name: 'hdProjectId', value: val.split('|')[0],
+							labelName: 'hdProjectName', labelValue: val.split('|')[1],
+							url: '${ctx}/repair/htRepairClientForm/htSelect',
+							itemCode: 'id', itemName: 'peijian',
+							cssClass: 'form-control'
+						});
+					}
+				}, unformat: function(val, obj, cell){return $('#hdProjectId_'+obj.rowId+'_'+obj.colModel.name+'Code', cell).val();}
+			},
+			{header:'渤海方案选择', name:'bhProjectId', align:"center", width:150,
+				formatter: function(val, obj, row, act){
+					return js.val(row, 'bhProjectId')+'|'+js.val(row, 'bhProjectName');
+				}, editable: true, edittype: "custom", editoptions: {
+					custom_element: function(val, editOptions) {
+
+						return js.template('listselectTpl', {
+							id: 'bhProjectId_'+editOptions.id, title: '渤海方案选择',
+							name: 'bhProjectId', value: val.split('|')[0],
+							labelName: 'bhProjectName', labelValue: val.split('|')[1],
+							url: '${ctx}/repair/htRepairClientForm/bhSelect?formId=${htFormInfo.id}',
+							itemCode: 'id', itemName: 'solution',
+							cssClass: 'form-control'
+						});
+					}
+				}, unformat: function(val, obj, cell){return $('#bhProjectId_'+obj.rowId+'_'+obj.colModel.name+'Code', cell).val();}
+			},
+			{header:'配件报价', name:'damagePrice', width:150, align:"center", editable:true, edittype:'text',
+				editoptions:{'maxlength':'10','min':'1', 'class':'form-control required number',
+					defaultValue:'0',
+					dataInit: function(element){
+						$(element).on("change",function(){$(this).resetValid(),changePrice()});
+					}
+				},
+				formatter: function(val, obj, row, act){
+					return  js.formatNumber(val/100, 2);
+				},
+				unformat: function(val, obj, cell){return $('#'+obj.rowId+'_'+obj.colModel.name, cell).val();}
+			},
+			{header:'是否有残值', name:'isSalvage', width:100, align:"center",
+				editable:true, edittype:'select', editoptions:{'class':'form-control required',
+					items: $.merge([{dictLabel:'请选择',dictValue:''}], ${@DictUtils.getDictListJson('sys_yes_no')}),
+					itemLabel: 'dictLabel', itemValue: 'dictValue', dataInit: function(element){
+						$(element).select2().on("change",function(){$(this).resetValid(),changePrice(),changeSalvage(element)});
+					}
+				},
+				unformat: function(val, obj, cell){return $('#'+obj.rowId+'_'+obj.colModel.name, cell).val();
+				}
+			},
+
+			{header:'残值类型', name:'salvageType', width:100, align:"center",
+				editable:true, edittype:'select', editoptions:{'class':'form-control',
+					items: $.merge([{dictLabel:'&nbsp;',dictValue:''}], ${@DictUtils.getDictListJson('salvage_type')}),
+					itemLabel: 'dictLabel', itemValue: 'dictValue', dataInit: function(element){
+						$(element).select2().on("change",function(){$(this).resetValid(),changePrice()});
+					}
+				},
+				unformat: function(val, obj, cell){return $('#'+obj.rowId+'_'+obj.colModel.name, cell).val();
+			},
+				formatter: function(val, obj, row, act){
+					return js.getDictLabel(${@DictUtils.getDictListJson('salvage_type')}, val, '${text("未知")}', true);
+				},
+
+			},
+			{header:'残值价格', name:'salvagePrice', width:150, align:"center", editable:true, edittype:'text',
+				editoptions:{'maxlength':'200','min':'0', 'class':'form-control number',
+					defaultValue:'0',
+					dataInit: function(element){
+						$(element).on("change",function(){$(this).resetValid(),changePrice()});
+					}},
+				unformat: function(val, obj, cell){return $('#'+obj.rowId+'_'+obj.colModel.name, cell).val();},
+				formatter: function(val, obj, row, act){
+					return  js.formatNumber(val/100, 2);
+				},
+
+			},
+			{header:'${text("操作")}', name:'actions', width:80, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+					var actions = [];
+					// 编辑行按钮，点击后，改变当前行为编辑状态
+					if (val == 'new'){
+						// 点击新增行出现的删除按钮，从未保存到数据库过，直接删除即可
+						actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#testDataChildDataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\');changePrice();});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+
+					}else{
+						// 初始化表单，回显的数据的删除按钮，隐藏行，并标记行为删除状态，点击表单保存后才真正进行删除
+						actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#testDataChildDataGrid\').dataGrid(\'setRowData\',\''+obj.rowId+'\',null,{display:\'none\'});$(\'#'+obj.rowId+'_status\').val(\''+Global.STATUS_DELETE+'\');changePrice();});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+					}
+					// changePrice();
+					return actions.join('');
+				}, editoptions: {defaultValue: 'new'}, unformat: function(val, obj, cell){return '';}}
+		],
+		// 编辑表格参数
+		editGrid: true,				// 是否是编辑表格
+		editGridInitRowNum: 1,		// 编辑表格的初始化新增行数
+		editGridAddRowBtn: $('#testDataChildDataGridAddRowBtn'),	// 子表增行按钮
+		editGridAddRowInitData: {id: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+		editGridInitAllRowEdit: true, // 是否初始化就编辑所有行
+
+
+		// 编辑表格的提交数据参数
+		editGridInputFormListName: 'offerPartList', // 提交的数据列表名
+		editGridInputFormListAttrs: 'status,id,damageId,hdProjectId,hdProjectName,bhProjectId,bhProjectName,damagePrice,isSalvage,salvageType,salvagePrice,', // 提交数据列表的属性字段
+
+		// 加载成功后执行事件
+		ajaxSuccess: function(data){
+			let bhFlag = "${htFormInfo.bhFlag}";
+			//1渤海工单0普通工单
+			if(bhFlag == '0'){
+				$('#testDataChildDataGrid').dataGrid('hideCol', 'bhProjectId'); //隐藏列
+			}else{
+				$('#testDataChildDataGrid').dataGrid('hideCol', 'hdProjectId'); //隐藏列
+			}
+		}
+	});
+
+
+</script>
+
+<script>
+
+	$(function(){
+		if (typeof window.webuploaderRefresh == 'function'){
+			window.webuploaderRefresh();
+		}
+	});
+
+	$("#inputForm").validate({
+		submitHandler: function(form){
+			let rowData = $('#testDataChildDataGrid').dataGrid('getRowData');
+			let ids = $('#testDataChildDataGrid').dataGrid('getDataIDs');
+
+			let num = 0;
+
+			for (let i = 0 ;i<rowData.length; i++){
+				let status = $("#"+ids[i]+"_status").val();
+				if(status == '1'){
+					num = num+1;
+				}
+			}
+			if(num == rowData.length){
+				alert("请录入报价方案！");
+				return;
+			}
+			if(rowData.length == 0){
+				alert("请录入报价方案！");
+				return;
+			}
+
+			js.ajaxSubmitForm($(form), function(data){
+				js.showMessage(data.message);
+				if(data.result == Global.TRUE){
+					js.closeCurrentTabPage(function(contentWindow){
+						contentWindow.page();
+					});
+				}
+			}, "json");
+		}
+	});
+
+</script>
+
+
+<script id="listselectTpl" type="text/template">//<!--<div>
+<#form:listselect id="{{d.id}}" title="{{d.title}}" name="{{d.name}}" value="{{d.value}}"
+	labelName="{{d.labelName}}" labelValue="{{d.labelValue}}" url="{{d.url}}"
+	itemCode="{{d.itemCode}}" itemName="{{d.itemName}}"
+	class="{{d.cssClass}}" btnClass="btn-sm" allowClear="true"/>
+</div>//--></script>
+
+
+<script>
+
+	function changeSalvage(element){
+		let rowId = element.id.split('_')[0];
+		console.log(rowId);
+		//是
+		if(element.value == '1'){
+			$("#"+rowId+"_salvageType").addClass("required");
+		}
+		//否
+		if(element.value == '0'){
+			$("#"+rowId+"_salvageType").removeClass("required");
+		}
+
+	}
+
+	function changePrice(){
+
+		//其他收费
+		let otherPrice = $("#otherPrice").val()*1;
+		//工时费
+		let manHourPrice = $("#manHourPrice").val()*1;
+
+		let rowData = $('#testDataChildDataGrid').dataGrid('getRowData');
+		//配件总和
+		let childPrice = 0;
+		//扣减抵扣
+		let subPrice = 0;
+		let ids = $('#testDataChildDataGrid').dataGrid('getDataIDs');
+
+		for (let i = 0 ;i<rowData.length; i++){
+			let status = $("#"+ids[i]+"_status").val();
+			if(status != '1'){
+				childPrice += rowData[i].damagePrice * 1;
+				if(rowData[i].isSalvage == '1' && rowData[i].salvageType == '2'){
+					subPrice += rowData[i].salvagePrice*1;
+				}
+			}
+
+		}
+
+		//本次总费=配件价格+工时费-残值价格（当残值类型为抵扣时，回收则不计算）+其他收费
+		let sumPrice = otherPrice + manHourPrice + childPrice - subPrice;
+		$("#sumPrice").val(js.formatNumber(sumPrice, 2));
+		console.log("otherPrice："+otherPrice);
+		console.log("manHourPrice："+manHourPrice);
+		console.log("childPrice："+childPrice);
+		console.log("subPrice："+subPrice);
+
+		console.log("本次总费："+sumPrice);
+
+		//保单限额
+		let surplusCoverage = $("#surplusCoverage").val();
+
+		//自付额 本次自付款=本次总费-保单剩余限额
+		let selfPrice = sumPrice -surplusCoverage*1;
+		if(selfPrice < 0){
+			//剩余保额
+			$("#surplusPrice").val(Math.abs(selfPrice*100));
+			$("#selfPrice").val(0);
+		}else{
+			$("#surplusPrice").val(0);
+			$("#selfPrice").val(js.formatNumber(selfPrice, 2));
+		}
+
+	}
+
+
+	function changeSelect(damageId){
+
+		let bhFlag = "${htFormInfo.bhFlag}";
+		let phoneModelId = "${htRepairClientForm.phoneType}";
+
+		if(bhFlag == '0'){
+			//损坏部位id
+			let assemblyId = damageId.value;
+			let rowId = damageId.id.split('_')[0];
+
+			$("#hdProjectId_"+rowId+"_hdProjectIdName").val("");
+			$("#hdProjectId_"+rowId+"_hdProjectIdCode").val("");
+			$("#"+rowId+"_damagePrice").val("");
+			$("#hdProjectId_"+rowId+"_hdProjectIdName").addClass("required");
+
+			$("#hdProjectId_"+rowId+"_hdProjectIdDiv").attr("data-url","${ctx}/repair/htRepairClientForm/htSelect?phoneModelId="+phoneModelId+"&assemblyId="+assemblyId);
+		}else{
+
+			let rowId = damageId.id.split('_')[0];
+
+			$("#bhProjectId_"+rowId+"_bhProjectIdName").val("");
+			$("#bhProjectId_"+rowId+"_bhProjectIdCode").val("");
+			$("#bhProjectId_"+rowId+"_bhProjectIdCode").addClass("required");
+
+			$("#"+rowId+"_damagePrice").val("");
+
+		}
+
+	}
+
+
+	function listselectCallback(id, act,index , layero, selectData){
+
+		if (act == 'ok'){
+			let bhFlag = "${htFormInfo.bhFlag}";
+			let rowId = id.split('_')[1];
+
+			if(bhFlag == '0'){
+				let hdProjectId = $("#hdProjectId_"+rowId+"_hdProjectIdCode").val();
+				let price =	selectData[hdProjectId].price;
+				$("#"+rowId+"_damagePrice").val(price);
+			}else{
+				let bhProjectId = $("#bhProjectId_"+rowId+"_bhProjectIdCode").val();
+				let price =	selectData[bhProjectId].price;
+				$("#"+rowId+"_damagePrice").val(price);
+			}
+		}
+	}
+
+
+</script>

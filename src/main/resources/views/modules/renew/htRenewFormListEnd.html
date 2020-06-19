@@ -1,0 +1,88 @@
+<% layout('/layouts/default.html', {title: '换新完成工单', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa icon-notebook"></i> ${text('换新完成工单')}
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${htRenewForm}" action="${ctx}/renew/htRenewForm/listDataEnd" method="post" class="form-inline"
+			data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+			<div class="form-group">
+				<label class="control-label">${text('工单ID')}：</label>
+				<div class="control-inline width-120">
+					<#form:input path="id" class="form-control width-120" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label">${text('新机品牌')}：</label>
+				<div class="control-inline width-120">
+					<#form:select path="htRenewForm.htBrandInfo.id" items="${brandList}" blankOption="true" blankOptionLabel="请选择" itemLabel="name" itemValue="id" class="form-control width-120" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label">${text('自付款')}：</label>
+				<div class="control-inline">
+					<#form:input path="htRenewForm.selfPrice" class="form-control width-120 number"/>
+				</div>
+			</div>
+
+<!--			<div class="form-group">-->
+<!--				<label class="control-label">${text('工单状态')}：</label>-->
+<!--				<div class="control-inline width-120">-->
+<!--					<#form:select path="formStatus" dictType="form_status" blankOption="true" class="form-control width-120" />-->
+<!--				</div>-->
+<!--			</div>-->
+
+			<div class="form-group">
+				<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+				<button type="reset" class="btn btn-default btn-sm">${text('重置')}</button>
+			</div>
+		</#form:form>
+		<table id="dataGrid"></table>
+		<div id="dataGridPage"></div>
+	</div>
+</div>
+</div>
+<% } %>
+<script>
+	// 初始化DataGrid对象
+	$('#dataGrid').dataGrid({
+		searchForm: $("#searchForm"),
+		columnModel: [
+			{header:'${text("工单ID")}', name:'id', width:150, align:"center", frozen:true, formatter: function(val, obj, row, act){
+					return '<a href="${ctx}/renew/htRenewForm/formInfo?htFormInfo.id='+val+'" class="btnList" data-title="${text("查看换新工单")}">'+(val||row.id)+'</a>';
+				}},
+			{header:'${text("客户姓名")}', name:'htClaimSettlementForm.userName', width:150, align:"center"},
+			{header:'${text("联系电话")}', name:'htClaimSettlementForm.phone', width:150, align:"center"},
+			{header:'${text("新机品牌")}', name:'htRenewForm.htBrandInfo.name', width:150, align:"center"},
+			{header:'${text("新机型号")}', name:'htRenewForm.htPhoneModelInfo.model', index:'m.model', width:150, align:"center"},
+			{header:'${text("采购价")}', name:'htRenewForm.purchasePrice', width:150, align:"center", formatter: function(val, obj, row, act){
+					return js.formatNumber(val/100, 2);
+				}},
+			{header:'${text("手机报价")}', name:'htRenewForm.phonePrice', width:150, align:"center", formatter: function(val, obj, row, act){
+					return js.formatNumber(val/100, 2);
+				}},
+			{header:'${text("产品名称")}', name:'policyInfo.channelProductName', width:150, align:"center"},
+			{header:'${text("自付款金额")}', name:'htRenewForm.purchasePrice', width:150, align:"center", formatter: function(val, obj, row, act){
+					return js.formatNumber(val/100, 2);
+				}},
+			{header:'${text("收货地址")}', name:'htRenewForm.receiveAddress', width:150, align:"center"},
+			{header:'${text("明细地址")}', name:'htRenewForm.receiveAddressDetail', width:150, align:"center"},
+
+			{header:'${text("工单状态")}', name:'formStatus', index:'f.form_status', width:150, align:"center", formatter: function(val, obj, row, act){
+					return js.getDictLabel(${@DictUtils.getDictListJson('form_status')}, val, '${text("---")}', true);
+				}},
+
+		],
+		sortableColumn: false,
+		// 加载成功后执行事件
+		ajaxSuccess: function(data){
+
+		}
+	});
+</script>

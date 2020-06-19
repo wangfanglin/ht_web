@@ -1,0 +1,119 @@
+<% layout('/layouts/default.html', {title: '申请关闭', libs: ['validate','fileupload']}){ %>
+<link rel="stylesheet" href="${ctxStatic}/common/css/index.css">
+<script src="${ctxStatic}/common/js/index.js"></script>
+<script src="${ctxStatic}/common/js/jquery.rotate.min.js"></script>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-title">
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+
+		<#form:form id="inputForm" model="${htFormOperation}" action="${ctx}/forminfo/htFormOperation/save" method="post" class="form-horizontal">
+			<div class="box-body">
+				<div  style="text-align:center;"><h3>申请关闭工单</h3></div>
+				<#form:hidde path="formId" style="display: none"/>
+				<#form:hidde path="bdId" style="display: none"/>
+				<#form:hidde path="bpm.taskId" style="display: none"/>
+				<#form:hidde path="bpm.procInsId" style="display: none"/>
+				<#form:hidde path="bpm.activityId" style="display: none"/>
+				<#form:hidde id="operationType"  name="operationType" value="1" style="display: none"/>
+				<#form:hidde id="type"  name="type" value="1" style="display: none"/>
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-3">截图证明:</label>
+							<div class="col-sm-9">
+								<ul class="picView-magnify-list" style="padding: 30px">
+									<%for(imgs in damageImgsList!){ %>
+
+									<li>
+										<a href="javascript:void(0)" data-magnify="gallery" data-group="g1" data-src="${imgs}" data-caption="测试图片一">
+											<img src="${imgs}"  width="100px" height="100px">
+										</a>
+									</li>
+
+									<% } %>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group" >
+							<label class="control-label col-sm-2" title="">
+								<span class="required ">*</span> ${text('关闭原因:')}<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<p><#form:radio path="closeType" dictType="close_status"  class="form-control required" disabled="disabled"/><label><#form:input   path="otherReason" class="form-control required"   disabled="disabled" style="width: 100px"/></label></p>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('备注:')}<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:textarea  path="reason" class="form-control required" disabled="disabled"/>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('审核人:')}<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select  path="verifier" items="${list}"  itemLabel="user_name"  itemValue="user_code"    blankOption="true"  blankOptionLabel="请选择"  class="form-control required" disabled="disabled"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+	</div>
+			<div class="box-footer">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+
+					</div>
+				</div>
+			</div>
+
+		</#form:form>
+
+
+</div>
+<% } %>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+// $("input:radio[name='closeType']").on('ifChecked', function(){
+//     let flag = $(this).val();
+//     console.log(flag);
+//     if(flag == '4'){
+//         $('#otherReason').attr("disabled",false)
+//     }else{
+//         $('#otherReason').attr("disabled",true)
+//     }
+//
+// });
+</script>

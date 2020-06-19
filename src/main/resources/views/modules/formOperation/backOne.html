@@ -1,0 +1,59 @@
+<% layout('/layouts/default.html', {title: '转办任务', libs: ['validate','dataGrid']}){ %>
+<div class="box box-main">
+    <#form:form id="inputForm" action="${ctx}/forminfo/htFormOperation/backOneTask" method="post" class="form-horizontal">
+
+    <#form:hidden name="formId" value="${formId}" class="form-control"/>
+    <#form:hidden name="activity" value="${activity}" class="form-control"/>
+
+    <div class="box-body" style="padding-top:20px">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="control-label col-xs-3">${text('当前环节')}：</label>
+                    <div class="col-xs-8">
+                        <label class="control-label">${name!}</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="control-label col-xs-3">${text('退回原因')}：</label>
+                    <div class="col-xs-8">
+                        <#form:textarea path="comment" rows="3" maxlength="200" class="form-control"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="box-footer">
+        <div class="row">
+            <div class="col-sm-offset-3 col-sm-10">
+                <button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('确 定')}</button>&nbsp;
+                <button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+            </div>
+        </div>
+    </div>
+</#form:form>
+</div>
+<% } %>
+<script>
+    $("#inputForm").validate({
+        submitHandler: function(form){
+            js.ajaxSubmitForm($(form), function(data){
+                js.showMessage(data.message);
+                if(data.result == Global.TRUE){
+                    js.closeCurrentTabPage(function(contentWindow){
+                        if (contentWindow.BpmButton){
+                            contentWindow.BpmButton.callback();
+                        }else{
+                            contentWindow.page();
+                        }
+                    });
+                }
+            }, "json");
+        }
+    });
+</script>

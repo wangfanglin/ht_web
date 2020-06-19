@@ -1,0 +1,958 @@
+<% layout('/layouts/default.html', {title: '在线理赔表管理', libs: ['validate','fileupload']}){ %>
+
+<% include('/modules/common/policyDetail.html', {commonFromId:htClaimSettlementForm.htFormInfo.id}){} %>
+<link rel="stylesheet" href="${ctxStatic}/common/css/index.css">
+<script src="${ctxStatic}/common/js/imagePreview.js"></script>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-title">
+				<i class="fa icon-note"></i> ${text(htClaimSettlementForm.isNewRecord ? '新增在线理赔表' : '编辑在线理赔表')}
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${htClaimSettlementForm}" action="${ctx}/htclaimsettlementform/htClaimSettlementForm/save" method="post" class="form-horizontal">
+			<div class="box-body">
+				<div class="form-unit">${text('基本信息')}</div>
+				<#form:hidden path="id"/>
+
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-1" title="">
+								<span class="required hide">*</span> ${text('联系结果')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-9">
+								<#form:radio path="contactStatus" dictType="contact_status" class="form-control required" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row ">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('再次联系时间')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="againContactDate" readonly="true" maxlength="20" class="form-control Wdate"
+									dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:true});"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="shows row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('客户名字')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<%if(htClaimSettlementForm.bpm.isView!){%>
+								<#form:input path="userName" maxlength="255" class="form-control required"/>
+								<%}%>
+
+								<%if(!htClaimSettlementForm.bpm.isView!){%>
+								<#form:input path="htUserApplyInfo.cardName" maxlength="255" class="form-control required"/>
+								<%}%>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('手机号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<%if(htClaimSettlementForm.bpm.isView!){%>
+								<#form:input path="phone" maxlength="255" class="form-control required"/>
+								<%}%>
+
+								<%if(!htClaimSettlementForm.bpm.isView!){%>
+								<#form:input path="htUserApplyInfo.userPhone" maxlength="255" class="form-control required"/>
+								<%}%>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('手机品牌')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<%if(htClaimSettlementForm.bpm.isView!){%>
+								<#form:select path="phoneBrand" items="${brandInfoList}" itemLabel="name" itemValue="id" maxlength="255" class="form-control required" onchange="findPhoneModel()"/>
+								<%}%>
+
+								<%if(!htClaimSettlementForm.bpm.isView!){%>
+								<#form:select path="htUserApplyInfo.facilityBrandId" items="${brandInfoList}" itemLabel="name" itemValue="id" maxlength="255" class="form-control required" onchange="findPhoneModel()"/>
+								<%}%>
+
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('手机型号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<%if(htClaimSettlementForm.bpm.isView!){%>
+								<#form:select path="phoneModel" items="${htPhoneModelInfoList}" itemLabel="model" itemValue="id" maxlength="255" class="form-control required" />
+								<%}%>
+
+								<%if(!htClaimSettlementForm.bpm.isView!){%>
+								<#form:select path="htUserApplyInfo.facilityModelId" items="${htPhoneModelInfoList}" itemLabel="model" itemValue="id" maxlength="255" class="form-control required"/>
+								<%}%>
+
+
+
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="shows row">
+					<div class="col-xs-5">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('身份证')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<%if(htClaimSettlementForm.bpm.isView!){%>
+								<#form:input path="idNumber"  maxlength="18" class="form-control idcard required"/>
+								<%}%>
+
+								<%if(!htClaimSettlementForm.bpm.isView!){%>
+								<#form:input path="htUserApplyInfo.cardId"  maxlength="18" class="form-control idcard required"/>
+								<%}%>
+
+
+
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="shows row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required hide">*</span> ${text('损坏部位')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-12">
+									<ul class="picView-magnify-list" style="padding: 0px" id="imgs">
+										<%for(imgs in damageImgsList!){ %>
+										<li>
+											<a href="javascript:void(0)" data-magnify="gallery" data-group="g1" data-src="${imgs}" data-caption="">
+												<img src="${imgs}" width="100px" height="100px">
+											</a>
+										</li>
+										<% } %>
+									</ul>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required hide">*</span> ${text('身份证')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-12">
+								<ul class="picView-magnify-list" style="padding: 30px" id="imgs1">
+								<%for(imgs in identityCardImgsList!){ %>
+
+										<li>
+											<a href="javascript:void(0)" data-magnify="gallery" data-group="g1" data-src="${imgs}" data-caption="测试图片一">
+												<img src="${imgs}"  width="100px" height="100px">
+											</a>
+										</li>
+
+								<% } %>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required hide">*</span> ${text('购买凭证')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-12">
+								<ul class="picView-magnify-list" style="padding: 30px" id="imgs2">
+								<%for(imgs in purchaseImgsList!){ %>
+										<li>
+											<a href="javascript:void(0)" data-magnify="gallery" data-group="g1" data-src="${imgs}" data-caption="测试图片一">
+												<img src="${imgs}" width="100px" height="100px" >
+											</a>
+										</li>
+								<% } %>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="shows row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required hide">*</span> ${text('')}<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-12">
+								<#form:fileupload id="damageImgsId" returnPath="true"
+								filePathInputId="damageImgs"
+								bizKey="${htClaimSettlementForm.id}" bizType="damage_image"
+									 uploadType="image" readonly="false"/>
+								<#form:hidden name="damageImgs" class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required hide">*</span> ${text('')}<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-12">
+								<#form:fileupload id="identityCardImgsId" returnPath="true"
+								filePathInputId="identityCardImgs"
+								bizKey="${htClaimSettlementForm.id}" bizType="identityCard_image"
+								uploadType="image" readonly="false" />
+
+								<#form:hidden name="identityCardImgs" class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required hide">*</span> ${text('')}<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-12">
+								<#form:fileupload id="purchaseImgsId" returnPath="true"
+								filePathInputId="purchaseImgs"
+								bizKey="${htClaimSettlementForm.id}" bizType="purchase_image"
+								uploadType="image" readonly="false"/>
+								<#form:hidden name="purchaseImgs" class="form-control"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="shows row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-1" title="">
+								<span class="required hide">*</span> ${text('损坏原因')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-9">
+								<#form:textarea path="causeDamage" rows="4" placeholder="请描述设备损坏过程" maxlength="255" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="shows row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('损坏部件*')}<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="shows row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> <i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${text('主部件')}：<#form:checkbox path="masterUnit" items="${unitZhuList}" itemLabel="name" itemValue="id" class="form-control required" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="shows row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> <i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${text('副部件')}：<#form:checkbox path="viceParts" items="${unitFuList}" itemLabel="name" itemValue="id" class="form-control required" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="shows row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-1" title="">
+								<span class="required hide">*</span> ${text('修理类型')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-9">
+								<#form:radio path="maintainId" items="${breakDownList}" itemLabel="breakType" itemValue="id" class="form-control digits" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="shows row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-1" title="">
+								<span class="required hide">*</span> ${text('需要邮寄理赔资料*')}<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-9">
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="shows row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-1" title="">
+								<span class="required hide">*</span> <i class="fa icon-question hide"></i></label>
+							<div class="col-sm-11">
+								<#form:checkbox path="settlementDataId" items="${claimDataList}" itemLabel="data_name" itemValue="id" class="form-control required" />
+								<#form:hidden path="claimDataNameStr"  />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="shows row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('选择子产品')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-5">
+								<#form:select path="productChildId" onchange="getChildId();" items="${policyDetails}" itemLabel="productInfo.proName" itemValue="id" class="form-control required" />
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="shows row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('资料是否合格')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:radio path="isQualified" dictType="is_qualified" class="form-control required" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<#form:input path="disqualificationDisqualification" placeholder="请描述不合格原因" maxlength="255"  class="form-control required"/>
+					</div>
+				</div>
+				<div class="shows isQualifi row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-1" title="">
+								<span class="required hide">*</span> ${text('维修类型')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-9">
+								<#form:radio path="maintainType" dictType="maintain_type" class="form-control required" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('服务方式')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:radio path="serveType" dictType="ht_service_mode" class="form-control required" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="shows isQualifi point row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('维修网点')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:treeselect id="maintainBranchIdName" title="${text('机构选择')}"
+									path="maintainBranchId" placeholder="请选择维修网点" labelPath="office.officeName"
+									url="${ctx}/product/channelProductInfo/treeData?parentCode=0_WXWD001&flag=1"
+								    allowClear="true" class="required"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="shows isQualifi point row" style="margin-left: 70px;display: flex;">
+					<div style="color: red;margin-right: 6px;">
+						推荐网点:
+					</div>
+					<ul style="font-size: 14px;width: 60%;" id="recommendPoint">
+
+					</ul>
+
+				</div>
+				<div class="shows isQualifi row">
+					<div class="col-xs-9">
+						<div class="form-group">
+							<label class="control-label col-sm-1" title="">
+								<span class="required hide">*</span> ${text('生成短信模板')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-9">
+								<#form:textarea path="sms" rows="4" placeholder="短信模板内容预览"  class="form-control "/>
+								<span>
+									<input type="button" value="生成短信模板" onclick="getSmsMess();">
+								</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="shows isQualifi row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('是否需要给客户叫快递')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:radio path="isExpress" dictType="whether_express" class="form-control required" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="return">
+				<div class="shows isQualifi row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required hide">*</span> ${text('确认回寄地址*')}<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-9">
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="shows isQualifi row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('联系人')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<input name="returnName" value="${finfArea.user_name!}" maxlength="255" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('联系电话')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<input name="returnPhone" value="${finfArea.user_phone!}" maxlength="20" class="form-control phone digits required"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('具体地址')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:treeselect id="returnAreaCodeName" title="${text('区域选择')}"
+									path="area.areaCode"   labelPath="area.areaName"
+									url="${ctx}/sys/area/treeData" class="required" />
+
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<input name="returnAddress" value="${finfArea.address!}" maxlength="20" class="form-control required"/>
+					</div>
+				</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-1" title="">
+								<span class="required hide">*</span> ${text('备注')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-9">
+								<#form:textarea path="remark" maxlength="255" class="form-control"/>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+				<#form:input path="callId" style="display: none" class="call"/>
+			</div>
+			<div class="box-footer">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+
+						<#form:hidden id="formInfoStatus" path="htFormInfo.status"/>
+						<#form:hidden path="htFormInfo.id"/>
+
+						<% if (htClaimSettlementForm.bpm.activityId == 'claim_info' && !htClaimSettlementForm.bpm.isView ){ %>
+							<button type="button" data-layer="true" data-layer-width="725" data-layer-height="420" onclick="gbButton(this);" class="btn btn-sm btn-info mr3"><i class="fa icon-minus"></i> ${text('申请关闭')}</button>
+						<% } %>
+
+						<#bpm:button bpmEntity="${htClaimSettlementForm}" formKey="hd_form_claim" completeText="${text('提 交')}"/>
+						<script>
+                            function gbButton(b) {
+                                var $bt=$(b);
+
+                                let formId = "${htClaimSettlementForm.htFormInfo.id!}";
+                                let procInsId = "${htClaimSettlementForm.bpm.procInsId!}";
+                                let activityId = "${htClaimSettlementForm.bpm.activityId!}";
+                                let taskId = "${htClaimSettlementForm.bpm.taskId!}";
+                                js.addTabPage($bt,"","${ctx}/forminfo/htFormOperation/close?id=${htClaimSettlementForm.id}&formId="+formId+"&activityId="+activityId+"&procInsId="+procInsId+"&taskId="+taskId);
+
+                            }
+
+                            function gpButton(b) {
+                                var $bt=$(b);
+
+                                let formId = "${htClaimSettlementForm.htFormInfo.id!}";
+                                let procInsId = "${htClaimSettlementForm.bpm.procInsId!}";
+                                let activityId = "${htClaimSettlementForm.bpm.activityId!}";
+                                let taskId = "${htClaimSettlementForm.bpm.taskId!}";
+                                js.addTabPage($bt,"","${ctx}/forminfo/htFormOperation/reassignment?id=${htClaimSettlementForm.id}&formId="+formId+"&activityId="+activityId+"&procInsId="+procInsId+"&taskId="+taskId);
+
+                            }
+                            // 业务实现草稿按钮
+                            $('#btnDraft').click(function(){
+                                $('#formInfoStatus').val(Global.STATUS_DRAFT);
+                            });
+                            // 流程按钮提交事件
+                            BpmButton = window.BpmButton || {};
+                            BpmButton.complete = function($this, task){
+                                $('#formInfoStatus').val(Global.STATUS_AUDIT);
+                            };
+						</script>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+
+
+<script type="text/javascript">
+   ImagePreview.init({id:"imgs"});
+   ImagePreview.init({id:"imgs1"});
+   ImagePreview.init({id:"imgs2"});
+
+$("#inputForm").validate({
+	submitHandler: function(form){
+        $('#maintainType').iCheck('enable');//禁用
+		js.ajaxSubmitForm($(form), function(data){
+            if(data.result == Global.TRUE){
+                js.showMessage(data.message);
+			}
+            if(data.result == Global.FALSE){
+                js.showMessage(data.message ,'', 'warning', 4000);
+            }
+
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+
+function getSmsMess(){
+    let claimData = "";
+    var arr=new Array();
+    $("input[name='settlementDataId']:checked").each(function() {
+        let str = $(this).parent().parent().text().trim()+",";
+        claimData += str;
+    });
+    claimData=claimData.slice(0, -1);
+    $("#claimDataNameStr").val(claimData);
+    arr = claimData.split(",");
+    var officeId = $("#maintainBranchIdNameCode").val();
+    var maintainType = $("input[name='maintainType']:checked").val();
+    if (maintainType == undefined||maintainType == ''){
+        js.showMessage("生成信息前，请先选择维修类型!");
+		return;
+    }
+    if (maintainType == '2') {
+        if (claimData== ''||claimData== null ||claimData == undefined || officeId == '') {
+            js.showMessage("生成信息前，请先选择理赔资料,维修网点!");
+            return;
+        }
+    }
+	if (maintainType == '1'){
+		if(claimData== ''||claimData== null ||claimData == undefined){
+            js.showMessage("生成信息前，请先选择理赔资料!");
+			return;
+		}
+	}
+	$.ajax({url:'${ctx}/htclaimsettlementform/htClaimSettlementForm/getSmsString',
+		data:{"arr":arr,"officeId":officeId,"maintainType":maintainType},
+		type:"POST",
+		traditional:true,
+		success:function(data){
+	    if (data.status == 'error'){
+	        js.showMessage(data.msg);
+		} else{
+	        log(data.msg);
+            $("#sms").val(data.data)
+		}
+		}
+	});
+
+}
+
+$("input:checkbox[name='masterUnit']").on('ifChecked ifUnchecked', function(event){
+	var zhuStr = getZhuStr();
+    var fuStr = getFuStr();
+    ajaxGetmaintainId(zhuStr,fuStr);
+});
+$("input:checkbox[name='viceParts']").on('ifChecked ifUnchecked', function(event){
+    var zhuStr = getZhuStr();
+    var fuStr = getFuStr();
+    ajaxGetmaintainId(zhuStr,fuStr);
+
+});
+function ajaxGetmaintainId(zhuidStr,fuidStr) {
+	log(zhuidStr+"  "+fuidStr);
+    js.ajaxSubmit('${ctx}/htbreakdowninfo/htBreakdownInfo/getmaintainId', {"zhuidStr":zhuidStr,"fuidStr":fuidStr}, function(data){
+		log('结果'+data.data);
+		if (data.data == '1'||data.data==undefined){
+            $("input:radio[name='maintainId']").iCheck('uncheck');
+		}
+        $("input:radio[name='maintainId'][value='"+data.data+"']").iCheck('check');
+	})
+}
+function getZhuStr(){
+    var valueZhu = "";
+    var zhuStr = "";
+	$("input:checkbox[name='masterUnit']:checked").each(function(i) {
+        zhuStr = $(this).val();
+		if (0 === i) {
+            valueZhu = zhuStr;
+		} else {
+            valueZhu += "," + zhuStr;
+		}
+	});
+	return valueZhu;
+}
+function getFuStr(){
+    var valueFu = "";
+    var fuStr = "";
+    $("input:checkbox[name='viceParts']:checked").each(function(i) {
+        fuStr = $(this).val();
+        if (0 === i) {
+            valueFu = fuStr;
+        } else {
+            valueFu += "," + fuStr;
+        }
+    });
+    return valueFu;
+}
+$("input:radio[name='contactStatus']").on('ifChecked', function(event){
+    let claimStatus = $(this).val();
+    //1联系成功
+    claStatus(claimStatus);
+});
+$("input:radio[name='isQualified']").on('ifChecked', function(event){
+    let claimStatus = $(this).val();
+    isQualifiedFun(claimStatus);
+});
+function getChildId(){
+    var id = $("#productChildId").val();
+    ajaxCheckType(id);
+
+}
+function ajaxCheckType(chaildId){
+    $.ajax({
+        type:"get",
+        url:"${ctx}/policy/policyDetail/getPolicyMaintainType?chaildId="+chaildId,//+formId,
+        success: function(data) {
+            log(data);
+            $("input:radio[name='maintainType'][value='"+data+"']").iCheck('check');//选中
+            $('#maintainType').iCheck('disable');//禁用
+            var   isQualified = $("input:radio[name='isQualified']:checked").val();
+            log("资料是否合格"+isQualified)
+            if (isQualified!=null&&isQualified!=''&&isQualified!=undefined){
+                isQualifiedFun(isQualified);
+            }
+        }
+    });
+    var formId = '${htClaimSettlementForm.htFormInfo.id}';
+    var childId  = $("#productChildId").val();
+	//选择 子产品时 推荐维修网点
+    $.ajax({
+        type:"get",
+        url:"${ctx}/htclaimsettlementform/htClaimSettlementForm/recommendMainPoint?formId="+formId+"&childId="+childId,
+        success: function(data) {
+            var str = "";
+            if(null != data && "" != data) {
+                $.each(data, function (index, value) {
+                    var organizationId = "X"+value.organizationId;
+                    str += "<li style='display: flex;align-items: center;margin-bottom: 10px;width:60%;' >"
+                    str += "<span style='color: red;'>" + (index + 1) + "." + value.pointName + "(案件未处理:" + value.formCount + ")</span>"
+                    str += "<p style='border: 1px solid #666;border-radius: 5px;padding: 0px 4px;margin-left: 16px;margin-left: auto;' onclick=\"usePoint('"+organizationId+"','"+value.officeName+"')\">确认使用</p>"
+                    str += "</li>";
+
+                });
+            }else{
+                str += "<li style='display: flex;align-items: center;margin-bottom: 10px;width:60%;'>"
+                str += "<span style='color: red;'>暂无推荐网点</span>"
+                str += "</li>";
+            }
+            console.log(str);
+            $("#recommendPoint").html(str);
+        }
+    });
+
+
+}
+
+//是否需要叫快递
+$("input:radio[name='isExpress']").on('ifChecked', function(event){
+   let isExpressStatus = $(this).val();
+    if (isExpressStatus == '0'){
+        $("#returnName").attr("disabled",false);
+        $("#returnPhone").attr("disabled",false);
+        $("#returnAddress").attr("disabled",false);
+        $("#returnAreaCodeNameName").attr("disabled",false);
+    }
+    if (isExpressStatus == '1'){
+        $("#returnName").attr("disabled",true);
+        $("#returnPhone").attr("disabled",true);
+        $("#returnAddress").attr("disabled",true);
+        $("#returnAreaCodeNameName").attr("disabled",true);
+   }
+});
+$(function(){
+
+    if (typeof window.webuploaderRefresh == 'function'){
+        window.webuploaderRefresh();
+    }
+    var status = '${status!}';
+    if (status == 'error') {
+        js.showMessage("该工单下暂无在线申请信息");
+        js.closeCurrentTabPage(function(contentWindow){
+                contentWindow.page();
+        })
+	}
+    var id = $("#productChildId").val();
+    ajaxCheckType(id);
+    $("input:radio[name='contactStatus']:checked").each(function(i) {
+        let claimStatus = $(this).val();
+        //1联系成功
+        claStatus(claimStatus);
+    });
+    $("input:radio[name='isQualified']:checked").each(function(i) {
+        let claimStatus = $(this).val();
+        isQualifiedFun(claimStatus);
+    });
+	var formId = '${htClaimSettlementForm.htFormInfo.id}';
+	var childId  = $("#productChildId").val();
+	if (childId==""||childId==null||childId==undefined){
+        $.ajax({
+            type:"get",
+            url:"${ctx}/htclaimsettlementform/htClaimSettlementForm/recommendMainPoint?formId="+formId+"&chaildId="+childId,
+            success: function(data) {
+                var str = "";
+                if(null != data && "" != data) {
+                    $.each(data, function (index, value) {
+                        var organizationId = "X"+value.organizationId;
+                        str += "<li style='display: flex;align-items: center;margin-bottom: 10px;width:60%;' >"
+                        str += "<span style='color: red;'>" + (index + 1) + "." + value.pointName + "(案件未处理:" + value.formCount + ")</span>"
+                        str += "<p style='border: 1px solid #666;border-radius: 5px;padding: 0px 4px;margin-left: 16px;margin-left: auto;' onclick=\"usePoint('"+organizationId+"','"+value.officeName+"')\">确认使用</p>"
+                        str += "</li>";
+
+                    });
+                }else{
+                    str += "<li style='display: flex;align-items: center;margin-bottom: 10px;width:60%;'>"
+                    str += "<span style='color: red;'>暂无推荐网点</span>"
+                    str += "</li>";
+                }
+                console.log(str);
+                $("#recommendPoint").html(str);
+            }
+        });
+	} else{
+	    var str ="";
+        str += "<li style='display: flex;align-items: center;margin-bottom: 10px;width:60%;'>"
+        str += "<span style='color: red;'>暂无推荐网点</span>"
+        str += "</li>";
+    console.log(str);
+    $("#recommendPoint").html(str);
+	}
+
+
+    getChildId()
+
+});
+
+   function usePoint(officeId,officeName) {
+       var officeid = officeId.substring(1);
+       console.log(officeId+"~~"+officeid+"~~"+officeName);
+       $("#maintainBranchIdNameName").val(officeName);
+       $("#maintainBranchIdNameCode").val(officeid);
+   }
+	function claStatus(claimStatus) {
+        if(claimStatus == '1'){
+            $(".shows").removeClass("hide");
+            //$(".timeShow").addClass("hide");
+            $('#masterUnit').iCheck('enable');
+            $('#viceParts').iCheck('enable');
+            $('#claimDataStr').iCheck('enable');
+            $('#isQualified').iCheck('enable');
+            //$('#maintainType').iCheck('enable');
+            $('#serveType').iCheck('enable');
+            $('#isExpress').iCheck('enable');
+            $("#htUserApplyInfo_cardName").attr("disabled",false);
+            $("#htUserApplyInfo_userPhone").attr("disabled",false);
+            $("#htUserApplyInfo_facilityBrandId").attr("disabled",false);
+            $("#htUserApplyInfo_facilityModelId").attr("disabled",false);
+            $("#htUserApplyInfo_cardId").attr("disabled",false);
+            $("#causeDamage").attr("disabled",false)
+            $("#returnName").attr("disabled",false);
+            $("#returnPhone").attr("disabled",false);
+            $("#returnAddress").attr("disabled",false);
+            $("#returnAreaCodeNameName").attr("disabled",false);
+           // $("#maintainBranchIdNameName").attr("disabled",false);
+            //$("#disqualificationDisqualification").attr("disabled",false);
+
+
+            //获取是否需要给客户的值
+            var isExpressStatus = $("input:radio[name='isExpress']:checked").val();
+            log("是否需要快递"+isExpressStatus)
+            if (isExpressStatus!=null&&isExpressStatus!=''&&isExpressStatus!=undefined) {
+                if (isExpressStatus == '0') {
+                    $("#returnName").attr("disabled", false);
+                    $("#returnPhone").attr("disabled", false);
+                    $("#returnAddress").attr("disabled", false);
+                    $("#returnAreaCodeNameName").attr("disabled", false);
+                }
+                if (isExpressStatus == '1') {
+                    $("#returnName").attr("disabled", true);
+                    $("#returnPhone").attr("disabled", true);
+                    $("#returnAddress").attr("disabled", true);
+                    $("#returnAreaCodeNameName").attr("disabled", true);
+                }
+            }
+            initPoint();
+            //获取  资料是否合
+          var   isQualified = $("input:radio[name='isQualified']:checked").val();
+          log("资料是否合格"+isQualified)
+            if (isQualified!=null&&isQualified!=''&&isQualified!=undefined){
+                isQualifiedFun(isQualified);
+			}
+
+
+
+
+
+			}
+
+        if(claimStatus == '2' || claimStatus == '3' || claimStatus == '4'||claimStatus == '5'){
+            $(".shows").addClass("hide");
+            //$(".timeShow").removeClass("hide");
+            $('#masterUnit').iCheck('disable');
+            $('#viceParts').iCheck('disable');
+            $('#claimDataStr').iCheck('disable');
+            $('#isQualified').iCheck('disable');
+            $('#maintainType').iCheck('disable');
+            $('#serveType').iCheck('disable');
+            $('#isExpress').iCheck('disable');
+            $("#htUserApplyInfo_cardName").attr("disabled",true);
+            $("#htUserApplyInfo_userPhone").attr("disabled",true);
+            $("#htUserApplyInfo_facilityBrandId").attr("disabled",true);
+            $("#htUserApplyInfo_facilityModelId").attr("disabled",true);
+            $("#htUserApplyInfo_cardId").attr("disabled",true);
+            $("#causeDamage").attr("disabled",true);
+            $("#returnName").attr("disabled",true);
+            $("#returnPhone").attr("disabled",true);
+            $("#returnAddress").attr("disabled",true);
+            $("#returnAreaCodeNameName").attr("disabled",true);
+            $("#maintainBranchIdNameName").attr("disabled",true);
+            $("#disqualificationDisqualification").attr("disabled",true);
+
+            /*将理赔资料 和  是否需要为用户叫快递设为禁用*/
+            $("#settlementDataId").attr("disabled",true);
+            $("#isExpress").attr("disabled",true);
+            $('#settlementDataId').iCheck('disable');
+            $('#isExpress').iCheck('disable');
+
+
+   }
+        window.webuploaderRefresh();
+    }
+function isQualifiedFun(claimStatus) {
+    if (claimStatus == '1') {  //合格
+        //清空 不合格原因
+        $("#disqualificationDisqualification").val("");
+        $("#disqualificationDisqualification").attr("placeholder","");
+
+        $(".isQualifi").removeClass("hide");
+        $('#serveType').iCheck('enable');
+        $('#isExpress').iCheck('enable');
+        $("#returnName").attr("disabled", false);
+        $("#returnPhone").attr("disabled", false);
+        $("#returnAddress").attr("disabled", false);
+        $("#returnAreaCodeNameName").attr("disabled", false);
+        //$("#maintainBranchIdNameName").attr("disabled", false);
+        //获取维修类型的值
+        var maintainType = $("input[name='maintainType']:checked").val();
+        log("维修类型"+maintainType)
+        initPoint();
+        $("#disqualificationDisqualification").attr("disabled", true);
+    }
+	if (claimStatus == '2') {  //不合格
+        $(".isQualifi").addClass("hide");
+		$('#serveType').iCheck('disable');
+        $('#isExpress').iCheck('disable');
+		$("#returnName").attr("disabled", true);
+		$("#returnPhone").attr("disabled", true);
+		$("#returnAddress").attr("disabled", true);
+		$("#returnAreaCodeNameName").attr("disabled", true);
+		$("#maintainBranchIdNameName").attr("disabled", true);
+        $("#disqualificationDisqualification").attr("disabled", false);
+	}
+
+}
+
+function initPoint(){
+    var maintainType = $("input[name='maintainType']:checked").val();
+    log("维修类型"+maintainType)
+    if (maintainType!=null&&maintainType!=''&&maintainType!=undefined){
+        if (maintainType == '1') {
+            $(".point").addClass("hide");
+            $("#maintainBranchIdNameName").attr("disabled",true);
+        }
+        if (maintainType == '2') {
+            $(".point").removeClass("hide");
+            $("#maintainBranchIdNameName").attr("disabled",false);
+        }
+    }
+}
+
+
+   $("input:radio[name='maintainType']").on('ifChecked', function(event){
+   let claimStatus = $(this).val();
+       var sfhe = $("input:radio[name='isQualified']:checked").val();
+//
+//    if(sfhe == "2"){
+//        $(".point").addClass("hide");
+//        $("#maintainBranchIdNameName").attr("disabled",true);
+//        return;}
+   if (claimStatus == '1') {
+       $(".point").addClass("hide");
+       $("#maintainBranchIdNameName").attr("disabled",true);
+   }
+    if (claimStatus == '2') {
+        $(".point").removeClass("hide");
+       $("#maintainBranchIdNameName").attr("disabled",false);
+    }
+});
+function findPhoneModel() {
+    var option=$('#htUserApplyInfo_facilityBrandId option:selected').val(); //获取选中的项
+    console.log(option);
+    $.ajax({
+        type:"get",
+        url:"${ctx}/phonemodelinfo/htPhoneModelInfo/findByPhoneModel?brandId="+option,
+        success: function(data) {
+            var options = [];
+            $.each(data, function (index, value) {
+                options.push("<option value='" + value.id + "'> " + value.model + "</option>");
+            });
+            $("#htUserApplyInfo_facilityModelId option").remove();
+            $("#htUserApplyInfo_facilityModelId").append(options.join(''));
+            $('#htUserApplyInfo_facilityModelId').attr("disabled",false);
+            console.log(data);
+        }
+    });
+}
+
+
+   $("input:radio[name='isExpress']").on('ifChecked', function(event){
+       let status = $(this).val();
+       if (status == '1') {
+           $("#return *").hide();
+       }
+       if (status == '0') {
+           $("#return *").show();
+       }
+   });
+</script>

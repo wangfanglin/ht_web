@@ -1,0 +1,782 @@
+<% layout('/layouts/default.html', {title: '渠道产品表管理', libs: ['validate','dataGrid']}){ %>
+<script>
+	$(function () {
+        // 正数
+        jQuery.validator.addMethod("zheng", function(value, element) {
+            var tel = /^(\+)?\d+(\.\d+)?$/;
+            return this.optional(element) || (tel.test(value));
+        }, '请输入一个正数');
+
+	   var groupProductId = $("#groupProductId").val()
+		if (null!=groupProductId && ""!=groupProductId && undefined!=groupProductId){
+            changeProduct()
+		}
+    })
+</script>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-title">
+				<i class="fa icon-note"></i> ${text(channelProductInfo.isNewRecord ? '新增渠道产品表' : '编辑渠道产品表')}
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${channelProductInfo}" action="${ctx}/product/channelProductInfo/save" method="post" class="form-horizontal">
+			<div class="box-body">
+				<div class="form-unit">${text('基本信息')}</div>
+				<#form:hidden path="id"/>
+				<div class="row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('渠道名称')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" >
+								<#form:treeselect id="testOffice" title="${text('渠道选择')}"
+								path="distributionId" labelPath="distributionName"
+								url="${ctx}/product/channelProductInfo/treeData?parentCode=0_XS001" allowClear="true"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('渠道产品名称')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="name" maxlength="255" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('渠道产品编码')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="code" maxlength="255" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('数据传输方式')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="dataTransferType" dictType="dataTransferType" class="form-control required" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('组合产品名称')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="groupProductId"  items="${groupProductList}"  itemLabel="productName" itemValue="id" blankOption="true" blankOptionLabel="请选择" class="form-control required" onchange="changeProduct()"/>
+							</div>
+						</div>
+					</div>
+				</div>
+<!--换机产品的信息--------------------------------------------------------------------->
+				<div id="huanjiProduct" style="display: none">
+					<div class="form-unit">${text('换机产品')}</div>
+					<table id="huanJiDataGrid"></table>
+					<div id="hxFuWu" style="display: none">
+						<p><label><font size="2">生效规则</font></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><font id="hxGZ" size="2"></font></label></p>
+						<p><label><font size="2">服务有效期:</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    </label><label><font id="hxYX" size="2" ></font></label></p>
+					</div>
+				</div>
+
+				<!-------------------维修产品的信息-------------------------------------------------->
+				<div id="maintainProduct" style="display: none">
+					<div class="form-unit">${text('维修产品')}</div>
+
+					<table id="weiXiuDataGrid"></table>
+					<div id="wxFuWu" style="display: none">
+						<p><label><font size="2">生效规则</font></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><font id="wxSX" size="2"></font></label></p>
+						<p><label><font size="2">服务有效期:</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    </label><label><font id="wxYX" size="2" ></font></label></p>
+					</div>
+				</div>
+				<!--延保产品的信息---------------------------------------------------------->
+				<div id="extendProduct" style="display: none">
+					<div class="form-unit">${text('延保产品')}</div>
+
+					<table id="yanBaoDataGrid"></table>
+					<div id="ybFuWu" style="display: none">
+						<p><label><font size="2">生效规则</font></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><font id="ybGZ" size="2"></font></label></p>
+						<p><label><font size="2">服务有效期:</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    </label><label><font id="ybYX" size="2" ></font></label></p>
+					</div>
+				</div>
+				<!--数据保产品的信息------------------------------------------------------->
+				<div id="shuJuBaoProduct" style="display: none">
+					<div class="form-unit">${text('数据保产品')}</div>
+					<table id="shuJuBaoDataGrid"></table>
+					<div id="sjbFuWu" style="display: none">
+						<p><label><font size="2">生效规则</font></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><font id="sjbGZ" size="2"></font></label></p>
+						<p><label><font size="2">服务有效期:</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    </label><label><font id="sjbYX" size="2" ></font></label></p>
+					</div>
+				</div>
+				<div id="zFuWu" style="display: none">
+					<p><label><font size="2">生效规则</font></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><font id="zGZ" size="2"></font></label></p>
+					<p><label><font size="2">服务有效期:</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    </label><label><font id="zYX" size="2" ></font></label></p>
+				</div>
+
+				<div id="manyRule" style="display: none">
+					<p><label><font size="2">终止规则</font></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><font  size="2">复合规则</font></label></p>
+					<p><label><font id="fuHeResult" size="2"></font></label></p>
+				</div>
+				<div id="singleRule" style="display: none">
+					<p><label><font size="2">终止规则</font></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><font size="2">单一规则</font></label></p>
+					<p><label><font size="2">终止规则检测项:</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    </label><label><font id="danYiResult" size="2"></font></label></p>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-1" title="">
+								<span class="required">*</span> ${text('理赔资料清单')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-11">
+								<#form:checkbox path="claimData" items="${claimDataList}" itemLabel="data_name" itemValue="id" class="form-control required" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-unit">${text('供应链/财务')}</div>
+				<div class="row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('服务成本价')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="serveCostPrice" maxlength="7"  class="form-control zheng"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('费率')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="rate" maxlength="7"  class="form-control zheng"/>
+							</div>
+						</div>
+					</div>
+
+				<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required">*</span> ${text('保费')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="premium" maxlength="7"  class="form-control required zheng"/>
+						</div>
+					</div>
+				</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('建议零售价')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="suggestedRetailPrice" maxlength="7"  class="form-control required zheng"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('中介供应商')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="intermediaryServiceId"  items="${intermediaryServerList}" itemLabel="name" itemValue="id" blankOption="true" blankOptionLabel="请选择" class="form-control required digits" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<% if (channelProductInfo.isNewRecord){ %>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('是否立即启用')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:radio path="isStart" dictType="is_start" class="form-control required" />
+							</div>
+						</div>
+					</div>
+				<% } %>
+				<#form:hidden path="reamrk"/>
+			</div>
+			<div class="box-footer">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('product:channelProductInfo:edit')){ %>
+							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+						<% } %>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+            if(data.result == Global.TRUE) {
+                js.showMessage(data.message);
+            }else{
+                js.showMessage(data.message,"",'warning',4000);
+			}
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+var weixiuProductInfoList ;
+var huanjiProductInfoList ;
+var yanbaoProductInfoList ;
+var shujubaoProductInfoList ;
+
+function changeProduct() {
+    $('#weiXiuDataGrid').jqGrid('GridUnload');
+    $('#huanJiDataGrid').jqGrid('GridUnload');
+    $('#yanBaoDataGrid').jqGrid('GridUnload');
+    $('#shuJuBaoDataGrid').jqGrid('GridUnload');
+
+    //导航  和  规则都要隐藏
+
+    $("#maintainProduct").hide();
+    $("#huanjiProduct").hide();
+    $("#extendProduct").hide();
+    $("#shuJuBaoProduct").hide();
+
+
+    var groupProductId=$('#groupProductId option:selected').val(); //获取选中的项
+	if (groupProductId==null || groupProductId==undefined || groupProductId==''){
+	    $("#huanjiProduct").hide()
+	    $("#maintainProduct").hide()
+	    $("#extendProduct").hide()
+	    $("#shuJuBaoProduct").hide()
+
+
+	    $("#zFuWu").hide()
+	    $("#manyRule").hide()
+	    $("#singleRule").hide()
+
+	    return;
+	}
+    $.ajax({
+        type:'post',
+        async: false,
+        url:'${ctx}/product/htGroupProductInfo/findDetail?groupProductId='+groupProductId,
+        dataType:'json',
+        success:function(data){
+            if(data.status=="success"){
+                console.log(data)
+              var isSingleValidity =  data.data.isSingleValidity;
+              var terminationRules =  data.data.terminationRules;
+                var weixiu = data.data.weixiu
+                var huanxin = data.data.huanxin
+                var yanbao = data.data.yanbao
+                var shujubao = data.data.shujubao
+                var fuhe = data.data.fuhe
+                var danyiguize = data.data.danyiguize
+                var validity = data.data.validity
+                var isImmediately = data.data.isImmediately
+
+                if(terminationRules){
+					//fuhe
+                    $("#fuHeResult").text(fuhe);
+                   $("#manyRule").show()
+                    $("#singleRule").hide()
+
+				}else{
+                    $("#danYiResult").text(danyiguize);
+                    $("#singleRule").show()
+                    $("#manyRule").hide()
+					//danyiguize
+				}
+                if(weixiu){
+                    console.log("维修列表初始")
+                    $.ajax({
+                        type:'get',
+                        async: false,
+                        url:'${ctx}/product/htGroupProductInfo/listProduct?productType=0&groupProductId='+groupProductId,
+                        dataType:'json',
+                        success:function(data){
+                            if (data.status=='success'){
+                                console.log(data)
+                             weixiuProductInfoList = data.data.productInfoList;
+                              var validity = data.data.validity;
+                              var isImmediately = data.data.isImmediately;
+
+                                $("#maintainProduct").show()
+                                $('#weiXiuDataGrid').dataGrid({
+                                    data: weixiuProductInfoList,
+                                    datatype: "local",
+                                    columnModel: [
+                                        {header: '${text("产品名称")}', name: 'proName', index: 'a.pro_name', width: 150, align: "left"},
+                                        {header: '${text("产品编码")}', name: 'proCode', index: 'a.pro_code', width: 150, align:"center"},
+                                        {header: '${text("维修次数")}', name: 'maintenanceFrequency', index: 'a.pro_code', width: 150, align:"center"},
+                                        {header: '${text("手机销售价格下限")}', name: 'minPrice', index: 'a.min_price', width: 150, align: "center", formatter: function(val, obj, row, act){
+                                                return js.formatNumber(val/100, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                                            }},
+                                        {header: '${text("手机销售价格上限")}', name: 'maxPrice', index: 'a.max_price', width: 150, align: "center", formatter: function(val, obj, row, act){
+                                                return js.formatNumber(val/100, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                                            }},
+                                        {header: '${text("维修上限")}', name: 'restrictPrice', index: 'a.restrict_price', width: 150,align: "center", formatter: function(val, obj, row, act){
+                                                return js.formatNumber(val/100, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                                            }},
+                                        // {header: '${text("生效规则")}', name: 'isImmediately', index: 'a.is_immediately', width: 150, align: "center"},
+                                        // {header: '${text("服务有效期")}', name: 'validity', index: 'a.validity', width: 150, align: "center"},
+                                        {header: '${text("保费")}', name: 'premium', index: 'a.premium', width: 150, align: "center", formatter: function(val, obj, row, act){
+                                                return js.formatNumber(val/100, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                                            }},
+                                        {header: '${text("服务成本")}', name: 'serveCostPrice', index: 'a.serve_cost_price', width: 150, align: "center", formatter: function(val, obj, row, act){
+                                                return js.formatNumber(val/100, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                                            }},
+                                        {header: '${text("费率")}', name: 'rate', index: 'a.rate', width: 150, align: "center"},
+                                        {header: '${text("建议零售价")}', name: 'suggestedRetailPrice', index: 'a.suggested_retailPrice', width: 150, align: "center", formatter: function(val, obj, row, act){
+                                                return js.formatNumber(val/100, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                                            }}
+                                    ],
+                                    // 加载成功后执行事件
+                                    ajaxSuccess: function (data) {
+
+                                    }
+                                });
+                                $("#wxSX").text(isImmediately);
+								$("#wxYX").text(validity);
+                                $("#wxFuWu").show();
+							}
+
+                        }
+                })
+                }
+
+                if(huanxin){
+                    console.log("换机列表初始")
+                    $.ajax({
+                        type:'get',
+                        async: false,
+                        url:'${ctx}/product/htGroupProductInfo/listProduct?productType=1&groupProductId='+groupProductId,
+                        dataType:'json',
+                        success:function(data) {
+                            if (data.status=='success'){
+                                huanjiProductInfoList = data.data.productInfoList;
+                                var validity = data.data.validity;
+                                var isImmediately = data.data.isImmediately;
+                                console.log(data)
+                                $("#huanjiProduct").show()
+
+                                $('#huanJiDataGrid').dataGrid({
+                                    data: huanjiProductInfoList,
+                                    datatype: "local",
+                                    columnModel: [
+                                        {
+                                            header: '${text("产品名称")}',
+                                            name: 'proName',
+                                            index: 'a.pro_name',
+                                            width: 150,
+                                            align: "left"
+                                        },
+                                        {
+                                            header: '${text("产品编码")}',
+                                            name: 'proCode',
+                                            index: 'a.pro_code',
+                                            width: 150,
+                                            align: "center"
+                                        },
+                                        {
+                                            header: '${text("手机销售价格下限")}',
+                                            name: 'minPrice',
+                                            index: 'a.min_price',
+                                            width: 150,
+                                            align: "center",
+                                            formatter: function (val, obj, row, act) {
+                                                return js.formatNumber(val/100, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                                            }
+                                        },
+                                        {
+                                            header: '${text("手机销售价格上限")}',
+                                            name: 'maxPrice',
+                                            index: 'a.max_price',
+                                            width: 150,
+                                            align: "center",
+                                            formatter: function (val, obj, row, act) {
+                                                return js.formatNumber(val/100, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                                            }
+                                        },
+                                        {
+                                            header: '${text("换机自付额")}',
+                                            name: 'changePayment',
+                                            index: 'a.change_payment',
+                                            width: 150,
+                                            align: "center",
+                                            formatter: function (val, obj, row, act) {
+                                                return js.formatNumber(val/100, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                                            }
+                                        },
+                                        {
+                                            header: '${text("基础折旧率")}',
+                                            name: 'basisDepreciation',
+                                            index: 'a.basis_depreciation',
+                                            width: 150,
+                                            align: "right"
+                                        },
+                                        {
+                                            header: '${text("每月折旧率")}',
+                                            name: 'monthlyDepreciation',
+                                            index: 'a.monthly_depreciation',
+                                            width: 150,
+                                            align: "center"
+                                        },
+                                        // {
+                                        //     header: '${text("生效规则")}',
+                                        //     name: 'isImmediately',
+                                        //     index: 'a.is_immediately',
+                                        //     width: 150,
+                                        //     align: "center"
+                                        // },
+                                        // {
+                                        //     header: '${text("服务有效期")}',
+                                        //     name: 'validity',
+                                        //     index: 'a.validity',
+                                        //     width: 150,
+                                        //     align: "center"
+                                        // },
+                                        {
+                                            header: '${text("保费")}',
+                                            name: 'premium',
+                                            index: 'a.premium',
+                                            width: 150,
+                                            align: "center",
+                                            formatter: function (val, obj, row, act) {
+                                                return js.formatNumber(val/100, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                                            }
+                                        },
+                                        {
+                                            header: '${text("服务成本")}',
+                                            name: 'serveCostPrice',
+                                            index: 'a.serve_cost_price',
+                                            width: 150,
+                                            align: "center",
+                                            formatter: function (val, obj, row, act) {
+                                                return js.formatNumber(val/100, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                                            }
+                                        },
+                                        {
+                                            header: '${text("费率")}',
+                                            name: 'rate',
+                                            index: 'a.rate',
+                                            width: 150,
+                                            align: "center"
+                                        },
+                                        {
+                                            header: '${text("建议零售价")}',
+                                            name: 'suggestedRetailPrice',
+                                            index: 'a.suggested_retailPrice',
+                                            width: 150,
+                                            align: "center",
+                                            formatter: function (val, obj, row, act) {
+                                                return js.formatNumber(val/100, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                                            }
+                                        }
+                                    ],
+                                    // 加载成功后执行事件
+                                    ajaxSuccess: function (data) {
+
+                                    }
+                                });
+                                $("#hxGZ").text(isImmediately);
+                                $("#hxYX").text(validity);
+                                $("#hxFuWu").show();
+
+							}
+                        }
+                    })
+				}
+
+                if(yanbao){
+                    console.log("延保列表初始")
+                    $.ajax({
+                        type:'get',
+                        async: false,
+                        url:'${ctx}/product/htGroupProductInfo/listProduct?productType=2&groupProductId='+groupProductId,
+                        dataType:'json',
+                        success:function(data) {
+                            if (data.status=='success'){
+                               yanbaoProductInfoList = data.data.productInfoList;
+                                var validity = data.data.validity;
+                                var isImmediately = data.data.isImmediately;
+                                console.log(data)
+                                log("延保的产品"+yanbaoProductInfoList);
+                                $("#extendProduct").show()
+                                $('#yanBaoDataGrid').dataGrid({
+
+                                    data: yanbaoProductInfoList,
+                                    datatype: "local",
+                                    columnModel: [
+                                        {
+                                            header: '${text("产品名称")}',
+                                            name: 'proName',
+                                            index: 'a.pro_name',
+                                            width: 150,
+                                            align: "left"
+                                        },
+                                        {
+                                            header: '${text("产品编码")}',
+                                            name: 'proCode',
+                                            index: 'a.pro_code',
+                                            width: 150,
+                                            align: "center"
+                                        },
+                                        {
+                                            header: '${text("手机销售价格下限")}',
+                                            name: 'minPrice',
+                                            index: 'a.min_price',
+                                            width: 150,
+                                            align: "center",
+                                            formatter: function (val, obj, row, act) {
+                                                return js.formatNumber(val/100, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                                            }
+                                        },
+                                        {
+                                            header: '${text("手机销售价格上限")}',
+                                            name: 'maxPrice',
+                                            index: 'a.max_price',
+                                            width: 150,
+                                            align: "center",
+                                            formatter: function (val, obj, row, act) {
+                                                return js.formatNumber(val/100, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                                            }
+                                        },
+                                        {
+                                            header: '${text("维修上限")}',
+                                            name: 'restrictPrice',
+                                            index: 'a.restrict_price',
+                                            width: 150,
+                                            align: "center",
+                                            formatter: function (val, obj, row, act) {
+                                                return js.formatNumber(val/100, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                                            }
+                                        },
+                                        // {
+                                        //     header: '${text("生效规则")}',
+                                        //     name: 'isImmediately',
+                                        //     index: 'a.is_immediately',
+                                        //     width: 150,
+                                        //     align: "center"
+                                        // },
+                                        // {
+                                        //     header: '${text("服务有效期")}',
+                                        //     name: 'validity',
+                                        //     index: 'a.validity',
+                                        //     width: 150,
+                                        //     align: "center"
+                                        // },
+                                        {
+                                            header: '${text("保费")}',
+                                            name: 'premium',
+                                            index: 'a.premium',
+                                            width: 150,
+                                            align: "center",
+                                            formatter: function (val, obj, row, act) {
+                                                return js.formatNumber(val/100, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                                            }
+                                        },
+                                        {
+                                            header: '${text("服务成本")}',
+                                            name: 'serveCostPrice',
+                                            index: 'a.serve_cost_price',
+                                            width: 150,
+                                            align: "center",
+                                            formatter: function (val, obj, row, act) {
+                                                return js.formatNumber(val/100, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                                            }
+                                        },
+                                        {
+                                            header: '${text("费率")}',
+                                            name: 'rate',
+                                            index: 'a.rate',
+                                            width: 150,
+                                            align: "center"
+                                        },
+                                        {
+                                            header: '${text("建议零售价")}',
+                                            name: 'suggestedRetailPrice',
+                                            index: 'a.suggested_retailPrice',
+                                            width: 150,
+                                            align: "center",
+                                            formatter: function (val, obj, row, act) {
+                                                return js.formatNumber(val/100, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                                            }
+                                        }
+                                    ],
+                                    // 加载成功后执行事件
+                                    ajaxSuccess: function (data) {
+
+                                    }
+                                });
+                                $("#ybYX").text(validity);
+                                $("#ybGZ").text(isImmediately);
+                                $("#ybFuWu").show();
+							}
+                        }
+                    })
+				}
+
+                if(shujubao){
+                    console.log("数据保列表初始")
+                    $.ajax({
+                        type:'get',
+                        async: false,
+                        url:'${ctx}/product/htGroupProductInfo/listProduct?productType=3&groupProductId='+groupProductId,
+                        dataType:'json',
+                        success:function(data) {
+							if (data.status='success'){
+                              shujubaoProductInfoList = data.data.productInfoList;
+                                var validity = data.data.validity;
+                                var isImmediately = data.data.isImmediately;
+                                $("#shuJuBaoProduct").show()
+                                $('#shuJuBaoDataGrid').dataGrid({
+                                    data: shujubaoProductInfoList,
+                                    datatype: "local",
+                                    columnModel: [
+                                        {
+                                            header: '${text("产品名称")}',
+                                            name: 'proName',
+                                            index: 'a.pro_name',
+                                            width: 150,
+                                            align: "left"
+                                        },
+                                        {
+                                            header: '${text("产品编码")}',
+                                            name: 'proCode',
+                                            index: 'a.pro_code',
+                                            width: 150,
+                                            align: "center"
+                                        },
+                                        {
+                                            header: '${text("手机销售价格下限")}',
+                                            name: 'minPrice',
+                                            index: 'a.min_price',
+                                            width: 150,
+                                            align: "center",
+                                            formatter: function (val, obj, row, act) {
+                                                return js.formatNumber(val/100, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                                            }
+                                        },
+                                        {
+                                            header: '${text("手机销售价格上限")}',
+                                            name: 'maxPrice',
+                                            index: 'a.max_price',
+                                            width: 150,
+                                            align: "center",
+                                            formatter: function (val, obj, row, act) {
+                                                return js.formatNumber(val/100, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                                            }
+                                        },
+                                        {
+                                            header: '${text("维修上限")}',
+                                            name: 'restrictPrice',
+                                            index: 'a.restrict_price',
+                                            width: 150,
+                                            align: "center",
+                                            formatter: function (val, obj, row, act) {
+                                                return js.formatNumber(val/100, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                                            }
+                                        },
+                                        // {
+                                        //     header: '${text("生效规则")}',
+                                        //     name: 'isImmediately',
+                                        //     index: 'a.is_immediately',
+                                        //     width: 150,
+                                        //     align: "center"
+                                        // },
+                                        // {
+                                        //     header: '${text("服务有效期")}',
+                                        //     name: 'validity',
+                                        //     index: 'a.validity',
+                                        //     width: 150,
+                                        //     align: "center"
+                                        // },
+                                        {
+                                            header: '${text("保费")}',
+                                            name: 'premium',
+                                            index: 'a.premium',
+                                            width: 150,
+                                            align: "center",
+                                            formatter: function (val, obj, row, act) {
+                                                return js.formatNumber(val/100, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                                            }
+                                        },
+                                        {
+                                            header: '${text("服务成本")}',
+                                            name: 'serveCostPrice',
+                                            index: 'a.serve_cost_price',
+                                            width: 150,
+                                            align: "center",
+                                            formatter: function (val, obj, row, act) {
+                                                return js.formatNumber(val/100, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+                                            }
+                                        },
+                                        {
+                                            header: '${text("费率")}',
+                                            name: 'rate',
+                                            index: 'a.rate',
+                                            width: 150,
+                                            align: "center"
+                                        },
+                                        {
+                                            header: '${text("建议零售价")}',
+                                            name: 'suggestedRetailPrice',
+                                            index: 'a.suggested_retailPrice',
+                                            width: 150,
+                                            align: "center",
+                                            formatter: function (val, obj, row, act) {
+                                                return js.formatNumber(val/100, 2, false, '');
+                                            }
+                                        }
+                                    ],
+                                    // 加载成功后执行事件
+                                    ajaxSuccess: function (data) {
+
+                                    }
+                                });
+                                $("#sjbGZ").text(isImmediately);
+                                $("#sjbYX").text(validity);
+                                $("#sjbFuWu").show();
+							}
+                        }
+                    })
+				}
+
+                if(isSingleValidity){
+                    $("#zFuWu").hide();
+                    //danyi
+                }else{
+                    //tongyi
+                    $("#zGZ").text(isImmediately);
+                    $("#zYX").text(validity);
+                    $("#zFuWu").show();
+
+                    $("#hxFuWu").hide();
+                    $("#wxFuWu").hide();
+                    $("#ybFuWu").hide();
+                    $("#sjbFuWu").hide();
+                }
+            }else{
+                console.log(data.msg)
+            }
+        }
+    });
+}
+</script>

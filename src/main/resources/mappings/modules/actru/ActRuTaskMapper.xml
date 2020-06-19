@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jeesite.modules.actrutask.dao.ActRuTaskMapper" >
+  <resultMap id="BaseResultMap" type="com.jeesite.modules.actrutask.entity.ActRuTask" >
+    <id column="ID_" property="id" jdbcType="VARCHAR" />
+    <result column="REV_" property="rev" jdbcType="INTEGER" />
+    <result column="EXECUTION_ID_" property="executionId" jdbcType="VARCHAR" />
+    <result column="PROC_INST_ID_" property="procInstId" jdbcType="VARCHAR" />
+    <result column="PROC_DEF_ID_" property="procDefId" jdbcType="VARCHAR" />
+    <result column="TASK_DEF_ID_" property="taskDefId" jdbcType="VARCHAR" />
+    <result column="SCOPE_ID_" property="scopeId" jdbcType="VARCHAR" />
+    <result column="SUB_SCOPE_ID_" property="subScopeId" jdbcType="VARCHAR" />
+    <result column="SCOPE_TYPE_" property="scopeType" jdbcType="VARCHAR" />
+    <result column="SCOPE_DEFINITION_ID_" property="scopeDefinitionId" jdbcType="VARCHAR" />
+    <result column="PROPAGATED_STAGE_INST_ID_" property="propagatedStageInstId" jdbcType="VARCHAR" />
+    <result column="NAME_" property="name" jdbcType="VARCHAR" />
+    <result column="PARENT_TASK_ID_" property="parentTaskId" jdbcType="VARCHAR" />
+    <result column="DESCRIPTION_" property="description" jdbcType="VARCHAR" />
+    <result column="TASK_DEF_KEY_" property="taskDefKey" jdbcType="VARCHAR" />
+    <result column="OWNER_" property="owner" jdbcType="VARCHAR" />
+    <result column="ASSIGNEE_" property="assignee" jdbcType="VARCHAR" />
+    <result column="DELEGATION_" property="delegation" jdbcType="VARCHAR" />
+    <result column="PRIORITY_" property="priority" jdbcType="INTEGER" />
+    <result column="CREATE_TIME_" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="DUE_DATE_" property="dueDate" jdbcType="TIMESTAMP" />
+    <result column="CATEGORY_" property="category" jdbcType="VARCHAR" />
+    <result column="SUSPENSION_STATE_" property="suspensionState" jdbcType="INTEGER" />
+    <result column="TENANT_ID_" property="tenantId" jdbcType="VARCHAR" />
+    <result column="FORM_KEY_" property="formKey" jdbcType="VARCHAR" />
+    <result column="CLAIM_TIME_" property="claimTime" jdbcType="TIMESTAMP" />
+    <result column="IS_COUNT_ENABLED_" property="isCountEnabled" jdbcType="TINYINT" />
+    <result column="VAR_COUNT_" property="varCount" jdbcType="INTEGER" />
+    <result column="ID_LINK_COUNT_" property="idLinkCount" jdbcType="INTEGER" />
+    <result column="SUB_TASK_COUNT_" property="subTaskCount" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID_, REV_, EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_, TASK_DEF_ID_, SCOPE_ID_, SUB_SCOPE_ID_, 
+    SCOPE_TYPE_, SCOPE_DEFINITION_ID_, PROPAGATED_STAGE_INST_ID_, NAME_, PARENT_TASK_ID_, 
+    DESCRIPTION_, TASK_DEF_KEY_, OWNER_, ASSIGNEE_, DELEGATION_, PRIORITY_, CREATE_TIME_, 
+    DUE_DATE_, CATEGORY_, SUSPENSION_STATE_, TENANT_ID_, FORM_KEY_, CLAIM_TIME_, IS_COUNT_ENABLED_, 
+    VAR_COUNT_, ID_LINK_COUNT_, SUB_TASK_COUNT_
+  </sql>
+    <sql id = "all_count">
+      <if test="taskDefKey != null and taskDefKey != ''">
+          AND taskDefKey =#{task_def_key_,jdbcTypc=VARCHER}
+      </if>
+    </sql>
+  <select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from act_ru_task
+    where ID_ = #{id,jdbcType=VARCHAR}
+  </select>
+
+    <select id="select" resultMap="BaseResultMap" parameterType="hashmap">
+    select
+        <include refid="Base_Column_List" />
+    from act_ru_task
+    where 1=1
+        <include refid="all_count"/>
+    </select>
+<!-- -->
+    <select id="selectByTaskDefKeys" resultType="com.jeesite.modules.actrutask.entity.ActRuTask" parameterType="java.util.List">
+        select
+        ID_ as "id",
+        REV_ as "rev",
+        TASK_DEF_KEY_ as "taskDefKey",
+        CREATE_TIME_ as "creatTime"
+        from act_ru_task
+        where TASK_DEF_KEY_ in
+        <foreach collection="list" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="selectAll" resultType="com.jeesite.modules.actrutask.entity.ActRuTask">
+        select
+            a.ID_ AS "id",
+            a.PROC_INST_ID_ as "procInstId",
+            a.NAME_ as "name",
+            a.TASK_DEF_KEY_ as "taskDefKey",
+            a.CREATE_TIME_ as "createTime",
+            a.PRIORITY_ as "priority",
+            b.BUSINESS_KEY_ as "businessKey"
+        from act_ru_task a
+        left join act_ru_execution b
+        on a.PROC_INST_ID_ = b.ID_
+    </select>
+
+    <select id="selectAllIn" resultType="com.jeesite.modules.actrutask.entity.ActRuTask" >
+        select
+          b.form_id as "formId",
+          b.contact_status as "contactStatus",
+          b.repair_end_date as "repairEndDate",
+          b.claim_status as "claimStatus",
+          a.PROC_INST_ID_ as "procInstId"
+        from
+          act_ru_execution a
+        inner join
+          ht_repair_client_form b
+        on
+          a.BUSINESS_KEY_ = CONCAT("hd_form_claim:",b.form_id);
+    </select>
+
+    <update id="updateByList" parameterType="java.util.List">
+        UPDATE act_ru_task
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="PRIORITY_ = case " suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.priority != null and item.priority != ''">
+                        when ID_ = #{item.id} then #{item.priority}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        where ID_ in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item.id}
+        </foreach>
+    </update>
+
+</mapper>

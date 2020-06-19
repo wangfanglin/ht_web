@@ -1,0 +1,143 @@
+<% layout('/layouts/default.html', {title: '工单历史', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa icon-notebook"></i> ${text('工单历史')}
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${htHistory}" action="${ctx}/common/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+
+					<#form:input path="workOrderId"  style="display: none"/>
+
+			</#form:form>
+			<table id="dataGrid"></table>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		// {header:'${text("工单id")}', name:'id', index:'a.id', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
+		// 	return '<a href="${ctx}/forminfo/htFormInfo/form?id='+row.id+'" class="btnList" data-title="${text("编辑工单主表")}">'+(val||row.id)+'</a>';
+		// }},
+        {header:'${text("当前环节")}', name:'activityId', index:'a.activity_id', width:150, align:"center"},
+        {header:'${text("下一个换环节")}', name:'afterActivityId', index:'a.after_activity_id', width:150, align:"center"},
+
+		{header:'${text("工单类型")}', name:'formType', index:'a.form_type', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('form_type')}, val, '${text("未知")}', true);
+		}},
+        {header:'${text("环节名称")}', name:'activityName', index:'', width:150, align:"center"},
+		{header:'${text("处理人")}', name:'disposeUserId', index:'a.dispose_user_id', width:150, align:"center"},
+		{header:'${text("创建时间")}', name:'createDate', index:'a.create_date', width:150, align:"center"},
+        {header:'${text("操作")}', name:'', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+
+				if (row.isBack=='1'){
+                    return   '<a href="#"  onclick="back(this,\''+row.id+'\')"  data-layer="true" data-layer-width="1000" data-layer-height="600" >查看历史</a>'
+				} else{
+                    return   '<a href="#" onclick="historyForm(this,\''+row.activityId+'\',\''+row.afterActivityId+'\',\''+row.uniquenessId+'\',\''+row.historyFormId+'\',\''+row.formType+'\')"  data-layer="true" data-layer-width="1000" data-layer-height="600">查看历史</a>';
+				}
+            }}
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+        $('#dataGrid').dataGrid('hideCol', 'activityId'); //隐藏列
+        $('#dataGrid').dataGrid('hideCol', 'afterActivityId'); //隐藏列
+	}
+});
+
+
+function historyForm(b,act,nextAct,uniquenessId,historyFormId,formType) {
+    //historyFormId为表单的历史ID
+console.log(act)
+console.log(nextAct)
+console.log(formType)
+    var $bt=$(b);
+    var list=[
+        {"act":"client_info","nextAct":"client_close"},
+        {"act":"client_close","nextAct":"client_info"},
+        {"act":"client_close","nextAct":"client_wait"},
+        {"act":"client_wait_restart","nextAct":"client_check_restart"},
+        {"act":"client_check_restart","nextAct":"client_wait_restart"},
+        {"act":"client_check_restart","nextAct":"client_info"},
+        {"act":"claim_info","nextAct":"claim_close"},
+        {"act":"claim_close","nextAct":"claim_info"},
+        {"act":"claim_close","nextAct":"claim_wait_restart"},
+        {"act":"claim_wait_restart","nextAct":"claim_check_restart"},
+        {"act":"claim_check_restart","nextAct":"claim_wait_restart"},
+        {"act":"claim_check_restart","nextAct":"claim_info"},
+        {"act":"repair_info","nextAct":"repair_change_time"},
+        {"act":"repair_change_time","nextAct":"repair_info"},
+        {"act":"repair_info","nextAct":"repair_charge_close"},
+        {"act":"repair_charge_close","nextAct":"repair_info"},
+        {"act":"repair_charge_close","nextAct":"repair_wait_restart"},
+        {"act":"repair_wait_restart","nextAct":"repair_check_restart"},
+        {"act":"repair_check_restart","nextAct":"repair_wait_restart"},
+        {"act":"repair_check_restart","nextAct":"repair_info"},
+        {"act":"repair_charge","nextAct":"repair_offer"},
+        {"act":"repair_wait","nextAct":"repair_change_wait"},
+        {"act":"repair_change_wait","nextAct":"repair_wait"},
+        {"act":"repair_change_wait","nextAct":"repair_info"},
+        {"act":"repair_end_check","nextAct":"repair_end"},
+        {"act":"renew_info","nextAct":"renew_close"},
+        {"act":"renew_close","nextAct":"renew_info"},
+        {"act":"renew_close","nextAct":"renew_wait_restart"},
+        {"act":"renew_wait_restart","nextAct":"renew_check_restart"},
+        {"act":"renew_check_restart","nextAct":"renew_wait_restart"},
+        {"act":"renew_check_restart","nextAct":"renew_info"},
+        {"act":"renew_manager","nextAct":"renew_offer"},
+        {"act":"renew_director","nextAct":"renew_offer"},
+        {"act":"renew_offer","nextAct":"renew_offer_close"},
+        {"act":"renew_offer_close","nextAct":"renew_offer_wait"},
+        {"act":"renew_offer_wait","nextAct":"renew_offer_restart"},
+        {"act":"renew_offer_restart","nextAct":"renew_offer"},
+        {"act":"repair_charge","nextAct":"repair_change_wait"},
+        {"act":"client_close","nextAct":"client_wait_restart"},
+
+	]
+
+    for(var i=0; i<list.length; i++) {
+        if(act == list[i].act && nextAct == list[i].nextAct){
+            //需要根据环节判断一下
+            js.addTabPage($bt,"","${ctx}/forminfo/htFormOperation/readonly?uniquenessId="+uniquenessId+"&activityId="+act+"&afterActivityId="+nextAct);
+            return;
+		}
+	}
+
+	//根据工单类型判断即可
+	if ("0"==formType){//核赔的
+        js.addTabPage($bt,"","${ctx}/htclaimsettlementform/htClaimSettlementForm/formClaHistory?id="+historyFormId);
+	}
+	if ("1"==formType){//换新
+        js.addTabPage($bt,"","${ctx}/renew/htRenewForm/formHistory?id="+historyFormId);
+	}
+	if ("2"==formType){//维修的
+        js.addTabPage($bt,"","${ctx}/repair/htRepairClientForm/clientFormOnly?id="+historyFormId);
+	}
+	if ("4"==formType){ //待申请的
+        js.addTabPage($bt,"","${ctx}/htwaitapplyform/htWaitApplyFormHistory/form?id="+historyFormId);}
+	if ("5"==formType){//全损收款人列表
+        js.addTabPage($bt,"","${ctx}/receipt/htReceiptDataHistory/form?id="+historyFormId);
+	}
+    if ("6" == formType){//咨询的
+        js.addTabPage($bt,"","${ctx}/advisory/htAdvisoryHistory/form?id="+historyFormId);
+    }
+
+
+
+}
+
+
+
+
+
+
+function back(b,id) {
+    js.addTabPage($(b),"","${ctx}/common/form?id="+id );
+}
+</script>

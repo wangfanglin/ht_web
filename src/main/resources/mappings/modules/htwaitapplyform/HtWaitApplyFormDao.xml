@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.htwaitapplyform.dao.HtWaitApplyFormDao">
+	
+	<!-- 查询数据
+	<select id="findList" resultType="HtWaitApplyForm">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+	</select> -->
+	<select id="selectProcessInstanceByQueryCriteria" resultType="ProcessListingEntity">
+		<![CDATA[
+			SELECT DISTINCT
+			fs.id as 'htWaitApplyForm.id',f.id as 'htFormInfo.id',f.form_status as 'htFormInfo.formStatus',f.form_type as 'htFormInfo.formType',f.manage_status as 'htFormInfo.manageStatus',
+			  f.update_date AS 'htFormInfo.updateDate',fs.remark AS 'htWaitApplyForm.remark',t.PRIORITY_ AS 'level',
+			  t.ASSIGNEE_ as 'ASSIGNEE',t.NAME_ as 'taskName',uses.user_name as 'user.userName',t.DESCRIPTION_ AS 'description',
+			 res.NAME_ AS 'executionName',RES.ID_ AS 'executionId',t.ID_ AS 'taskId',
+					P.NAME_ AS ProcessDefinitionName,po.str_channel_name as 'policyInfo.strChannelName',
+					po.str_name as 'policyInfo.strName',po.str_contact_num as 'policyInfo.strContactNum',IF(t.ASSIGNEE_ IS NULL,'未分配','已分配') AS 'isAssigned',
+					fs.contact_status as 'htWaitApplyForm.contactStatus'
+			FROM
+				ht_form_info f
+				LEFT JOIN ht_wait_apply_form fs on f.id = fs.form_id
+				LEFT JOIN ht_policy_info po ON po.id = f.policy_id
+				LEFT JOIN ht_user_apply_info us ON f.id = us.form_id
+				LEFT JOIN ACT_RU_EXECUTION RES ON CONCAT("hd_form_claim:",f.id )= RES.BUSINESS_KEY_
+				LEFT JOIN ACT_RU_TASK t ON t.PROC_INST_ID_ = RES.PROC_INST_ID_
+				LEFT JOIN ACT_RE_PROCDEF P ON RES.PROC_DEF_ID_ = P.ID_
+				LEFT JOIN js_sys_user uses ON t.ASSIGNEE_ = uses.user_code
+			]]>
+		where
+		f.form_type = '4'
+		<if test="htWaitApplyForm.typeClose !=null and htWaitApplyForm.typeClose !='' and htWaitApplyForm.typeClose == 'open'">
+			and f.is_run = '0'
+		</if>
+		<if test="htWaitApplyForm.typeClose !=null and htWaitApplyForm.typeClose !='' and htWaitApplyForm.typeClose == 'close'">
+			and f.is_run = '1'
+		</if>
+		<if test="htWaitApplyForm.userName !=null and htWaitApplyForm.userName !=''">
+			and po.str_name LIKE CONCAT('%',#{htWaitApplyForm.userName},'%')
+		</if>
+		<if test="htWaitApplyForm.phone !=null and htWaitApplyForm.phone !=''">
+			and po.str_contact_num = #{htWaitApplyForm.phone}
+		</if>
+		<if test="htWaitApplyForm.htFormInfo.formStatus !=null and htWaitApplyForm.htFormInfo.formStatus !=''">
+			and f.form_status = #{htWaitApplyForm.htFormInfo.formStatus}
+		</if>
+		<if test="htWaitApplyForm.productId !=null and htWaitApplyForm.productId !=''">
+			and po.channel_product_id = #{htWaitApplyForm.productId}
+		</if>
+		<if test="htWaitApplyForm.isAssigned !=null and htWaitApplyForm.isAssigned !='' and htWaitApplyForm.isAssigned == '0'.toString() ">
+			and t.ASSIGNEE_ IS NULL
+		</if>
+		<if test="htWaitApplyForm.isAssigned !=null and htWaitApplyForm.isAssigned !='' and htWaitApplyForm.isAssigned == '1'.toString() ">
+			and t.ASSIGNEE_ IS NOT NULL
+		</if>
+		<if test="page.orderBy == null">
+			order by f.update_date desc
+		</if>
+		<if test="page != null and page.orderBy != null and page.orderBy != ''">
+			ORDER BY ${page.orderBy}
+		</if>
+
+	</select>
+    <select id="getBypolicyId" resultType="java.lang.String">
+		  select id from ht_form_info where policy_id = #{policyId} order by create_date desc limit 1
+	</select>
+    <select id="findByFormId" resultType="com.jeesite.modules.htwaitapplyform.entity.HtWaitApplyForm">
+		 select * from ht_wait_apply_form where form_id = #{formId} order by create_date desc limit 1
+	</select>
+</mapper>

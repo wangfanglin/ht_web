@@ -1,0 +1,157 @@
+<% layout('/layouts/default.html', {title: '保单管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa icon-notebook"></i> ${text('保单管理')}
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+				<% if(hasPermi('policy:policyInfo:edit')){ %>
+					<a href="${ctx}/policy/policyInfo/form" class="btn btn-default btnTool" title="${text('新增保单')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
+				<% } %>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${policyInfo}" action="${ctx}/policy/policyInfo/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+			<div class="form-group">
+				<label class="control-label">${text('保单号')}：</label>
+				<div class="control-inline">
+					<#form:input path="id" maxlength="64" class="form-control width-120"/>
+				</div>
+			</div>
+				<div class="form-group">
+					<label class="control-label">${text('客户姓名')}：</label>
+					<div class="control-inline">
+						<#form:input path="strName" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+			<div class="form-group">
+				<label class="control-label">${text('身份证号')}：</label>
+				<div class="control-inline">
+					<#form:input path="strCardId" maxlength="255" class="form-control width-120"/>
+				</div>
+			</div>
+				<div class="form-group">
+					<label class="control-label">${text('手机号码')}：</label>
+					<div class="control-inline">
+						<#form:input path="strContactNum" maxlength="50" class="form-control width-120"/>
+					</div>
+				</div>
+			<div class="form-group">
+				<label class="control-label">${text('手机IMEI')}：</label>
+				<div class="control-inline">
+					<#form:input path="strImeiNum" maxlength="255" class="form-control width-120"/>
+				</div>
+			</div>
+
+
+
+			<div class="form-group">
+				<label class="control-label">${text('手机品牌')}：</label>
+				<div class="control-inline width-120">
+					<#form:select path="strPhoneBrand" items="${brandList}" itemLabel="name" itemValue="id"   blankOption="true"  blankOptionLabel="请选择" class="form-control width-120"/>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="control-label">${text('保单状态')}：</label>
+				<div class="control-inline width-120">
+					<#form:select path="policyStatus" dictType="equity_status"  blankOption="true"  blankOptionLabel="请选择" class="form-control width-120"/>
+				</div>
+			</div>
+
+				<div class="form-group">
+					<label class="control-label">${text('过期时间')}：</label>
+					<div class="control-inline">
+						<#form:input path="dateEffectiveDate" readonly="true"  maxlength="20" class="form-control Wdate-datetime"
+							dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:true});"/> 至
+						<#form:input path="dateEndDate" readonly="true"  maxlength="20" class="form-control Wdate-datetime"
+						dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:true});"/>
+					</div>
+				</div>
+
+				<!--<div class="form-group">-->
+					<!--<label class="control-label">${text('保单终止时间')}：</label>-->
+					<!--<div class="control-inline">-->
+						<!---->
+					<!--</div>-->
+				<!--</div>-->
+
+
+
+
+
+
+
+
+
+
+
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="reset" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+        {header:'${text("渠道名称")}', name:'strChannelName', index:'a.str_channel_name', width:150, align:"center", formatter: function(val, obj, row, act){
+                return '<a href="${ctx}/policy/policyInfo/view?id='+row.id+'" class="btnList" data-title="${text("查看保单")}">'+(val||row.id)+'</a>';
+            }},
+		{header:'${text("保单号")}', name:'id', index:'a.id', width:150, align:"left"},
+        {header:'${text("剩余限额")}', name:'surplusCoverage', index:'a.surplus_coverage', width:150, align:"left"},
+        {header:'${text("电话号码")}', name:'strContactNum', index:'a.str_contact_num', width:150, align:"left"},
+		{header:'${text("产品名称")}', name:'channelProductName', index:'a.channel_product_name', width:150, align:"center"},
+        {header:'${text("客户姓名")}', name:'strName', index:'a.str_name', width:150, align:"left"},
+
+		{header:'${text("保单生效时间")}', name:'dateEffectiveDate', index:'a.date_effective_date', width:170, align:"center"},
+
+		{header:'${text("保单失效时间")}', name:'dateEndDate', index:'a.date_end_date', width:170, align:"center"},
+		{header:'${text("手机价格")}', name:'intSellPrice', index:'a.int_sell_price', width:150, align:"left"},
+		{header:'${text("手机品牌")}', name:'strPhoneBrand', index:'a.str_phone_brand', width:150, align:"left"},
+        {header:'${text("手机型号")}', name:'strPhoneModel', index:'a.str_phone_model', width:170, align:"left"},
+		{header:'${text("保单状态")}', name:'policyStatus', index:'a.policy_status', width:150, align:"left",formatter: function(val, obj, row, act){
+                return js.getDictLabel(${@DictUtils.getDictListJson('equity_status')}, val, '${text("--")}', true);
+            }},
+
+
+		// {header:'${text("产品名称")}', name:'strCardType', index:'a.str_card_type', width:150, align:"left"},
+        {header:'${text("创建时间")}', name:'createDate', index:'a.create_date', width:150, align:"center"},
+        {header:'${text("更新人")}', name:'updateBy', index:'a.update_by', width:150, align:"center"},
+		{header:'${text("更新时间")}', name:'updateDate', index:'a.update_date', width:150, align:"center"}
+
+
+		// {header:'${text("是否联系成功顾客")}', name:'callguke', index:'a.callguke', width:150, align:"left"},
+
+		// {header:'${text("渤海取消类型")}', name:'bhFlag', index:'a.bh_flag', width:150, align:"left"},
+
+		// {header:'${text("操作")}', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+		// 	var actions = [];
+		// 	<% if(hasPermi('policy:policyInfo:edit')){ %>
+		// 		actions.push('<a href="${ctx}/policy/policyInfo/form?id='+row.id+'" class="btnList" title="${text("编辑保单")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+		// 		if (row.status == Global.STATUS_NORMAL){
+		// 			actions.push('<a href="${ctx}/policy/policyInfo/disable?id='+row.id+'" class="btnList" title="${text("停用保单")}" data-confirm="${text("确认要停用该保单吗？")}"><i class="glyphicon glyphicon-ban-circle"></i></a>&nbsp;');
+		// 		} else if (row.status == Global.STATUS_DISABLE){
+		// 			actions.push('<a href="${ctx}/policy/policyInfo/enable?id='+row.id+'" class="btnList" title="${text("启用保单")}" data-confirm="${text("确认要启用该保单吗？")}"><i class="glyphicon glyphicon-ok-circle"></i></a>&nbsp;');
+		// 		}
+		// 		actions.push('<a href="${ctx}/policy/policyInfo/delete?id='+row.id+'" class="btnList" title="${text("删除保单")}" data-confirm="${text("确认要删除该保单吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+		// 	<% } %>
+		// 	return actions.join('');
+		// }}
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>

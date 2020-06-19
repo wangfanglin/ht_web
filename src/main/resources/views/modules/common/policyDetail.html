@@ -1,0 +1,498 @@
+<div id="testDiv">
+<%
+#ajax policyDetail: {
+%>
+
+    <div style="background: white">
+    <div class="form-unit">${text('工单状态')}</div>
+    <div class="row">
+
+        <div class="col-xs-3">
+            <div class="form-group">
+                <label class="control-label col-sm-4" title="">
+                    <span class="required hide">*</span> 工单号：<i class="fa icon-question hide"></i></label>
+                <div class="col-sm-8">
+                   <span> ${htForm.id!}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <div class="form-group">
+                <label class="control-label col-sm-4" title="">
+                    <span class="required hide">*</span> 申请状态：<i class="fa icon-question hide"></i></label>
+                <div class="col-sm-8">
+                    <span>    <%if("1"==apply!){%>已申请<%}%>
+                  <%if("2"==apply!){%>未申请<%}%></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <div class="form-group">
+                <label class="control-label col-sm-4" title="">
+                    <span class="required hide">*</span> 是否自动分配：<i class="fa icon-question hide"></i></label>
+                <div class="col-sm-8">
+                <span>    <%if("1"==htForm.isAutomatic!){%>已分配<%}%>
+                  <%if("2"==htForm.isAutomatic!){%>未分配<%}%></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <div class="form-group">
+                <label class="control-label col-sm-4" title="">
+                    <span class="required hide">*</span> 工单处理状态：<i class="fa icon-question hide"></i></label>
+                <div class="col-sm-8">
+                    <span>${@DictUtils.getDictLabel('manage_status',htForm.manageStatus!,'未知')}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+        <div class="form-unit">${text('保单信息')}
+            <span style="margin-left:651px;">保单工单数：该电话已创建保单数${policyInfo.polAmountByPhone!}单、工单数${policyInfo.formAmount!}单</span>
+        </div>
+
+        <div  class="row">
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="control-label col-sm-4" title="">
+                        <span class="required "></span> ${text('保单号')}：<i class="fa icon-question hide"></i></label>
+                    <div class="col-sm-8">
+                        <span> ${policyInfo.id!}</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    <div  class="row">
+        <div class="col-xs-3">
+            <div class="form-group">
+                <label class="control-label col-sm-4" title="">
+                    <span class="required "></span> ${text('客户姓名')}：<i class="fa icon-question hide"></i></label>
+                <div class="col-sm-8">
+                   <span> ${policyInfo.strName!}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <div class="form-group">
+                <label class="control-label col-sm-4" title="">
+                    <span class="required hide">*</span> ${text('联系电话')}：</label>
+                <div class="col-sm-8">
+                  <span> ${policyInfo.strContactNum!} <i class="fa icon-call-out" onclick="callNumber(${policyInfo.strContactNum!})"></i></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <div class="form-group">
+                <label class="control-label col-sm-4" title="">
+                    <span class="required hide">*</span> ${text('证件类型')}：<i class="fa icon-question hide"></i></label>
+                <div class="col-sm-8" id="commonIdType">
+                <span>    <%if("1"==policyInfo.strType!){%>身份证<%}%></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <div class="form-group">
+                <label class="control-label col-sm-4" title="">
+                    <span class="required hide">*</span> ${text('证件号码')}：<i class="fa icon-question hide"></i></label>
+                <div class="col-sm-8">
+                  <span>  ${policyInfo.strCardId!}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+        <div class="row">
+            <div class="col-xs-3">
+                <div class="form-group">
+                    <label class="control-label col-sm-4" title="">
+                        <span class="required hide">*</span> ${text('性别')}：<i class="fa icon-question hide"></i></label>
+                    <div class="col-sm-8" id="commonSex">
+                     <span>   <%if("1"==policyInfo.strSex!){%>男<%}%>
+                        <%if("2"==policyInfo.strSex!){%>女<%}%>
+                     <%if("1"!=policyInfo.strSex!  && "2"!=policyInfo.strSex!){%>--<%}%></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-3">
+            <div class="form-group">
+                <label class="control-label col-sm-4" title="">
+                    <span class="required hide">*</span> ${text('微信')}：<i class="fa icon-question hide"></i></label>
+                <div class="col-sm-8">
+                  <span>  ${policyInfo.strWechat!}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <div class="form-group">
+                <label class="control-label col-sm-4" title="">
+                    <span class="required hide">*</span> ${text('生日')}：<i class="fa icon-question hide"></i></label>
+                <div class="col-sm-8">
+                  <span>  ${policyInfo.dateBirthday!,"yyyy-MM-dd HH:mm:ss"}</span>
+                </div>
+            </div>
+        </div>
+        </div>
+
+        <div id="common_none">
+
+            <div class="row">
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('创建时间')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+
+                          <span>  ${policyInfo.createDate!,"yyyy-MM-dd HH:mm:ss"}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('创建人')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                          <span>  ${policyInfo.createBy!}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('审核状态')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                         <span>   暂无审核信息</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required hide">*</span> ${text('联系电话')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                          <span>  ${policyInfo.strContactNum!}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required hide">*</span> ${text('保单工单数')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                         <span>   ${policyInfo.formAmount!}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('渠道名称')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8" >
+                          <span>  ${policyInfo.strChannelName!}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('产品名称')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8" >
+                          <span>  ${policyInfo.channelProductName!}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('产品售价')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8" >
+                         <span>   ${policyInfo.intProductPrice!}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="row">
+
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('保单生效时间')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                          <span>  ${policyInfo.dateEffectiveDate!,"yyyy-MM-dd HH:mm:ss"}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('手机购买方式')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                         <span>   ${policyInfo.strBuyPattern!}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('保单终止时间')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                        <span>    ${policyInfo.dateEndDate!,"yyyy-MM-dd HH:mm:ss"}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('手机价格')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8" >
+                          <span>  ${policyInfo.intSellPrice!}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('保费收取状态')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8" >
+                          <span>  ${policyInfo.intStatus!}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('购机时间')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                         <span>   ${policyInfo.dateBuyCard!,"yyyy-MM-dd HH:mm:ss"}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('手机品牌')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8" >
+                         <span>   ${policyInfo.strPhoneBrand!}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('手机型号')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8" >
+                        <span>    ${policyInfo.strPhoneModel!}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+
+
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('手机IMEI号')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8" >
+                         <span>   ${policyInfo.strImeiNum!}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('省份')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8" >
+                       <span>    ${policyInfo.strProvince!}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('城市')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8" >
+                        <span>    ${policyInfo.strCity!}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('门店')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8" >
+                        <span>    ${policyInfo.strStore!}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('销售员')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8" >
+                         <span>   ${policyInfo.strSalesman!}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('贷款额度')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8" >
+                        <span>    ${policyInfo.intLoanAmount!}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('购卡时间')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                        <span>    ${policyInfo.dateBuyCard!,"yyyy-MM-dd HH:mm:ss"}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('报案人姓名')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8" >
+                         <span>   暂时</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('报案号')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8" >
+                        <span>    暂时</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required "></span> ${text('渤海总保额')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8" >
+                         <span>   暂时</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required hide"></span> ${text('报案保险单单号')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                         <span>   暂时</span>
+                        </div>
+                    </div>
+                </div>
+                    <div class="col-xs-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" title="">
+                                <span class="required "></span> <button type="submit" class="btn btn-sm btn-primary" onclick="callNumberBnt();">${text('拨号')}</button></label>
+                            <div class="col-sm-8">
+                                <#form:input path="phoneNum" placeholder="请输入拨打得电话" class="form-control phone"/>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+
+
+            <%if(commonApply!){%>
+            <% include('/modules/common/applyCommon.html', {commonApplyId:commonApplyId}){} %>
+            <%}%>
+
+
+
+
+            <hr style="height: 1px"/>
+            <button type="button" data-layer="true" data-layer-width="725" data-layer-height="420" onclick="openTab(this)" style="margin-left: 992px;margin-top: -3px;" class="btn btn-sm btn-info mr3"><i class="fa   icon-clock"></i> 查看历史</button>
+
+        </div>
+
+
+    </div>
+
+
+<% }%>
+</div>
+
+
+
+
+<script src="${ctxStatic}/common/common.js?${_version}" ></script>
+<script>
+    $(function () {
+        $.ajax({
+            type:"get",
+            url:"${ctx}/common/getPilicyDetail?commonFromId=${commonFromId}&commonApply=${commonApply}",
+            beforSend:function (XMLHttpRequest) {
+                XMLHttpRequest.setRequestHeader("Content-Type","text/html;charset=UTF-8")
+            },
+           success: function(data) {
+            //console.log(data);
+            $("#testDiv").html(data);
+               if (typeof window.webuploaderRefresh == 'function'){
+                   window.webuploaderRefresh();
+               }
+
+
+               js.getDictLabel(${@DictUtils.getDictListJson('manage_status')},'${htForm.manageStatus!}' , '未知', true)
+        }
+    });
+    });
+    function openTab(b,workOrderId) {
+        var $bt=$(b);
+        js.addTabPage($bt,"","${ctx}/common/listOpen?workOrderId=${commonFromId}");
+    }
+    function callNumberBnt() {
+        var number = $("#phoneNum").val();
+        if(number!=null && number!='' && number!=undefined){
+            if(!(/^((\+?86)|(\+86))?(13[012356789][0-9]{8}|15[012356789][0-9]{8}|18[02356789][0-9]{8}|147[0-9]{8}|1349[0-9]{7})$/.test(number))){
+                js.showMessage("拨打号码有误，请新重填写！");
+                return false;
+            }
+            callNumber(number);
+        }else{
+            js.showMessage("请输入，需要拨打的手机号！")
+        }
+
+    }
+    function callNumber(number) {
+        js.ajaxSubmit('${ctx}/htclaimsettlementform/htClaimSettlementForm/callInfoSave', {"phoneNum": number}, function(data){
+            if (data.result=='true'){
+                $(".call").each( function(){
+                    console.log("原始电话录音ID"+ $(this).val());
+                   $(this).attr("value" ,data.id)
+                    console.log("新的电话录音ID"+ $(this).val());
+                })
+                js.showMessage("拨打"+data.message, '', 'success', 2000);
+            }else{
+                js.showErrorMessage(data.message);
+            }
+        })
+    }
+</script>
+

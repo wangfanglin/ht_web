@@ -1,0 +1,491 @@
+<% layout('/layouts/default.html', {title: '保单管理', libs: ['validate','dataGrid']}){ %>
+<script>
+    $(function () {
+        if ($("#inputIdType").val()=="1"){$("#idType").html("身份证");}
+        if ($("#inputSex").val()=="1"){
+            $("#sex").html("男");
+        }else if ($("#inputSex").val()=="2") {
+            $("#sex").html("女");
+        }else{
+            $("#sex").html("--");
+		}
+
+    })
+</script>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-title">
+				<i class="fa icon-note"></i> ${text(policyInfo.isNewRecord ? '查看保单' : '查看保单')}
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${policyInfo}" action="${ctx}/policy/policyInfo/save" method="post" class="form-horizontal">
+			<div class="box-body">
+				<div class="form-unit">${text('保单详情')}</div>
+				<#form:hidden path="id"/>
+				<#form:hidden path="uniqueMark"/>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required "></span> ${text('保单号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								${policyInfo.id!}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('创建时间')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" id="createDate">
+								<input id="inputCreateDate" value="${policyInfo.createDate}"  style="display: none"/>
+								${policyInfo.createDate!,"yyyy-MM-dd HH:mm:ss"}
+							</div>
+						</div>
+					</div>
+
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('创建人')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${policyInfo.createBy}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('审核状态')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								暂无审核信息
+							</div>
+						</div>
+					</div>
+				</div>
+				<hr/>
+				<div class="row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('客户姓名')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${policyInfo.strName}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('联系电话')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${policyInfo.strContactNum}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('保单工单数')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+							暂时
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('证件类型')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" id="idType">
+								<input id="inputIdType" value="${policyInfo.strType}"  style="display: none"/>
+								${policyInfo.strType}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('证件号码')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${policyInfo.strCardId}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('性别')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" id="sex">
+								<input id="inputSex" value="${policyInfo.strSex}"  style="display: none"/>
+								${policyInfo.strSex}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('微信')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								${policyInfo.strWechat}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('生日')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" id="birthday">
+								<input id="inputBirthday" value="${policyInfo.dateBirthday}" style="display: none"/>
+								${policyInfo.dateBirthday!,"yyyy-MM-dd HH:mm:ss"}
+							</div>
+						</div>
+					</div>
+				</div>
+				<hr/>
+				<div class="row">
+					<div class="col-xs-4">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required "></span> ${text('渠道名称')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8" >
+							${policyInfo.strChannelName}
+						</div>
+					</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('产品名称')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" >
+								${policyInfo.channelProductName}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('产品售价')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" >
+								${policyInfo.intProductPrice}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('保单生效时间')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" id="effectTime">
+								<input id="inputEffectTime" value="${policyInfo.dateEffectiveDate}" style="display: none"/>
+								${policyInfo.dateEffectiveDate!,"yyyy-MM-dd HH:mm:ss"}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('手机购买方式')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" >
+								${policyInfo.strBuyPattern}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('保单终止时间')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" id ="endTime">
+								${policyInfo.dateEndDate!,"yyyy-MM-dd HH:mm:ss"}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('手机价格')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" >
+								${policyInfo.intSellPrice}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('保费收取状态')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" >
+								${policyInfo.intStatus}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('购机时间')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" id="costTime">
+								<input id="inputCostTime" value="${policyInfo.dateBuyCard}" style="display: none"/>
+								${policyInfo.dateBuyCard!,"yyyy-MM-dd HH:mm:ss"}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('手机品牌')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" >
+								${policyInfo.strPhoneBrand}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('手机型号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" >
+								${policyInfo.strPhoneModel}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('手机IMEI号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" >
+								${policyInfo.strImeiNum}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('省份')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" >
+								${policyInfo.strProvince}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('城市')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" >
+								${policyInfo.strCity}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('门店')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" >
+								${policyInfo.strStore}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('销售员')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" >
+								${policyInfo.strSalesman}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('贷款额度')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" >
+								${policyInfo.intLoanAmount}
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('购卡时间')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" id="buyCard">
+								<input id="inputBuyCard" value="${policyInfo.dateBuyCard}" style="display: none"/>
+								${policyInfo.dateBuyCard!,"yyyy-MM-dd HH:mm:ss"}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('报案人姓名')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" >
+								暂时
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('报案号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" >
+								暂时
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required "></span> ${text('渤海总保额')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8" >
+								暂时
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide"></span> ${text('报案保险单单号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+							暂时
+							</div>
+						</div>
+					</div>
+				<#form:hidden path="intBatchNum"/>
+				<#form:hidden path="intStatus"/>
+				<#form:hidden path="strCardType"/>
+				<#form:hidden path="channelProInfoId"/>
+				<#form:hidden path="groupProductId"/>
+				<#form:hidden path="policySubmissionDate"/>
+				<#form:hidden path="remarks"/>
+				<#form:hidden path="delflag"/>
+				<#form:hidden path="invite"/>
+				<#form:hidden path="inviteflag"/>
+				<#form:hidden path="fromtype"/>
+				<#form:hidden path="bhstauts"/>
+				<#form:hidden path="callguke"/>
+				<#form:hidden path="openid"/>
+				<#form:hidden path="externalIdentifier"/>
+				<#form:hidden path="bhFlag"/>
+				<#form:hidden path="insurancePeriods"/>
+				</div>
+				<div class="form-unit">${text('历史信息')}</div>
+			</div>
+		</#form:form>
+	<#form:form id="searchForm" model="${formInfo}" action="${ctx}/policy/policyInfo/formData?policyInfo.id=${formInfo.policyInfo.id}" method="post" class="form-inline hide"
+	data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+</#form:form>
+<table id="dataGrid"></table>
+<div class="form-unit">${text('和德1.0历史信息')}</div>
+<#form:form id="searchFormTow" model="${formInfo}" action="${ctx}/policy/policyInfo/oldFormData?policyInfo.id=${formInfo.policyInfo.id}" method="post" class="form-inline hide"
+data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+</#form:form>
+<table id="dataGridTow"></table>
+<div class="box-footer">
+	<div class="row">
+		<div class="col-sm-offset-2 col-sm-10">
+			<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+			<!--<button type="button" class="btn btn-sm btn-default" data-layer="true" data-layer-width="900" data-layer-height="600" id="dasd" onclick="tabOld(this,'123')"><i class="fa fa-reply-all"></i> ${text('测试1.0工单')}</button>-->
+		</div>
+	</div>
+</div>
+	</div>
+</div>
+<% } %>
+<script>
+    $("#inputForm").validate({
+        submitHandler: function(form){
+            js.ajaxSubmitForm($(form), function(data){
+                js.showMessage(data.message);
+                if(data.result == Global.TRUE){
+                    js.closeCurrentTabPage(function(contentWindow){
+                        contentWindow.page();
+                    });
+                }
+            }, "json");
+        }
+    });
+    // 初始化DataGrid对象
+    $('#dataGrid').dataGrid({
+        searchForm: $("#searchForm"),
+        columnModel: [
+            {header:'${text("工单号")}', name:'id', index:'', width:150, align:"center", formatter: function(val, obj, row, act){
+                    return '<a href="javascript:void(0)" data-layer="true" data-layer-width="900" data-layer-height="600" onclick="tab(this,\''+row.id+'\')">'+(row.id)+'</a>';
+                }},
+            {header:'${text("工单状态")}', name:'formStatus', index:'', width:150, align:"center", formatter: function(val, obj, row, act){
+                    return js.getDictLabel(${@DictUtils.getDictListJson('form_status')}, val, '${text("未知")}', true);
+                }},
+            {header:'${text("处理状态")}', name:'manageStatus', index:'', width:150, align:"center", formatter: function(val, obj, row, act){
+                    return js.getDictLabel(${@DictUtils.getDictListJson('manage_status')}, val, '${text("未知")}', true);
+                }},
+            {header:'${text("工单类型")}', name:'formType', index:'', width:150, align:"center", formatter: function(val, obj, row, act){
+                    return js.getDictLabel(${@DictUtils.getDictListJson('form_type')}, val, '${text("未知")}', true);
+                }},
+            {header:'${text("自动分配")}', name:'isAutomatic', index:'', width:150, align:"center", formatter: function(val, obj, row, act){
+                    return js.getDictLabel(${@DictUtils.getDictListJson('isAutomatic')}, val, '${text("未知")}', true);
+                }},
+            {header:'${text("所属网点")}', name:'office.officeName', index:'', width:150, align:"center"},
+            {header:'${text("是否关闭")}', name:'isRun', index:'', width:170, align:"center", formatter: function(val, obj, row, act){
+                    return js.getDictLabel(${@DictUtils.getDictListJson('is_run')}, val, '${text("未知")}', true);
+                }}
+        ],
+        // 加载成功后执行事件
+        ajaxSuccess: function(data){
+
+        }
+    });
+    $('#dataGridTow').dataGrid({
+        searchForm: $("#searchFormTow"),
+        columnModel: [
+            {header:'${text("工单号")}', name:'id', index:'', width:150, align:"center", formatter: function(val, obj, row, act){
+                    return '<a href="javascript:void(0)" data-layer="true" data-layer-width="900" data-layer-height="600" onclick="tabOld(this,\''+row.id+'\')">'+(row.id)+'</a>';
+                }},
+            {header:'${text("工单类型")}', name:'formType', index:'', width:150, align:"center", formatter: function(val, obj, row, act){
+                    if (row.formType == '1'){
+                        return "换新";
+                    }
+                    if (row.formType == '2'){
+                        return "维修";
+                    }
+                    if (row.formType == '3'){
+                        return "投诉";
+                    }
+                }},
+            {header:'${text("工单来源")}', name:'formStatus', index:'', width:150, align:"center"},
+            {header:'${text("联系方式")}', name:'manageStatus', index:'', width:150, align:"center"}
+        ],
+        // 加载成功后执行事件
+        ajaxSuccess: function(data){
+
+        }
+    });
+
+    function tab(b,workOrder) {
+        var $bt=$(b);
+        console.log(workOrder);
+        js.addTabPage($bt,"","${ctx}/policy/policyDetail/policyTab?commonFromId="+workOrder);
+    }
+    function tabOld(b,workOrder) {
+        var $bt=$(b);
+        console.log(workOrder);
+        js.addTabPage($bt,"","${ctx}/policy/policyDetail/policyTabOld?commonFromId="+workOrder);
+    }
+</script>

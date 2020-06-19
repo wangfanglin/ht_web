@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.product.dao.ChannelProductInfoDao">
+    <insert id="insertChannelClaimData">
+        insert into ht_channel_claim_data (id,channel_product_id,clain_data_id)values
+        <foreach collection="list" item="item" index="item" separator=",">
+            (
+            null,
+            #{channelProductId},
+            #{item}
+            )
+        </foreach>
+    </insert>
+    <delete id="delChannelClaimData">
+        delete  from  ht_channel_claim_data where channel_product_id=#{channelProductId}
+    </delete>
+
+    <!-- 查询数据
+    <select id="findList" resultType="ChannelProductInfo">
+        SELECT ${sqlMap.column.toSql()}
+        FROM ${sqlMap.table.toSql()}
+        <where>
+            ${sqlMap.where.toSql()}
+        </where>
+        ORDER BY ${sqlMap.order.toSql()}
+    </select> -->
+
+    <select id="findClaimData" resultType="java.util.Map">
+        select * from ht_claim_data
+    </select>
+    <select id="findClaimDataByChannelProductId" resultType="java.util.Map">
+       SELECT * FROM    ht_claim_data a
+inner join  ht_channel_claim_data b on a.id=b.clain_data_id where channel_product_id=#{channelProductId}
+    </select>
+    <select id="findDeductible" resultType="java.lang.Double">
+        select d.change_payment from ht_policy_info p
+inner join ht_channel_product_info q on q.id = p.channel_product_id
+inner join ht_group_product_info a on a.id = q.group_product_id
+inner join ht_product_child_middle b on a.id = b.group_product_id
+inner join ht_group_product_child c on b.group_product_child_id = c.id
+inner join ht_product_info d on c.product_id = d.id
+where d.product_type ='1' and p.id=#{policyId}
+    </select>
+</mapper>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.ds.DataSyncDao">
+
+    <select id="findOldPhoneModel" resultType="java.util.Map">
+select a.*,b.id as brandID from mobile_model a inner join ht_brand_info b on a.brand=b.name group by a.model
+    </select>
+    <select id="findOldbrand" resultType="java.lang.String">
+        select brand from mobile_model  GROUP BY brand
+    </select>
+    <select id="findOldPurchasing" resultType="java.util.Map">
+        select * from channel_purchase
+    </select>
+    <select id="findOldExpressage" resultType="java.util.Map">
+        select * from channel_expr
+    </select>
+    <select id="findOldSale" resultType="java.util.Map">
+        select * from channel_sale
+    </select>
+    <select id="findOldAgent" resultType="java.util.Map">
+        select * from channel_agent
+    </select>
+    <select id="findOldSupplier" resultType="java.util.Map">
+         select * from channel_supplier
+    </select>
+    <select id="findOldProduct" resultType="java.util.Map">
+        SELECT
+	a.id,
+	b.id AS productID,
+	b.pro_name AS productName,
+	c.id AS channelSaleID,
+	c.salechannelname AS channelSaleName,
+	d.id AS agentID,
+	a.del_flag
+FROM
+	channel_pro_info a
+	INNER JOIN channel_protype b ON a.product_type_id = b.id
+	INNER JOIN channel_sale c ON a.sale_channel_id = c.id
+	INNER JOIN channel_agent d ON a.agent_id = d.id
+    </select>
+    <select id="findOldMaintenancePoint" resultType="java.util.Map">
+
+SELECT * FROM `sys_office` where  parent_ids='0,51c6ba8a85ba4dd291fd1190794d7557,dbe3e3f23fc3478193cfc657a79496dd,93d4318323394d76a7c0210b4735b9ca,' or   parent_ids= '0,51c6ba8a85ba4dd291fd1190794d7557,dbe3e3f23fc3478193cfc657a79496dd,7add7c5b17ec4102a91100e40b259404,'
+
+    </select>
+</mapper>

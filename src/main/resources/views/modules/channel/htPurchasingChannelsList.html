@@ -1,0 +1,87 @@
+<% layout('/layouts/default.html', {title: '采购渠道管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa icon-notebook"></i> ${text('采购渠道管理')}
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+				<% if(hasPermi('channel:htPurchasingChannels:edit')){ %>
+					<a href="${ctx}/channel/htPurchasingChannels/form" class="btn btn-default btnTool" title="${text('新增采购渠道')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
+				<% } %>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${htPurchasingChannels}" action="${ctx}/channel/htPurchasingChannels/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="form-group">
+					<label class="control-label">${text('采购渠道编码')}：</label>
+					<div class="control-inline">
+						<#form:input path="code" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('渠道名称')}：</label>
+					<div class="control-inline">
+						<#form:input path="strname" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('反佣')}：</label>
+					<div class="control-inline">
+						<#form:input path="intcommission" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('结算方式')}：</label>
+					<div class="control-inline width-120">
+						<#form:select path="clearingForm" dictType="close_account_type" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('备注')}：</label>
+					<div class="control-inline">
+						<#form:input path="remark" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="reset" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'${text("采购渠道编码")}', name:'code', index:'a.code', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			return '<a href="${ctx}/channel/htPurchasingChannels/form?id='+row.id+'" class="btnList" data-title="${text("编辑采购渠道")}">'+(val||row.id)+'</a>';
+		}},
+		{header:'${text("渠道名称")}', name:'strname', index:'a.strname', width:150, align:"left"},
+		{header:'${text("反佣")}', name:'intcommission', index:'a.intcommission', width:150, align:"left"},
+		{header:'${text("结算方式")}', name:'clearingForm', index:'a.clearing_form', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('close_account_type')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("备注")}', name:'remark', index:'a.remark', width:150, align:"left"},
+		{header:'${text("操作")}', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('channel:htPurchasingChannels:edit')){ %>
+				actions.push('<a href="${ctx}/channel/htPurchasingChannels/form?id='+row.id+'" class="btnList" title="${text("编辑采购渠道")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+				actions.push('<a href="${ctx}/channel/htPurchasingChannels/delete?id='+row.id+'" class="btnList" title="${text("删除采购渠道")}" data-confirm="${text("确认要删除该采购渠道吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			<% } %>
+			return actions.join('');
+		}}
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>

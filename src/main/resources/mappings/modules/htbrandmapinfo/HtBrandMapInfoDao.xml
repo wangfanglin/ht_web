@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.htbrandmapinfo.dao.HtBrandMapInfoDao">
+	
+	<!-- 查询数据
+	<select id="findList" resultType="HtBrandMapInfo">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+	</select> -->
+	<select id="getMapBrandId" resultType="String">
+		SELECT id FROM ht_brand_info WHERE name=#{name}
+	</select>
+	<select id="getDistributionId" resultType="String">
+	SELECT office_code FROM js_sys_office WHERE office_name=#{officeName}
+	</select>
+	<select id="getMap" resultType="String">
+	SELECT id FROM ht_brand_map_info
+	WHERE distribution_id=#{distributionId}
+	and original_brand=#{originalBrand}
+	 and status='0' LIMIT 1
+	</select>
+	<select id="findInfoBrandId" resultType="HtBrandMapInfo">
+		SELECT * FROM ht_brand_map_info WHERE map_brand_id = #{brandId} LIMIT 1
+	</select>
+
+
+	<select id="getByDistributionIdAndOriginalBrand" resultType="HtBrandMapInfo">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			distribution_id = #{distributionId}
+			and original_brand = #{originalBrand}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+		limit 1
+	</select>
+
+</mapper>

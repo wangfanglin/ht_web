@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.number.dao.HtDateTableDao">
+	
+	<!-- 查询数据 报案量
+	<select id="findList" resultType="HtDateTable">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+	</select> -->
+	<select id="findList" resultType="com.jeesite.modules.number.entity.HtDateTable">
+	select j.office_name as office_name,date_format(f.create_date,'%y%y-%m-%d') as num_time,count(h.channel_id)as result_num
+		from ht_policy_info h
+		inner join js_sys_office j on j.office_code=h.channel_id
+		inner join ht_form_info f on h.id=f.policy_id
+			where  j.office_type='2'
+	  		and j.parent_codes	like '%XS001%'
+		 	and f.create_date BETWEEN #{startTime} and #{endTime}
+			and
+            year(#{startTime})=year(#{endTime})
+			or
+			(
+			year(f.create_date) = year(#{endTime})
+			and
+			month(f.create_date) = month (#{endTime})
+			and
+			day(f.create_date) = day (#{endTime})
+			and
+			 year(#{startTime})=year(#{endTime})
+			)
+			GROUP BY date(f.create_date), j.office_code
+			ORDER BY j.office_name desc,f.create_date desc
+	</select>
+	<select id="pushData" resultType="com.jeesite.modules.number.entity.HtDateTable">
+		select a.office_name as office_name,IF(b.month_num is null,0,b.month_num) as month_num,
+		IF(c.day_num is null,0,c.day_num) as day_num
+		from(
+		select j.office_code as office_code,j.office_name as office_name
+		from js_sys_office j
+		where  j.office_type='2'
+	  	and j.parent_codes	like '%XS001%'
+		) as a
+		left join
+		(
+		select j.office_code as office_code,count(j.office_code) as month_num
+		from ht_policy_info h
+		inner join js_sys_office j on j.office_code=h.channel_id
+		inner join ht_form_info f on h.id=f.policy_id
+		where  j.office_type='2'
+	  	and j.parent_codes	like '%XS001%'
+		and year(f.create_date)=year(NOW())
+		and month(f.create_date)=month(NOW())
+		group by j.office_code
+		) as b on a.office_code=b.office_code
+		left join(
+		select j.office_code as office_code,count(j.office_code) as day_num
+		from ht_policy_info h
+		inner join js_sys_office j on j.office_code=h.channel_id
+		inner join ht_form_info f on h.id=f.policy_id
+		where  j.office_type='2'
+	  	and j.parent_codes	like '%XS001%'
+		and year(f.create_date)=year(NOW())
+		and month(f.create_date)=month(NOW())
+		and day(f.create_date)=day(NOW())
+		group by j.office_code
+		) c on a.office_code=c.office_code
+		order by b.month_num desc,a.office_code
+		limit 10
+	</select>
+	<select id="phoneNum" resultType="com.jeesite.modules.number.entity.HtDateTable">
+		select date(a.create_date) as num_time,
+		sum(case when a.type='0' then 1 else 0 end) as result_call_num,
+ 		sum(case when a.type='1' then 1 else 0 end) as result_get_num
+		from ht_call_log a
+		where
+		a.create_date BETWEEN #{startTime} and #{endTime}
+			and
+            year(#{startTime})=year(#{endTime})
+			or
+			(
+			year(a.create_date) = year(#{startTime})
+			and
+			month(a.create_date) = month (#{endTime})
+			and
+			day(a.create_date) = day (#{endTime})
+			and
+			year(a.create_date) = year(#{startTime})
+			and
+			month(a.create_date) = month (#{startTime})
+			and
+			day(a.create_date) = day (#{startTime})
+			)
+			group by date(a.create_date)
+			ORDER BY  a.create_date desc
+
+	</select>
+	<select id="refuseDate" resultType="com.jeesite.modules.number.entity.HtDateTable">
+		SELECT c.maintenance_point_name as maintenance_point_name,date_format(b.create_date,'%y%y-%m-%d') AS num_time,COUNT(a.office_id) as result_num
+		FROM
+			ht_form_info a
+			INNER JOIN ht_form_operation b ON a.id = b.form_id
+			INNER JOIN ht_maintenance_point c on a.office_id=c.organization_id
+		WHERE
+			a.is_run = '1'
+			AND b.type = '2'
+			AND b.audit_result = '1'
+			AND b.close_type = '1'
+		 AND
+		 YEAR(#{startTime})=YEAR(#{endTime})
+		 AND
+		 b.create_date BETWEEN #{startTime} AND #{endTime}
+			GROUP BY date(b.create_date),c.organization_id,b.form_id
+			ORDER BY c.maintenance_point_name desc,b.create_date desc
+
+	</select>
+	<select id="refuseNumber" resultType="java.util.List">
+		SELECT
+		CASE monthes WHEN 1 THEN num ELSE 0 END as  january ,
+		CASE monthes WHEN 2 THEN num ELSE 0 END as  february ,
+		CASE monthes WHEN 3 THEN num ELSE 0 END as  march ,
+		CASE monthes WHEN 4 THEN num ELSE 0 END as  april ,
+		CASE monthes WHEN 5 THEN num ELSE 0 END as  may ,
+		CASE monthes WHEN 6 THEN num ELSE 0 END as  june ,
+		CASE monthes WHEN 7 THEN num ELSE 0 END as  july ,
+		CASE monthes WHEN 8 THEN num ELSE 0 END as  august ,
+		CASE monthes WHEN 9 THEN num ELSE 0 END as  september ,
+		CASE monthes WHEN 10 THEN num ELSE 0 END as  october ,
+		CASE monthes WHEN 11 THEN num ELSE 0 END as  november ,
+		CASE monthes WHEN 12 THEN num ELSE 0 END as  december
+		from
+		(SELECT
+		COUNT(a.id) AS num,
+		MONTH ( b.create_date ) AS monthes
+		FROM
+		ht_form_info a
+		INNER JOIN ht_form_operation b ON a.id = b.form_id
+		WHERE
+		a.is_run = '1'
+		AND b.type = '2'
+		AND b.audit_result = '1'
+		AND b.close_type = '1'
+		AND YEAR ( b.create_date ) = YEAR ( NOW( ) )
+		GROUP BY MONTH ( b.create_date )
+		) a
+	</select>
+	<select id="overTime" resultType="com.jeesite.modules.number.entity.HtDateTable">
+	SELECT a.maintenance_point_name as maintenance_point_name ,d.num_time as num_time,count(b.office_id) as result_num
+		FROM (
+		SELECT c.form_id as id,date_format(c.start_date,'%y%y-%m-%d') as num_time
+		FROM ht_time_efficiency c
+		WHERE c.start_date between #{startTime} and #{endTime}
+		and
+		c.end_date is not null
+		and <![CDATA[c.end_date<=#{endTime}]]>
+		and  <![CDATA[TO_DAYS(c.end_date) - TO_DAYS(c.start_date) >3]]>
+		  )d
+			inner join ht_form_info b on d.id=b.id
+			left join ht_maintenance_point a on a.organization_id=b.office_id
+		GROUP BY a.organization_id,day(d.num_time)
+		ORDER BY a.maintenance_point_name desc,d.num_time desc
+		</select>
+	<select id="getOverOffice" resultType="java.util.Map">
+			select a.maintenance_point_name as maintenance_point_name,
+			IF(b.num is null,0,b.num) as  result_num
+			from(select p.maintenance_point_name,p.organization_id
+			from ht_maintenance_point p
+			group by p.maintenance_point_name) a
+			left join (
+			select p.organization_id ,count(p.organization_id) as num
+			from ht_maintenance_point p
+			inner join ht_form_info  f on p.organization_id=f.office_id
+			inner join ht_time_efficiency t on t.form_id=f.id
+			where Month(t.start_date)=Month(NOW())
+			and t.end_date is not null
+			and f.form_type='2'
+			and TO_DAYS(t.end_date) - TO_DAYS(t.start_date) >3
+			GROUP BY p.organization_id ) b on a.organization_id=b.organization_id
+			ORDER BY b.num desc,a.organization_id
+			limit 5
+	</select>
+
+</mapper>

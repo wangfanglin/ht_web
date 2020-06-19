@@ -1,0 +1,101 @@
+<% layout('/layouts/default.html', {title: '在线理赔表管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa icon-notebook"></i> ${text('在线理赔表管理')}
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${htClaimSettlementForm}" action="${ctx}/htclaimsettlementform/htClaimSettlementForm/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<#form:hidden path="typeClose" />
+				<div class="form-group">
+					<label class="control-label">${text('客户名字')}：</label>
+					<div class="control-inline">
+						<#form:input path="userName" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('手机号')}：</label>
+					<div class="control-inline">
+						<#form:input path="phone" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<!--<div class="form-group">-->
+					<!--<label class="control-label">${text('产品名称')}：</label>-->
+					<!--<div class="control-inline width-120">-->
+						<!--<#form:select path="productId" items="${productInfoList}" itemLabel="name" itemValue="id" blankOption="true"  class="form-control required" />-->
+					<!--</div>-->
+				<!--</div>-->
+				<div class="form-group">
+					<label class="control-label">${text('工单状态')}：</label>
+					<div class="control-inline width-120">
+						<#form:select path="htFormInfo.formStatus" dictType="form_status" blankOption="true"  class="form-control required" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('是否分配')}：</label>
+					<div class="control-inline width-120">
+						<% var isAssignedList = [{label:'已分配',value:'1'},{label:'未分配',value:'0'}]; %>
+						<#form:select path="isAssigned" items="${isAssignedList}" itemLabel="label" itemValue="value" blankOption="true"  class="form-control required" />
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="reset" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'${text("工单ID")}', name:'htFormInfo.id', index:'f.id', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			return '<a href="${ctx}/htclaimsettlementform/htClaimSettlementForm/formInfo?formId='+row.htFormInfo.id+'" class="btnList" data-title="${text("编辑在线理赔表")}">'+(val||row.id)+'</a>';
+		}},
+        {header:'${text("销售渠道")}', name:'policyInfo.strChannelName', index:'po.str_channel_name', width:150, align:"left"},
+		{header:'${text("客户名字")}', name:'policyInfo.strName', index:'po.str_name', width:150, align:"left"},
+		{header:'${text("手机号")}', name:'policyInfo.strContactNum', index:'po.str_contact_num', width:150, align:"left"},
+        {header:'${text("是否分配")}', name:'isAssigned', index:'t.ASSIGNEE_', width:150, align:"left"},
+        {header:'${text("处理人")}', name:'user.userName', index:'uses.user_name', width:150, align:"left"},
+		{header:'${text("更新时间")}', name:'htFormInfo.updateDate', index:'f.update_date', width:150, align:"center"},
+        {header:'${text("联系情况")}', name:'htClaimSettlementForm.contactStatus', index:'fs.contact_status', width:150, align:"center", formatter: function(val, obj, row, act){
+                return js.getDictLabel(${@DictUtils.getDictListJson('contact_status')}, val, '${text("--")}', true);
+            }},
+        {header:'${text("资料是否合格")}', name:'htClaimSettlementForm.isQualified', index:'fs.is_qualified', width:150, align:"center", formatter: function(val, obj, row, act){
+                return js.getDictLabel(${@DictUtils.getDictListJson('is_qualified')}, val, '${text("--")}', true);
+            }},
+        {header:'${text("任务环节")}', name:'taskName',  width:150, align:"left"},
+        {header:'${text("任务等级")}', name:'level', index:'t.PRIORITY_', width:150, align:"center", formatter: function(val, obj, row, act){
+                return js.getDictLabel(${@DictUtils.getDictListJson('bpm_task_priority')}, val, '${text("--")}', true);
+         }},
+        {header:'${text("工单状态")}', name:'htFormInfo.formStatus', index:'f.form_status', width:150, align:"center", formatter: function(val, obj, row, act){
+                return js.getDictLabel(${@DictUtils.getDictListJson('form_status')}, val, '${text("--")}', true);
+            }},
+		{header:'${text("备注")}', name:'htFormInfo.remark', index:'f.remark', width:150, align:"left"},
+		{header:'${text("操作")}', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('htclaimsettlementform:htClaimSettlementForm:edit')){ %>
+				actions.push('<a href="${ctx}/htclaimsettlementform/htClaimSettlementForm/formInfo?formId='+row.htFormInfo.id+'" class="btnList" title="${text("编辑在线理赔表")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+				actions.push('<a href="${ctx}/htclaimsettlementform/htClaimSettlementForm/delete?id='+row.id+'" class="btnList" title="${text("删除在线理赔表")}" data-confirm="${text("确认要删除该在线理赔表吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			<% } %>
+			return actions.join('');
+		}}
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>

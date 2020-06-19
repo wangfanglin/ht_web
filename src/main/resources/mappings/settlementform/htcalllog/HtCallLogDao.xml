@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.settlementform.htcalllog.dao.HtCallLogDao">
+	
+	<!-- 查询数据
+	<select id="findList" resultType="HtCallLog">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+	</select> -->
+	<select id="getByUserId" resultType="HtCallLog">
+		 SELECT *
+		 FROM ht_call_log a WHERE user_id = #{userCode}
+		 and type = #{type}
+		 and `status` = '0' ORDER BY create_date DESC LIMIT 1
+	</select>
+
+
+
+	<select id="findListBuStatus" resultType="java.lang.Integer">
+		SELECT COUNT(1) FROM ht_call_log a
+		WHERE type =#{type}
+		AND YEAR(NOW())=YEAR(a.create_date)
+		AND MONTH(NOW())=MONTH(a.create_date)
+	</select>
+	
+	<select id="getUserIdByEmpNoFirst" resultType="java.lang.String">
+		select a.user_code
+		from js_sys_user a
+		inner join js_sys_employee b on a.user_code = b.emp_code
+		where b.emp_no = #{empNo}
+		 ORDER BY a.create_date DESC LIMIT 1
+	</select>
+	
+</mapper>

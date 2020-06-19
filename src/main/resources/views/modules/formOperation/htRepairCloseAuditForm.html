@@ -1,0 +1,65 @@
+<% layout('/layouts/default.html', {title: '维修工单-维修完成详情', libs: ['validate','fileupload']}){ %>
+<% include('/modules/common/policyDetail.html', {commonFromId:commonFromId}){} %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${formOperation}" action="${ctx}/forminfo/htFormOperation/save" method="post" class="form-horizontal">
+			<div class="box-body">
+
+				<#form:input path="formId"  style="display: none"/>
+				<#form:input path="bdId"  style="display: none"/>
+				<#form:input id="type"  name="type" value="2" style="display: none"/>
+				<#form:input id="operationType"  name="operationType" value="1" style="display: none"/>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-3" title="">
+								<span class="required hide">*</span> ${text('审核备注')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:textarea path="auditRemark" rows="4" maxlength="500" class="form-control"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="box-footer">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<#bpm:button bpmEntity="${formOperation}" formKey="hd_form_claim" completeText="${text('通 过')}"/>
+						<%if(!formOperation.bpm.isView!){%>
+                        <button type="button" data-layer="true" data-layer-width="725" data-layer-height="420" class="btn btn-sm btn-danger mr3" id="btnBack" onclick="back(this)"><i class="fa fa-reply-all"></i> ${text('驳 回')}</button>
+						<%}%>
+						&nbsp;&nbsp;&nbsp;&nbsp;
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+
+
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+function back(b) {
+    var $bt=$(b);
+    js.addTabPage($bt, '', "${ctx}/forminfo/htFormOperation/backOne?formId=${formOperation.formId}");
+}
+</script>

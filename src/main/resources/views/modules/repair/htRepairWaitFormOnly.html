@@ -1,0 +1,152 @@
+<% layout('/layouts/default.html', {title: '维修工单-修改维修时间待审核管理', libs: ['validate','dataGrid','fileupload']}){ %>
+<div class="main-content">
+	<% include('/modules/common/policyDetail.html', {commonFromId:commonFromId}){} %>
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-title">
+				<i class="fa icon-note"></i> ${text(htRepairClientForm.isNewRecord ? '维修工单管理' : '维修工单管理')}
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${htRepairClientForm}" action="${ctx}/repair/htRepairClientForm/save" method="post" class="form-horizontal">
+		<div class="box-body">
+			<div class="form-unit">${text('核实用户实际信息')}</div>
+				<#form:hidden path="id"/>
+
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('客户姓名')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="htClaimSettlementForm.userName" readonly="true" maxlength="64" class="form-control"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('联系电话')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input path="htClaimSettlementForm.phone" readonly="true" class="form-control"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('手机品牌')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="htClaimSettlementForm.phoneBrand" disabled="true" items="${brandList}" blankOption="true" blankOptionLabel="请选择" itemLabel="name" itemValue="id" class="form-control required" />
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('手机型号')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:select path="htClaimSettlementForm.phoneModel" disabled="true" items="${typeList}" blankOption="true" blankOptionLabel="请选择"  itemLabel="model" itemValue="id" class="form-control required" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('手机IMEI')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input value="${htFormInfo.policyInfo.strImeiNum}" readonly="true" maxlength="64" class="form-control"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('产品名称')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<#form:input value="${htFormInfo.policyInfo.channelProductName}" readonly="true" maxlength="10" class="form-control"/>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<%
+			var i = 1;
+			for(repairCount in repairCountList){ %>
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> 第${i}次修改维修时间：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							${repairCount.createDate,"yyyy-MM-dd"}
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('备注')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							${repairCount.remarks}
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<%
+			i++;
+			} %>
+
+
+			<div class="box-footer">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('repair:htRepairClientForm:edit')){ %>
+						<#form:hidden id="formInfoStatus" path="htFormInfo.status"/>
+						<#form:hidden path="htFormInfo.id"/>
+
+						<#bpm:button bpmEntity="${htRepairClientForm}" formKey="hd_form_claim" completeText="${text('提 交')}"/>
+						<% } %>
+						<script>
+							// 业务实现草稿按钮
+							$('#btnDraft').click(function(){
+								$('#formInfoStatus').val(Global.STATUS_DRAFT);
+							});
+							// 流程按钮提交事件
+							BpmButton = window.BpmButton || {};
+							BpmButton.complete = function($this, task){
+								$('#formInfoStatus').val(Global.STATUS_AUDIT);
+							};
+						</script>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+
+	</div>
+</div>
+<% } %>
+
+
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+
+</script>

@@ -1,0 +1,35 @@
+<div id="commonButtonGB" style="display: inline-block;">
+    <%
+    #ajax commonButtonGB: {
+    %>
+<button type="button" data-layer="true" data-layer-width="725" data-layer-height="420"  myButton="GB" onclick="butt(this,${id!});" class="btn btn-sm btn-default"><i class="fa icon-minus"></i> ${text('申请关闭')}</button>
+    <%}%>
+</div>
+<script src="${ctxStatic}/common/common.js?${_version}" ></script>
+<script>
+
+    $(function () {
+        $.get("${ctx}/forminfo/htFormOperation/GBbutton?commonFromId=${commonFromId}",function (data) {
+            console.log(data);
+                $("#commonButtonGB").html(data);
+        });
+    });
+
+    function butt(b,formId,procInsId) {
+        //获取工单ID
+
+        var $bt=$(b);
+        console.log($bt.attr("myButton"));
+        if ($bt.attr("myButton")=="GP"){
+
+            js.addTabPage($bt,"","${ctx}/forminfo/htFormOperation/reassignment?formId="+formId);
+        }
+        if ($bt.attr("myButton")=="GB"){
+            js.addTabPage($bt,"","${ctx}/forminfo/htFormOperation/close?formId="+formId+"&procInsId="+procInsId);
+        }
+        if ($bt.attr("myButton")=="KQ"){
+            js.addTabPage($bt,"","${ctx}/forminfo/htFormOperation/reopen?formId="+formId);
+        }
+    }
+</script>
+</html>

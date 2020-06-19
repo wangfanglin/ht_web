@@ -1,0 +1,156 @@
+<% layout('/layouts/default.html', {title: '待申请工单管理', libs: ['validate']}){ %>
+<% include('/modules/common/policyDetail.html', {commonFromId:htWaitApplyForm.htFormInfo.id}){} %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-title">
+				<i class="fa icon-note"></i> ${text(htWaitApplyForm.isNewRecord ? '新增待申请工单' : '编辑待申请工单')}
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${htWaitApplyForm}" action="${ctx}/htwaitapplyform/htWaitApplyForm/save" method="post" class="form-horizontal">
+			<div class="box-body">
+				<div class="form-unit">${text('基本信息')}</div>
+				<#form:hidden path="id"/>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required hide">*</span> ${text('联系结果')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-10">
+								<#form:radio path="contactStatus" dictType="contact_status" class="form-control required" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row timeShow">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('再次联系时间')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="againContactDate" readonly="true" maxlength="20" class="form-control  Wdate"
+									dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:true});"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required hide">*</span> ${text('资料是否申请')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-10">
+								<#form:radio path="whetherApply" dictType="whether_apply" class="form-control required" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('备注')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:textarea path="remark" maxlength="255" class="form-control "/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="box-footer">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<#form:hidden id="formInfoStatus" path="htFormInfo.status"/>
+						<#form:hidden path="htFormInfo.id"/>
+						<% if (htWaitApplyForm.bpm.activityId == 'client_info' && !htWaitApplyForm.bpm.isView ){ %>
+						<button type="button" data-layer="true" data-layer-width="725" data-layer-height="420" onclick="gbButton(this);" class="btn btn-sm btn-info mr3"><i class="fa icon-minus"></i> ${text('申请关闭')}</button>
+						<% } %>
+						<#bpm:button bpmEntity="${htWaitApplyForm}" formKey="hd_form_claim" completeText="${text('提 交')}"/>
+						<script>
+                            function gbButton(b) {
+                                var $bt=$(b);
+
+                                let formId = "${htWaitApplyForm.htFormInfo.id!}";
+                                let procInsId = "${htWaitApplyForm.bpm.procInsId!}";
+                                let activityId = "${htWaitApplyForm.bpm.activityId!}";
+                                let taskId = "${htWaitApplyForm.bpm.taskId!}";
+                                js.addTabPage($bt,"","${ctx}/forminfo/htFormOperation/close?id=${htWaitApplyForm.id}&formId="+formId+"&activityId="+activityId+"&procInsId="+procInsId+"&taskId="+taskId);
+
+                            }
+                            // 业务实现草稿按钮
+                            $('#btnDraft').click(function(){
+                                $('#formInfoStatus').val(Global.STATUS_DRAFT);
+                            });
+                            // 流程按钮提交事件
+                            BpmButton = window.BpmButton || {};
+                            BpmButton.complete = function($this, task){
+                                $('#formInfoStatus').val(Global.STATUS_AUDIT);
+                            };
+						</script>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+
+        $('#whetherApply').iCheck('enable');//禁用
+
+		js.ajaxSubmitForm($(form), function(data){
+            if(data.result == Global.TRUE){js.showMessage(data.message);}
+            if(data.result == Global.FALSE){js.showMessage(data.message,'','warning',4000);$('#whetherApply').iCheck('disable');}//禁用
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+
+$(function () {
+    let claimStatus = $("input:radio[name='contactStatus']:checked").val();
+        //1联系成功
+        if(claimStatus == '1'){
+            //$(".timeShow").addClass("hide");
+            //$("#againContactDate").attr("disabled", true);
+
+            $('#whetherApply').iCheck('enable');
+            $("input:radio[name='whetherApply']").iCheck('uncheck');//选中
+        }else{
+            $("input:radio[name='whetherApply'][value='0']").iCheck('check');//选中
+            $('#whetherApply').iCheck('disable');//禁用
+
+            //$(".timeShow").removeClass("hide");
+            //$("#againContactDate").attr("disabled", false);
+
+        }
+})
+
+$("input:radio[name='contactStatus']").on('ifChecked', function(event){
+    let claimStatus = $(this).val();
+    //1联系成功
+    if(claimStatus == '1'){
+        //$(".timeShow").addClass("hide");
+        //$("#againContactDate").attr("disabled", true);
+
+        $('#whetherApply').iCheck('enable');
+        $("input:radio[name='whetherApply']").iCheck('uncheck');//选中
+	}else{
+        $("input:radio[name='whetherApply'][value='0']").iCheck('check');//选中
+        $('#whetherApply').iCheck('disable');//禁用
+
+        //$(".timeShow").removeClass("hide");
+        //$("#againContactDate").attr("disabled", false);
+
+	}
+});
+</script>

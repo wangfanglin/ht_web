@@ -1,0 +1,99 @@
+<% layout('/layouts/default.html', {title: '转办任务', libs: ['validate','dataGrid']}){ %>
+<div class="box box-main">
+    <#form:form id="inputForm" action="${ctx}/forminfo/htFormOperation/backTask" method="post" class="form-horizontal">
+    <#form:hidden name="id" value="${task.id}" class="form-control"/>
+    <#form:hidden name="formId" value="${formId}" class="form-control"/>
+    <#form:hidden name="bdId" value="${bdId}" class="form-control"/>
+    <#form:hidden name="operationType" value="${operationType}" class="form-control"/>
+    <#form:hidden name="procInsId" value="${procInsId}" class="form-control"/>
+    <#form:hidden name="procInsId" value="${procInsId}" class="form-control"/>
+    <#form:hidden name="nowActivity" value="${task.activityId}" class="form-control"/>
+    <div class="box-body" style="padding-top:20px">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="control-label col-xs-3">${text('当前环节')}：</label>
+                    <div class="col-xs-8">
+                        <label class="control-label">${isNotBlank(task.name)?task.name:text("未设置环节名")}</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="control-label col-xs-3">${text('退回到哪')}：</label>
+                    <div class="col-xs-8 pt5">
+                        <table id="backActivity"></table>
+                        <#form:hidden path="activityId" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="control-label col-xs-3">${text('退回原因')}：</label>
+                    <div class="col-xs-8">
+                        <#form:textarea path="comment" rows="3" maxlength="200" class="form-control"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="box-footer">
+        <div class="row">
+            <div class="col-sm-offset-3 col-sm-10">
+                <button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('确 定')}</button>&nbsp;
+                <button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+            </div>
+        </div>
+    </div>
+</#form:form>
+</div>
+<% } %>
+<script>
+    $("#backActivity").dataGrid({
+        data: ${toJson(backActivity!)},
+        datatype: "local", // 设置本地数据
+        autoGridHeight: function(){return 130;}, // 设置自动高度
+// 	autoGridWidth: function(){return 450;}, // 设置自动高度
+        // 设置数据表格列
+        columnModel: [
+            {header:'${text("编号")}', name:'activityId', hidden:true},
+            {header:'${text("环节名称")}', name:'activityName', width:100, align:"center", formatter: function(val, obj, row, act){
+                    return (val||'${text("未设置环节名")}');
+                }},
+            {header:'${text("环节处理人")}', name:'assigneeName', width:100, align:"center"}
+        ],
+        sortableColumn: false,
+        // 加载成功后执行事件
+        ajaxSuccess: function(data){
+            $('#backActivity').dataGrid('setSelectRow', '1');
+        }
+    });
+    $("#inputForm").validate({
+        submitHandler: function(form){
+            var backActivityDataGrid = $('#backActivity'),
+                rowId = backActivityDataGrid.dataGrid('getSelectRow');
+            if (!rowId){
+                js.showMessage('${text("请选择退回到哪")}？');
+                return;
+            }
+            var rowData = backActivityDataGrid.dataGrid('getRowData', rowId);
+            $('#activityId').val(rowData.activityId);
+            js.ajaxSubmitForm($(form), function(data){
+                js.showMessage(data.message);
+                if(data.result == Global.TRUE){
+                    js.closeCurrentTabPage(function(contentWindow){
+                        if (contentWindow.BpmButton){
+                            contentWindow.BpmButton.callback();
+                        }else{
+                            contentWindow.page();
+                        }
+                    });
+                }
+            }, "json");
+        }
+    });
+</script>

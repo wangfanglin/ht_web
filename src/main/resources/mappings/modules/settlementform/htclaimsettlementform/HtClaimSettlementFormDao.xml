@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.settlementform.htclaimsettlementform.dao.HtClaimSettlementFormDao">
+
+    <!-- 查询数据
+    <select id="findList" resultType="HtClaimSettlementForm">
+        SELECT ${sqlMap.column.toSql()}
+        FROM ${sqlMap.table.toSql()}
+        <where>
+            ${sqlMap.where.toSql()}
+        </where>
+        ORDER BY ${sqlMap.order.toSql()}
+    </select> -->
+    <insert id="saveMiddleInfo">
+		insert  into ht_settlement_data_middle(id,settlement_data,create_date)
+		values (#{dataid},#{settlementData},NOW())
+	</insert>
+    <select id="getSettlementDataList" resultType="java.lang.String">
+		select settlement_data from ht_settlement_data_middle where id = #{settlementDataId}
+	</select>
+
+    <select id="getUnitStrInfo" resultType="java.util.Map">
+		SELECT
+		  (
+		   SELECT
+			GROUP_CONCAT(`name`)
+		   FROM
+			ht_assembly_unit
+		   WHERE
+			CONCAT('%',f.master_unit,'%') LIKE CONCAT('%',id,'%')
+		  ) AS 'master_unit_str',
+		  (
+		   SELECT
+			GROUP_CONCAT(`name`)
+		   FROM
+			ht_assembly_unit
+		   WHERE
+			 CONCAT('%',f.vice_parts,'%') LIKE CONCAT('%',id,'%')
+		   ) AS 'vice_parts_str',
+		   f.master_unit,
+		  f.vice_parts
+		  FROM
+			ht_claim_settlement_form f WHERE f.form_id = #{formId}
+	</select>
+    <select id="getAccessoriesInfoList" resultType="java.util.Map">
+		SELECT
+			a.id ,a.`name` AS "peijian",u.`name` AS 'sunhuaibuwei',IF(a.is_original = '0','非原厂','原厂') as 'is_original',convert(a.price /100, decimal(12,2)) as "price"
+		FROM
+			ht_accessories_info a INNER JOIN ht_assembly_unit u ON a.assembly_id = u.id
+		WHERE
+			a.assembly_id = #{assemblyId} and a.status = '0'
+		AND (
+			SELECT
+				GROUP_CONCAT(d.phone_model_id)
+			FROM
+				ht_accessories_phone_model d
+			WHERE
+				d.accessories_info_id = a.id
+		) LIKE CONCAT('%',#{phoneModelId},'%');
+
+	</select>
+
+	<select id="selectProcessInstanceByQueryCriteria" resultType="ProcessListingEntity">
+		<![CDATA[
+			SELECT DISTINCT
+			fs.id as 'htClaimSettlementForm.id',f.id as 'htFormInfo.id',f.form_status as 'htFormInfo.formStatus',f.form_type as 'htFormInfo.formType',f.manage_status as 'htFormInfo.manageStatus',
+			  f.update_date AS 'htFormInfo.updateDate',fs.remark AS 'htClaimSettlementForm.remark',t.PRIORITY_ AS 'level',
+			  t.ASSIGNEE_ as 'ASSIGNEE',t.NAME_ as 'taskName',uses.user_name as 'user.userName',t.DESCRIPTION_ AS 'description',
+			 res.NAME_ AS 'executionName',RES.ID_ AS 'executionId',t.ID_ AS 'taskId',
+					P.NAME_ AS ProcessDefinitionName,po.str_channel_name as 'policyInfo.strChannelName',
+					po.str_name as 'policyInfo.strName',po.str_contact_num as 'policyInfo.strContactNum',IF(t.ASSIGNEE_ IS NULL,'未分配','已分配') AS 'isAssigned',
+					fs.contact_status as 'htClaimSettlementForm.contactStatus',fs.is_qualified as 'htClaimSettlementForm.isQualified'
+			FROM
+				ht_form_info f
+				LEFT JOIN ht_claim_settlement_form fs on f.id = fs.form_id
+				LEFT JOIN ht_policy_info po ON po.id = f.policy_id
+				LEFT JOIN ht_user_apply_info us ON f.id = us.form_id
+				LEFT JOIN ACT_RU_EXECUTION RES ON CONCAT("hd_form_claim:",f.id )= RES.BUSINESS_KEY_
+				LEFT JOIN ACT_RU_TASK t ON t.PROC_INST_ID_ = RES.PROC_INST_ID_
+				LEFT JOIN ACT_RE_PROCDEF P ON RES.PROC_DEF_ID_ = P.ID_
+				LEFT JOIN js_sys_user uses ON t.ASSIGNEE_ = uses.user_code
+			]]>
+			where
+				f.form_type = '0'
+				<if test="htClaimSettlementForm.typeClose !=null and htClaimSettlementForm.typeClose !=''">
+					and f.is_run = '1'
+				</if>
+				<if test="htClaimSettlementForm.typeClose ==null || htClaimSettlementForm.typeClose ==''">
+					and f.is_run = '0'
+				</if>
+				<if test="htClaimSettlementForm.userName !=null and htClaimSettlementForm.userName !=''">
+					and po.str_name LIKE CONCAT('%',#{htClaimSettlementForm.userName},'%')
+				</if>
+				<if test="htClaimSettlementForm.phone !=null and htClaimSettlementForm.phone !=''">
+					and po.str_contact_num = #{htClaimSettlementForm.phone}
+				</if>
+				<if test="htClaimSettlementForm.htFormInfo.formStatus !=null and htClaimSettlementForm.htFormInfo.formStatus !=''">
+					and f.form_status = #{htClaimSettlementForm.htFormInfo.formStatus}
+				</if>
+				<if test="htClaimSettlementForm.productId !=null and htClaimSettlementForm.productId !=''">
+					and po.channel_product_id = #{htClaimSettlementForm.productId}
+				</if>
+				<if test="htClaimSettlementForm.isAssigned !=null and htClaimSettlementForm.isAssigned !='' and htClaimSettlementForm.isAssigned == '0'.toString() ">
+					and t.ASSIGNEE_ IS NULL
+				</if>
+				<if test="htClaimSettlementForm.isAssigned !=null and htClaimSettlementForm.isAssigned !='' and htClaimSettlementForm.isAssigned == '1'.toString() ">
+					and t.ASSIGNEE_ IS NOT NULL
+				</if>
+				<if test="page.orderBy == null">
+					order by f.update_date desc
+				</if>
+				<if test="page != null and page.orderBy != null and page.orderBy != ''">
+					ORDER BY ${page.orderBy}
+				</if>
+	</select>
+    <select id="getByFormId"
+            resultType="com.jeesite.modules.settlementform.htclaimsettlementform.entity.HtClaimSettlementForm">
+SELECT
+	a.`id` AS "id",
+	a.`form_id` AS "htFormInfo.id",
+	a.`work_order_id` AS "workOrderId",
+	a.`contact_status` AS "contactStatus",
+	a.`again_contact_date` AS "againContactDate",
+	a.`user_name` AS "userName",
+	a.`phone` AS "phone",
+	a.`phone_model` AS "phoneModel",
+	a.`phone_brand` AS "phoneBrand",
+	a.`id_number` AS "idNumber",
+	a.`cause_damage` AS "causeDamage",
+	a.`maintain_id` AS "maintainId",
+	a.`master_unit` AS "masterUnit",
+	a.`vice_parts` AS "viceParts",
+	a.`is_qualified` AS "isQualified",
+	a.`settlement_data_id` AS "settlementDataId",
+	a.`maintain_type` AS "maintainType",
+	a.`serve_type` AS "serveType",
+	a.`return_area_code` AS "returnAreaCode",
+	a.`maintain_branch_id` AS "maintainBranchId",
+	a.`sms` AS "sms",
+	a.`is_express` AS "isExpress",
+	a.`return_name` AS "returnName",
+	a.`return_phone` AS "returnPhone",
+	a.`return_address` AS "returnAddress",
+	a.`create_date` AS "createDate",
+	a.`create_by` AS "createBy",
+	a.`update_date` AS "updateDate",
+	a.`update_by` AS "updateBy",
+	a.`remark` AS "remark",
+	a.`disqualification_disqualification` AS "disqualificationDisqualification",
+	a.`status` AS "status",
+	a.`call_info_id` AS "callInfoId",
+	a.`damage_imgs` AS "damageImgs",
+	a.`identity_card_imgs` AS "identityCardImgs",
+	a.`purchase_imgs` AS "purchaseImgs",
+	f.`policy_id` AS "htFormInfo.policyInfo.id",
+	f.`manage_status` AS "htFormInfo.manageStatus",
+	f.`form_status` AS "htFormInfo.formStatus",
+	f.`form_type` AS "htFormInfo.formType",
+	f.`office_id` AS "htFormInfo.office.id",
+	f.`is_run` AS "htFormInfo.isRun",
+	f.`status` AS "htFormInfo.status",
+	f.`create_by` AS "htFormInfo.createBy",
+	f.`create_date` AS "htFormInfo.createDate",
+	f.`update_by` AS "htFormInfo.updateBy",
+	f.`update_date` AS "htFormInfo.updateDate",
+	f.`remarks` AS "htFormInfo.remarks",
+	f.`is_automatic` AS "htFormInfo.isAutomatic",
+	p.`id` AS "htUserApplyInfo.id",
+	p.`policy_id` AS "htUserApplyInfo.policyId",
+	p.`facility_brand_id` AS "htUserApplyInfo.facilityBrandId",
+	p.`form_id` AS "htUserApplyInfo.formId",
+	p.`facility_model_id` AS "htUserApplyInfo.facilityModelId",
+	p.`facility_color` AS "htUserApplyInfo.facilityColor",
+	p.`area_id` AS "htUserApplyInfo.areaId",
+	p.`malfunction_date` AS "htUserApplyInfo.malfunctionDate",
+	p.`malfunction_id` AS "htUserApplyInfo.malfunctionId",
+	p.`card_name` AS "htUserApplyInfo.cardName",
+	p.`card_id` AS "htUserApplyInfo.cardId",
+	p.`user_phone` AS "htUserApplyInfo.userPhone",
+	p.`card_start_date` AS "htUserApplyInfo.cardStartDate",
+	p.`card_end_date` AS "htUserApplyInfo.cardEndDate",
+	p.`bad_part_img` AS "htUserApplyInfo.badPartImg",
+	p.`card_img` AS "htUserApplyInfo.cardImg",
+	p.`voucher_img` AS "htUserApplyInfo.voucherImg",
+	p.`is_main` AS "htUserApplyInfo.isMain",
+	po.`id` AS "policyInfo.id",
+	po.`unique_mark` AS "policyInfo.uniqueMark",
+	po.`str_name` AS "policyInfo.strName",
+	po.`str_contact_num` AS "policyInfo.strContactNum",
+	po.`str_type` AS "policyInfo.strType",
+	po.`str_wechat` AS "policyInfo.strWechat",
+	po.`str_card_id` AS "policyInfo.strCardId",
+	po.`date_birthday` AS "policyInfo.dateBirthday",
+	po.`str_sex` AS "policyInfo.strSex",
+	po.`str_filiale` AS "policyInfo.strFiliale",
+	po.`str_channel_name` AS "policyInfo.strChannelName",
+	po.`channel_product_name` AS "policyInfo.channelProductName",
+	po.`int_product_price` AS "policyInfo.intProductPrice",
+	po.`int_sell_price` AS "policyInfo.intSellPrice",
+	po.`date_cost_time` AS "policyInfo.dateCostTime",
+	po.`str_province` AS "policyInfo.strProvince",
+	po.`str_card_number` AS "policyInfo.strCardNumber",
+	po.`date_buy_card` AS "policyInfo.dateBuyCard",
+	po.`date_effective_date` AS "policyInfo.dateEffectiveDate",
+	po.`str_buy_pattern` AS "policyInfo.strBuyPattern",
+	po.`date_end_date` AS "policyInfo.dateEndDate",
+	po.`str_sys` AS "policyInfo.strSys",
+	po.`str_phone_brand` AS "policyInfo.strPhoneBrand",
+	po.`str_color` AS "policyInfo.strColor",
+	po.`str_phone_model` AS "policyInfo.strPhoneModel",
+	po.`str_city` AS "policyInfo.strCity",
+	po.`int_internal` AS "policyInfo.intInternal",
+	po.`str_store` AS "policyInfo.strStore",
+	po.`str_imei_num` AS "policyInfo.strImeiNum",
+	po.`str_salesman` AS "policyInfo.strSalesman",
+	po.`coverage` AS "policyInfo.coverage",
+	po.`int_loan_amount` AS "policyInfo.intLoanAmount",
+	po.`int_batch_num` AS "policyInfo.intBatchNum",
+	po.`int_status` AS "policyInfo.intStatus",
+	po.`str_card_type` AS "policyInfo.strCardType",
+	po.`channel_id` AS "policyInfo.channelId",
+	po.`channel_product_id` AS "policyInfo.channelProductId",
+	po.`policy_submission_date` AS "policyInfo.policySubmissionDate",
+	po.`status` AS "policyInfo.status",
+	po.`create_by` AS "policyInfo.createBy",
+	po.`create_date` AS "policyInfo.createDate",
+	po.`update_by` AS "policyInfo.updateBy",
+	po.`update_date` AS "policyInfo.updateDate",
+	po.`remarks` AS "policyInfo.remarks",
+	po.`delflag` AS "policyInfo.delflag",
+	po.`surplus_coverage` AS "policyInfo.surplusCoverage",
+	po.`invite` AS "policyInfo.invite",
+	po.`inviteflag` AS "policyInfo.inviteflag",
+	po.`fromtype` AS "policyInfo.fromtype",
+	po.`bhstauts` AS "policyInfo.bhstauts",
+	po.`callguke` AS "policyInfo.callguke",
+	po.`openid` AS "policyInfo.openid",
+	po.`external_identifier` AS "policyInfo.externalIdentifier",
+	po.`bh_flag` AS "policyInfo.bhFlag",
+	po.`insurance_periods` AS "policyInfo.insurancePeriods"
+FROM
+	`ht_claim_settlement_form` a
+	LEFT JOIN `ht_form_info` f ON f.id = a.form_id
+	LEFT JOIN `ht_user_apply_info` p ON p.form_id = a.form_id
+	LEFT JOIN `ht_policy_info` po ON po.id = f.policy_id
+WHERE
+	a.`form_id` = #{formId}
+
+	</select>
+
+</mapper>

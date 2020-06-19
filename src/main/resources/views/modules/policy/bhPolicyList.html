@@ -1,0 +1,192 @@
+<% layout('/layouts/default.html', {title: 'bh_policy管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa icon-notebook"></i> ${text('bh_policy管理')}
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+				<% if(hasPermi('policy:bhPolicy:edit')){ %>
+					<a href="${ctx}/policy/bhPolicy/form" class="btn btn-default btnTool" title="${text('新增bh_policy')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
+				<% } %>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${bhPolicy}" action="${ctx}/policy/bhPolicy/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="form-group">
+					<label class="control-label">${text('保单表id')}：</label>
+					<div class="control-inline">
+						<#form:input path="policyinfoid" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('渤海报案号')}：</label>
+					<div class="control-inline">
+						<#form:input path="clmno" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('类别ID')}：</label>
+					<div class="control-inline">
+						<#form:input path="categoryid" maxlength="11" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('类别名称')}：</label>
+					<div class="control-inline">
+						<#form:input path="categoryname" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('型号id')}：</label>
+					<div class="control-inline">
+						<#form:input path="deviceid" maxlength="11" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('品牌id')}：</label>
+					<div class="control-inline">
+						<#form:input path="brandid" maxlength="11" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('出险经过')}：</label>
+					<div class="control-inline">
+						<#form:input path="message" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('报案人姓名')}：</label>
+					<div class="control-inline">
+						<#form:input path="name" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('保险单的单号')}：</label>
+					<div class="control-inline">
+						<#form:input path="plyno" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('区域代码')}：</label>
+					<div class="control-inline">
+						<#form:input path="regioncode" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('上门时间')}：</label>
+					<div class="control-inline">
+						<#form:input path="repairdate" readonly="true" maxlength="20" class="form-control Wdate-datetime"
+							dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:false});"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('总保额')}：</label>
+					<div class="control-inline">
+						<#form:input path="coverageamt" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('属性ID')}：</label>
+					<div class="control-inline">
+						<#form:input path="attributeid" maxlength="11" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('属性名称')}：</label>
+					<div class="control-inline">
+						<#form:input path="attributevalue" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('属性值ID')}：</label>
+					<div class="control-inline">
+						<#form:input path="valueid" maxlength="11" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('属性值')}：</label>
+					<div class="control-inline">
+						<#form:input path="value" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('渤海流程号')}：</label>
+					<div class="control-inline">
+						<#form:input path="taskid" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('折旧后剩余保额')}：</label>
+					<div class="control-inline">
+						<#form:input path="remainderamtZj" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('备注')}：</label>
+					<div class="control-inline">
+						<#form:input path="remarks" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('删除标记')}：</label>
+					<div class="control-inline">
+						<#form:input path="delFlag" maxlength="1" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="reset" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'${text("保单表id")}', name:'policyinfoid', index:'a.policyinfoid', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			return '<a href="${ctx}/policy/bhPolicy/form?id='+row.id+'" class="btnList" data-title="${text("编辑bh_policy")}">'+(val||row.id)+'</a>';
+		}},
+		{header:'${text("渤海报案号")}', name:'clmno', index:'a.clmno', width:150, align:"left"},
+		{header:'${text("类别ID")}', name:'categoryid', index:'a.categoryid', width:150, align:"center"},
+		{header:'${text("类别名称")}', name:'categoryname', index:'a.categoryname', width:150, align:"left"},
+		{header:'${text("型号id")}', name:'deviceid', index:'a.deviceid', width:150, align:"center"},
+		{header:'${text("品牌id")}', name:'brandid', index:'a.brandid', width:150, align:"center"},
+		{header:'${text("出险经过")}', name:'message', index:'a.message', width:150, align:"left"},
+		{header:'${text("报案人姓名")}', name:'name', index:'a.name', width:150, align:"left"},
+		{header:'${text("保险单的单号")}', name:'plyno', index:'a.plyno', width:150, align:"left"},
+		{header:'${text("区域代码")}', name:'regioncode', index:'a.regioncode', width:150, align:"left"},
+		{header:'${text("上门时间")}', name:'repairdate', index:'a.repairdate', width:150, align:"center"},
+		{header:'${text("总保额")}', name:'coverageamt', index:'a.coverageamt', width:150, align:"left"},
+		{header:'${text("属性ID")}', name:'attributeid', index:'a.attributeid', width:150, align:"center"},
+		{header:'${text("属性名称")}', name:'attributevalue', index:'a.attributevalue', width:150, align:"left"},
+		{header:'${text("属性值ID")}', name:'valueid', index:'a.valueid', width:150, align:"center"},
+		{header:'${text("属性值")}', name:'value', index:'a.value', width:150, align:"left"},
+		{header:'${text("渤海流程号")}', name:'taskid', index:'a.taskid', width:150, align:"left"},
+		{header:'${text("折旧后剩余保额")}', name:'remainderamtZj', index:'a.remainderamt_zj', width:150, align:"left"},
+		{header:'${text("更新时间")}', name:'updateDate', index:'a.update_date', width:150, align:"center"},
+		{header:'${text("备注")}', name:'remarks', index:'a.remarks', width:150, align:"left"},
+		{header:'${text("删除标记")}', name:'delFlag', index:'a.del_flag', width:150, align:"left"},
+		{header:'${text("操作")}', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('policy:bhPolicy:edit')){ %>
+				actions.push('<a href="${ctx}/policy/bhPolicy/form?id='+row.id+'" class="btnList" title="${text("编辑bh_policy")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+				actions.push('<a href="${ctx}/policy/bhPolicy/delete?id='+row.id+'" class="btnList" title="${text("删除bh_policy")}" data-confirm="${text("确认要删除该bh_policy吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			<% } %>
+			return actions.join('');
+		}}
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>

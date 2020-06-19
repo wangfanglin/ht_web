@@ -1,0 +1,86 @@
+<% layout('/layouts/default.html', {title: '自付款信息历史表管理', libs: ['validate']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+		</div>
+		<#form:form id="inputForm" model="${htDeductibleInfo}" action="${ctx}/deductible/htDeductibleInfoHistory/save" method="post" class="form-horizontal">
+		<div class="box-body">
+			<#form:hidden path="id"/>
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-5" title="">
+							<span class="required hide">*</span> ${text('微信昵称')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-7">
+							${htDeductibleInfo.wxNick!}
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('客户名称')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							${htDeductibleInfo.userName!}
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-5" title="">
+							<span class="required hide">*</span> ${text('自付款额度')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-7">
+							${htDeductibleInfo.deductiblesLimit!}
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('付款时间')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							<%if(null != htDeductibleInfo.payDate!){%>
+							${htDeductibleInfo.payDate!,"yyyy-MM-dd HH:ss:mm"}
+							<%}%>
+							<%if(null == htDeductibleInfo.payDate!){%>
+							--
+							<%}%>
+
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label class="control-label col-sm-4" title="">
+							<span class="required hide">*</span> ${text('支付方式')}：<i class="fa icon-question hide"></i></label>
+						<div class="col-sm-8">
+							${@DictUtils.getDictLabel('pay_type',htDeductibleInfo.payType!,'--')}
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+			<div class="box-footer">
+
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+</script>

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.renew.dao.HtRenewFormDao">
+	
+	<!-- 查询数据
+	<select id="findList" resultType="HtRenewForm">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+	</select> -->
+
+
+	<select id="findRenewList" resultType="RenewListEntity">
+		<![CDATA[
+			SELECT DISTINCT
+			fs.id as 'htRenewForm.id',f.id as 'htFormInfo.id',f.form_status as 'htFormInfo.formStatus',f.form_type as 'htFormInfo.formType',f.manage_status as 'htFormInfo.manageStatus',
+			  f.update_date AS 'htFormInfo.updateDate',fs.remarks AS 'htRenewForm.remarks',t.PRIORITY_ AS 'level',
+			  t.ASSIGNEE_ as 'ASSIGNEE',t.NAME_ as 'taskName',uses.user_name as 'user.userName',t.DESCRIPTION_ AS 'description',
+			 res.NAME_ AS 'executionName',RES.ID_ AS 'executionId',t.ID_ AS 'taskId',
+					po.str_channel_name as 'policyInfo.strChannelName',
+					po.channel_product_name as 'policyInfo.channelProductName',
+					o.office_name as 'office.officeName',
+					b.name as 'htBrandInfo.name',
+					m.model as 'htPhoneModelInfo.model',
+					sf.user_name as 'htClaimSettlementForm.userName',sf.phone as 'htClaimSettlementForm.phone',
+					fs.contact_status as 'htRenewForm.contactStatus',fs.is_qualified as 'htRenewForm.isQualified'
+			FROM
+				ht_form_info f
+				LEFT JOIN ht_claim_settlement_form sf on f.id = sf.form_id
+				LEFT JOIN ht_renew_form fs on f.id = fs.form_id
+				LEFT JOIN js_sys_office o on o.office_code = sf.maintain_branch_id
+				LEFT JOIN ht_brand_info b on b.id = sf.phone_brand
+				LEFT JOIN ht_phone_model_info m on m.id = sf.phone_model
+				LEFT JOIN ht_policy_info po ON po.id = f.policy_id
+				LEFT JOIN ACT_RU_EXECUTION RES ON CONCAT("hd_form_claim:",f.id )= RES.BUSINESS_KEY_
+				LEFT JOIN ACT_RU_TASK t ON t.PROC_INST_ID_ = RES.PROC_INST_ID_
+				LEFT JOIN js_sys_user uses ON t.ASSIGNEE_ = uses.user_code
+			]]>
+		where
+		f.form_type = '1'
+		<if test="htRenewForm.isRun !=null and htRenewForm.isRun !=''">
+			and f.is_run = '1'
+		</if>
+		<if test="htRenewForm.htFormInfo.id !=null and htRenewForm.htFormInfo.id !=''">
+			and f.id = #{htRenewForm.htFormInfo.id}
+		</if>
+		<if test="htRenewForm.policyInfo.strChannelName !=null and htRenewForm.policyInfo.strChannelName !=''">
+		and po.str_channel_name = #{htRenewForm.policyInfo.strChannelName}
+		</if>
+
+		<if test="htRenewForm.htFormInfo.formStatus !=null and htRenewForm.htFormInfo.formStatus !=''">
+			and f.form_status = #{htRenewForm.htFormInfo.formStatus}
+		</if>
+		<if test="htRenewForm.htFormInfo.manageStatus !=null and htRenewForm.htFormInfo.manageStatus !=''">
+			and f.manage_status = #{htRenewForm.htFormInfo.manageStatus}
+		</if>
+		<if test="htRenewForm.startDate !=null">
+			and f.update_date &gt;= #{htRenewForm.startDate,jdbcType=DATE}
+		</if>
+		<if test="htRenewForm.endDate !=null">
+			and f.update_date &lt;= #{htRenewForm.endDate,jdbcType=DATE}
+		</if>
+		<if test="page.orderBy == null">
+			order by f.update_date desc
+		</if>
+		<if test="page != null and page.orderBy != null and page.orderBy != ''">
+			ORDER BY ${page.orderBy}
+		</if>
+	</select>
+
+	<select id="findEndList" resultType="HtRenewEndForm">
+		SELECT i.id ,f.change_brand AS 'htRenewForm.htBrandInfo.id',f.change_model AS 'htRenewForm.htPhoneModelInfo.id',
+		bi.name AS 'htRenewForm.htBrandInfo.name',mi.model AS 'htRenewForm.htPhoneModelInfo.model',
+		f.purchase_price AS 'htRenewForm.purchasePrice',
+		f.phone_price AS 'htRenewForm.phonePrice',f.self_price AS 'htRenewForm.selfPrice',f.receive_address AS 'htRenewForm.receiveAddress',
+		f.receive_address_detail AS 'htRenewForm.receiveAddressDetail',i.form_status AS 'formStatus',
+		sf.user_name AS 'htClaimSettlementForm.userName',sf.phone AS 'htClaimSettlementForm.phone',
+		po.id AS 'policyInfo.id',po.channel_product_name AS 'policyInfo.channelProductName'
+		FROM ht_form_info i
+		LEFT JOIN ht_renew_form f ON i.id = f.form_id
+		LEFT JOIN ht_claim_settlement_form sf ON i.id = sf.form_id
+		LEFT JOIN ht_brand_info bi ON f.change_brand = bi.id
+		LEFT JOIN ht_phone_model_info mi ON f.change_model = mi.id
+		LEFT JOIN ht_policy_info po ON i.policy_id = po.id
+
+		<where>
+			i.form_type = #{formType}
+			<if test="id !=null and id !=''">
+				and i.id = #{id}
+			</if>
+			<if test="htRenewForm.htBrandInfo.id !=null and htRenewForm.htBrandInfo.id !=''">
+				and f.change_brand = #{htRenewForm.htBrandInfo.id}
+			</if>
+			<if test="htRenewForm.selfPrice !=null and htRenewForm.selfPrice !=''">
+				and f.self_price = #{htRenewForm.selfPrice}
+			</if>
+			<if test="formStatus !=null and formStatus !=''">
+				and i.form_status = #{formStatus}
+			</if>
+
+
+		</where>
+		<if test="page != null and page.orderBy != null and page.orderBy != ''">
+			ORDER BY ${page.orderBy}
+		</if>
+	</select>
+
+
+	<select id="findAllList" resultType="HtRenewEndForm">
+		SELECT f.form_id AS 'id',f.change_brand AS 'htRenewForm.htBrandInfo.id',f.change_model AS 'htRenewForm.htPhoneModelInfo.id',
+		bi.name AS 'htRenewForm.htBrandInfo.name',mi.model AS 'htRenewForm.htPhoneModelInfo.model',
+		sf.user_name AS 'htClaimSettlementForm.userName',sf.phone AS 'htClaimSettlementForm.phone',
+		po.id AS 'policyInfo.id',po.channel_product_name AS 'policyInfo.channelProductName',
+		po.str_channel_name AS 'policyInfo.strChannelName',f.contact_status AS 'htRenewForm.contactStatus',
+		i.manage_status AS 'manageStatus',
+		i.form_status AS 'formStatus',
+		t.reopen_type AS 'htFormOperation.reopenType',
+		f.update_date AS 'updateDate'
+		FROM ht_renew_form f
+		LEFT JOIN ht_form_info i ON i.id = f.form_id
+		LEFT JOIN ht_claim_settlement_form sf ON i.id = sf.form_id
+		LEFT JOIN ht_brand_info bi ON f.change_brand = bi.id
+		LEFT JOIN ht_phone_model_info mi ON f.change_model = mi.id
+		LEFT JOIN ht_policy_info po ON i.policy_id = po.id
+		LEFT JOIN (
+		SELECT b.reopen_type,b.form_id FROM
+		(SELECT * FROM ht_form_operation n ORDER BY n.create_date desc) b
+		WHERE b.operation_type = '3'
+		AND b.type = '1'
+		GROUP BY b.form_id
+		) t ON t.form_id = f.form_id
+		WHERE f.status = '0'
+		<if test="id !=null and id !=''">
+			and i.id = #{id}
+		</if>
+		<if test="htClaimSettlementForm.userName !=null and htClaimSettlementForm.userName !=''">
+			and sf.user_name = #{htClaimSettlementForm.userName}
+		</if>
+		<if test="isRun !=null and isRun !=''">
+			and i.is_run = #{isRun}
+		</if>
+		<if test="policyInfo.strChannelName !=null and policyInfo.strChannelName !=''">
+			and po.str_channel_name LIKE CONCAT('%',#{policyInfo.strChannelName},'%')
+		</if>
+		<if test="formStatus !=null and formStatus !=''">
+			and i.form_status = #{formStatus}
+		</if><if test="manageStatus !=null and manageStatus !=''">
+			and i.manage_status = #{manageStatus}
+		</if>
+		<if test="startDate !=null">
+			and f.update_date &gt;= #{startDate,jdbcType=DATE}
+		</if>
+		<if test="endDate !=null">
+			and f.update_date &lt;= #{endDate,jdbcType=DATE}
+		</if>
+		<if test="page.orderBy == null">
+			order by f.update_date desc
+		</if>
+		<if test="page != null and page.orderBy != null and page.orderBy != ''">
+			ORDER BY ${page.orderBy}
+		</if>
+	</select>
+
+
+</mapper>
